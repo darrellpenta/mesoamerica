@@ -1,0 +1,5740 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.45246,
+          20.813087
+        ]
+      },
+      "properties": {
+        "name": "Acanceh",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ACC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.3254,
+          19.90093
+        ]
+      },
+      "properties": {
+        "name": "Acanmul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ACN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.962406,
+          14.928033
+        ]
+      },
+      "properties": {
+        "name": "Acasaguastlan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, El Progreso",
+        "description": "Site with recorded Maya inscriptions. Also known as: San Agustin Acasaguastlan = Guaytan",
+        "alt_name": "San Agustin Acasaguastlan = Guaytan"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.939,
+          17.0755
+        ]
+      },
+      "properties": {
+        "name": "Acte",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: ActÃ© = Akte",
+        "acronym": "ACT",
+        "alt_name": "ActÃ© = Akte"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.58,
+          16.45
+        ]
+      },
+      "properties": {
+        "name": "Actun Balam",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.423006,
+          20.29668
+        ]
+      },
+      "properties": {
+        "name": "Actun Ch'on",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Actun Chon = Actun ChÃ³n",
+        "acronym": "ATC",
+        "alt_name": "Actun Chon = Actun ChÃ³n"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.08801,
+          17.03631
+        ]
+      },
+      "properties": {
+        "name": "Actun Chapat",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ACP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.057019,
+          16.197779
+        ]
+      },
+      "properties": {
+        "name": "Actun Dzib",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Toledo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Actun Tz'iib = Actun Tz'ib",
+        "alt_name": "Actun Tz'iib = Actun Tz'ib"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.67501,
+          17.18516
+        ]
+      },
+      "properties": {
+        "name": "Actun Neko",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.86394,
+          17.11356
+        ]
+      },
+      "properties": {
+        "name": "Actun Tunichil Muknal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Actun Tunichil Mucnal = Tunichil Muknal",
+        "acronym": "ATM",
+        "alt_name": "Actun Tunichil Mucnal = Tunichil Muknal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.140828,
+          17.107507
+        ]
+      },
+      "properties": {
+        "name": "Actuncan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Actun Can",
+        "acronym": "ATU",
+        "alt_name": "Actun Can"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.456318,
+          20.253525
+        ]
+      },
+      "properties": {
+        "name": "Acum",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.2025,
+          17.149
+        ]
+      },
+      "properties": {
+        "name": "Aguacate",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "AGA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.38333,
+          16.56167
+        ]
+      },
+      "properties": {
+        "name": "Aguas Calientes",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "AGC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.204668,
+          16.395316
+        ]
+      },
+      "properties": {
+        "name": "Aguateca",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "AGT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.84139,
+          18.415
+        ]
+      },
+      "properties": {
+        "name": "Akalpeten",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.30158,
+          20.947223
+        ]
+      },
+      "properties": {
+        "name": "Ake",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "AKE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.262739,
+          20.70775
+        ]
+      },
+      "properties": {
+        "name": "Aktun Xch'omil Ch'en",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Actun Xch'omil Ch'en = Actun Xch'omil = Xch'omil Ch'en",
+        "alt_name": "Actun Xch'omil Ch'en = Actun Xch'omil = Xch'omil Ch'en"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.47427,
+          18.21732
+        ]
+      },
+      "properties": {
+        "name": "Aktunkin",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.3198,
+          20.40088
+        ]
+      },
+      "properties": {
+        "name": "Akumal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Ocumal",
+        "acronym": "AKM",
+        "alt_name": "Ocumal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.640334,
+          20.152959
+        ]
+      },
+      "properties": {
+        "name": "Almuchil",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "AMC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.54472,
+          17.98889
+        ]
+      },
+      "properties": {
+        "name": "Altamira",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Alta Mira",
+        "acronym": "ALM",
+        "alt_name": "Alta Mira"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.40622,
+          17.99042
+        ]
+      },
+      "properties": {
+        "name": "Altar de los Reyes",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ALR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.525184,
+          16.473785
+        ]
+      },
+      "properties": {
+        "name": "Altar de Sacrificios",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ALS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.34706,
+          17.76394
+        ]
+      },
+      "properties": {
+        "name": "Altun Ha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Belize",
+        "description": "Site with recorded Maya inscriptions. Also known as: Altun-Ha",
+        "acronym": "ALH",
+        "alt_name": "Altun-Ha"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.229206,
+          17.290197
+        ]
+      },
+      "properties": {
+        "name": "Alvaro Obregon",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Tabasco",
+        "description": "Site with recorded Maya inscriptions. Also known as: Ãlvaro ObregÃ³n = Alvaro ObregÃ³n = ObregÃ³n",
+        "acronym": "OBR",
+        "alt_name": "Ãlvaro ObregÃ³n = Alvaro ObregÃ³n = ObregÃ³n"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.11464,
+          16.51845
+        ]
+      },
+      "properties": {
+        "name": "Anonal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ANL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.269997,
+          16.451927
+        ]
+      },
+      "properties": {
+        "name": "Arroyo de Piedra",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Arroyo Piedra = Dos Piedras",
+        "acronym": "ARP",
+        "alt_name": "Arroyo Piedra = Dos Piedras"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.625181,
+          17.403332
+        ]
+      },
+      "properties": {
+        "name": "Bajo de la Joventud",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Bajo Juventud",
+        "alt_name": "Bajo Juventud"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.009253,
+          17.198485
+        ]
+      },
+      "properties": {
+        "name": "Baking Pot",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BKP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.08178,
+          19.8415
+        ]
+      },
+      "properties": {
+        "name": "Bakna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BKN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.585,
+          17.88222
+        ]
+      },
+      "properties": {
+        "name": "Balakbal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BLK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.944885,
+          18.556518
+        ]
+      },
+      "properties": {
+        "name": "Balamku",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BAL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.07267,
+          17.06617
+        ]
+      },
+      "properties": {
+        "name": "Balamtun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BLM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.466701,
+          18.517393
+        ]
+      },
+      "properties": {
+        "name": "Becan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BCN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.986627,
+          17.943173
+        ]
+      },
+      "properties": {
+        "name": "Bedrock",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Orange Walk",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.76916,
+          17.28211
+        ]
+      },
+      "properties": {
+        "name": "Bejucal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BJC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.12175,
+          18.41861
+        ]
+      },
+      "properties": {
+        "name": "Bellote (Island)",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Tabasco",
+        "description": "Site with recorded Maya inscriptions. Also known as: El Bellote",
+        "acronym": "BLL",
+        "alt_name": "El Bellote"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.84117,
+          20.11
+        ]
+      },
+      "properties": {
+        "name": "Bilimkok",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BMK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.9167,
+          17.2167
+        ]
+      },
+      "properties": {
+        "name": "Blackman Eddy",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.89345,
+          17.867988
+        ]
+      },
+      "properties": {
+        "name": "Blue Creek",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Orange Walk",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.065,
+          16.704
+        ]
+      },
+      "properties": {
+        "name": "Bonampak",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "BPK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.12976,
+          17.13475
+        ]
+      },
+      "properties": {
+        "name": "Buenavista del Cayo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Buenavista de Cayo = Buenavista",
+        "acronym": "BVC",
+        "alt_name": "Buenavista de Cayo = Buenavista"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.073708,
+          17.145956
+        ]
+      },
+      "properties": {
+        "name": "Cahal Pech",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CLP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.810328,
+          18.105612
+        ]
+      },
+      "properties": {
+        "name": "Calakmul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CLK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.18561,
+          16.85975
+        ]
+      },
+      "properties": {
+        "name": "Canancax",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CNX"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.03842,
+          16.01469
+        ]
+      },
+      "properties": {
+        "name": "Cancuen",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CNC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.71156,
+          17.85172
+        ]
+      },
+      "properties": {
+        "name": "Candzibaantun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CDZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.97677,
+          20.24405
+        ]
+      },
+      "properties": {
+        "name": "Cap'eldzibtunichna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CDZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.117781,
+          16.763237
+        ]
+      },
+      "properties": {
+        "name": "Caracol",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CRC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.345,
+          20.17278
+        ]
+      },
+      "properties": {
+        "name": "Chacmultun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CHM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.52733,
+          18.72428
+        ]
+      },
+      "properties": {
+        "name": "Chactun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.49914,
+          17.91422
+        ]
+      },
+      "properties": {
+        "name": "Champerico",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CHP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.532619,
+          16.117476
+        ]
+      },
+      "properties": {
+        "name": "Chapatengo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.815833,
+          17.880833
+        ]
+      },
+      "properties": {
+        "name": "Cheyokolna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.003933,
+          16.702936
+        ]
+      },
+      "properties": {
+        "name": "Chiapa de Corzo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CPC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.486376,
+          18.506936
+        ]
+      },
+      "properties": {
+        "name": "Chicanna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CHC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.569032,
+          20.683121
+        ]
+      },
+      "properties": {
+        "name": "Chichen Itza",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CHN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.579593,
+          17.432832
+        ]
+      },
+      "properties": {
+        "name": "Chinikiha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Tabasco",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CNK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.78492,
+          16.12894
+        ]
+      },
+      "properties": {
+        "name": "Chinkultic",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CKL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.19963,
+          17.62419
+        ]
+      },
+      "properties": {
+        "name": "Chochkitam",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Tzotzkitam = Chochquitan = Chosquitan = BA-25",
+        "acronym": "CKM",
+        "alt_name": "Tzotzkitam = Chochquitan = Chosquitan = BA-25"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.21635,
+          17.16921
+        ]
+      },
+      "properties": {
+        "name": "Chunhuitz",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CNZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.259167,
+          17.3675
+        ]
+      },
+      "properties": {
+        "name": "CivalSibal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CVL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.732332,
+          20.49004
+        ]
+      },
+      "properties": {
+        "name": "CobaNohoch Mul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "COB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.201341,
+          18.28001
+        ]
+      },
+      "properties": {
+        "name": "Comalcalco",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Tabasco",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CML"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.141233,
+          14.837622
+        ]
+      },
+      "properties": {
+        "name": "Copan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Honduras, Copán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CPN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.00454,
+          16.89534
+        ]
+      },
+      "properties": {
+        "name": "Cueva de Galon",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Cueva de las Pinturas = Cobanerita",
+        "acronym": "CVG",
+        "alt_name": "Cueva de las Pinturas = Cobanerita"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.277256,
+          18.253351
+        ]
+      },
+      "properties": {
+        "name": "Cueva de la Virgencita",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.059982,
+          17.01805
+        ]
+      },
+      "properties": {
+        "name": "Cuychen",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CUY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.981059,
+          16.798796
+        ]
+      },
+      "properties": {
+        "name": "Dos Caobas",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "DCB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.29583,
+          16.44583
+        ]
+      },
+      "properties": {
+        "name": "Dos Pilas",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Dos Pozos",
+        "acronym": "DPL",
+        "alt_name": "Dos Pozos"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.910491,
+          19.693113
+        ]
+      },
+      "properties": {
+        "name": "Dzehkabtun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "DZK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.596431,
+          21.091357
+        ]
+      },
+      "properties": {
+        "name": "Dzibilchaltun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "DBC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.594867,
+          19.578209
+        ]
+      },
+      "properties": {
+        "name": "Dzibilnocac",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "DBN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.92994,
+          21.28144
+        ]
+      },
+      "properties": {
+        "name": "Dzilam",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Dzilam Gonzalez",
+        "acronym": "DZL",
+        "alt_name": "Dzilam Gonzalez"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.883333,
+          16.75
+        ]
+      },
+      "properties": {
+        "name": "Eduardo Quiroz Cave",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.230109,
+          19.597036
+        ]
+      },
+      "properties": {
+        "name": "Edzna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Etzna",
+        "acronym": "ETZ",
+        "alt_name": "Etzna"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.136312,
+          20.890692
+        ]
+      },
+      "properties": {
+        "name": "Ek Balam",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Ek' Balam = Ek' B'ahlam = Ekbalam",
+        "acronym": "EKB",
+        "alt_name": "Ek' Balam = Ek' B'ahlam = Ekbalam"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.80487,
+          15.103761
+        ]
+      },
+      "properties": {
+        "name": "Abra, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Honduras, Copán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ABR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.82478,
+          16.5344
+        ]
+      },
+      "properties": {
+        "name": "Amparo, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "AMP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.46,
+          16.77167
+        ]
+      },
+      "properties": {
+        "name": "Camalote Dolores, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: El Camalote = El Camalote/Dolores",
+        "acronym": "CAD",
+        "alt_name": "El Camalote = El Camalote/Dolores"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.21247,
+          17.06436
+        ]
+      },
+      "properties": {
+        "name": "Cayo, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CAY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.11824,
+          16.95522
+        ]
+      },
+      "properties": {
+        "name": "Chicozapote, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CZP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.560915,
+          16.813609
+        ]
+      },
+      "properties": {
+        "name": "Chilonche, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Chilonche",
+        "acronym": "CHT",
+        "alt_name": "Chilonche"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.574333,
+          16.642167
+        ]
+      },
+      "properties": {
+        "name": "Chorro, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: San Lucas = El Pato = La Armenia",
+        "acronym": "CRO",
+        "alt_name": "San Lucas = El Pato = La Armenia"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.562778,
+          17.273611
+        ]
+      },
+      "properties": {
+        "name": "Encanto, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ENC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.227732,
+          16.425734
+        ]
+      },
+      "properties": {
+        "name": "Excavado, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "EXC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.48325,
+          17.827556
+        ]
+      },
+      "properties": {
+        "name": "Gallinero, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "GAL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.266667,
+          17.981667
+        ]
+      },
+      "properties": {
+        "name": "Mameyal, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "MAM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.43583,
+          17.69057
+        ]
+      },
+      "properties": {
+        "name": "Manantial, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Corosal = Corozal = El Tablero = Ch'anal",
+        "acronym": "MAN",
+        "alt_name": "Corosal = Corozal = El Tablero = Ch'anal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.803912,
+          21.211155
+        ]
+      },
+      "properties": {
+        "name": "Meco, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "MEC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.92088,
+          17.756111
+        ]
+      },
+      "properties": {
+        "name": "Mirador, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "MRD"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.57001,
+          16.472121
+        ]
+      },
+      "properties": {
+        "name": "PabellÃ³n, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PAB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.337349,
+          18.077787
+        ]
+      },
+      "properties": {
+        "name": "Palmar, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PLM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.35578,
+          17.26606
+        ]
+      },
+      "properties": {
+        "name": "Peru, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Waka'",
+        "acronym": "PRU",
+        "alt_name": "Waka'"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.26079,
+          15.04745
+        ]
+      },
+      "properties": {
+        "name": "PortÃ³n, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Baja Verapaz",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PRT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.328758,
+          17.455145
+        ]
+      },
+      "properties": {
+        "name": "Porvenir, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PVR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.791041,
+          15.110079
+        ]
+      },
+      "properties": {
+        "name": "Puente, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Honduras, Copán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PUT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.449167,
+          16.844444
+        ]
+      },
+      "properties": {
+        "name": "Reinado, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Ni'tuunal",
+        "alt_name": "Ni'tuunal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.786667,
+          18.771389
+        ]
+      },
+      "properties": {
+        "name": "Resbalon, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "RSB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.261839,
+          17.523793
+        ]
+      },
+      "properties": {
+        "name": "Retiro, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "RTR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.7813,
+          21.061616
+        ]
+      },
+      "properties": {
+        "name": "Rey, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "REY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.105057,
+          20.147173
+        ]
+      },
+      "properties": {
+        "name": "Rosal, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "RSL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.78472,
+          19.49917
+        ]
+      },
+      "properties": {
+        "name": "TabasqueÃ±o, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TBS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.611667,
+          17.061667
+        ]
+      },
+      "properties": {
+        "name": "Temblor, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TMB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.569127,
+          17.686038
+        ]
+      },
+      "properties": {
+        "name": "Tortuguero, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Tabasco",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TRT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.86694,
+          18.32667
+        ]
+      },
+      "properties": {
+        "name": "Zacatal, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.64349,
+          17.02105
+        ]
+      },
+      "properties": {
+        "name": "Zapote, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ZAP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.82155,
+          17.23372
+        ]
+      },
+      "properties": {
+        "name": "Zotz, El",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: XinoxultÃºn = Dos Aguadas = El Diablo = El Sotz",
+        "acronym": "ZTZ",
+        "alt_name": "XinoxultÃºn = Dos Aguadas = El Diablo = El Sotz"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.891576,
+          16.930194
+        ]
+      },
+      "properties": {
+        "name": "Flores",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Noj Peten",
+        "acronym": "FLS",
+        "alt_name": "Noj Peten"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.692545,
+          20.805382
+        ]
+      },
+      "properties": {
+        "name": "Hacienda Hotzuc",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Hotzuc",
+        "acronym": "HTZ",
+        "alt_name": "Hotzuc"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.536227,
+          20.690021
+        ]
+      },
+      "properties": {
+        "name": "Halakal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "HLK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.48769,
+          19.54863
+        ]
+      },
+      "properties": {
+        "name": "Hobomo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xobomo",
+        "acronym": "HBM",
+        "alt_name": "Xobomo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.770851,
+          19.408825
+        ]
+      },
+      "properties": {
+        "name": "Hochob",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "HCH"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.27306,
+          17.31194
+        ]
+      },
+      "properties": {
+        "name": "Holmul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: La Riverita",
+        "acronym": "HLM",
+        "alt_name": "La Riverita"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.493056,
+          18.409722
+        ]
+      },
+      "properties": {
+        "name": "Hormiguero",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "HRM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.028333,
+          17.095278
+        ]
+      },
+      "properties": {
+        "name": "Huacutal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Aguacatal",
+        "acronym": "HUA",
+        "alt_name": "Aguacatal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.319565,
+          15.677686
+        ]
+      },
+      "properties": {
+        "name": "Hun Nal Ye",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Alta Verapaz",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.588195,
+          20.122131
+        ]
+      },
+      "properties": {
+        "name": "Huntichmul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Huntichmul I",
+        "acronym": "HNT",
+        "alt_name": "Huntichmul I"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.38127,
+          20.857557
+        ]
+      },
+      "properties": {
+        "name": "IchmulIchmul de Morley = Kumche",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ICL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.814352,
+          20.614311
+        ]
+      },
+      "properties": {
+        "name": "IkilIki",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "IKL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.466667,
+          16.566667
+        ]
+      },
+      "properties": {
+        "name": "Itzan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ITN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.7281,
+          20.01773
+        ]
+      },
+      "properties": {
+        "name": "Itzimte-Bolonchen",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Itzimte = Bolonchen",
+        "acronym": "ITB",
+        "alt_name": "Itzimte = Bolonchen"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.409568,
+          16.573896
+        ]
+      },
+      "properties": {
+        "name": "Ixkun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "IXK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.68702,
+          16.97843
+        ]
+      },
+      "properties": {
+        "name": "Ixlu",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "IXL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.395934,
+          16.510148
+        ]
+      },
+      "properties": {
+        "name": "Ixtonton",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "IXT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.478321,
+          16.472963
+        ]
+      },
+      "properties": {
+        "name": "Ixtutz",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "IXZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.486523,
+          20.209341
+        ]
+      },
+      "properties": {
+        "name": "Jaina",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Island of Jaina = Isla de Jaina",
+        "acronym": "JAI",
+        "alt_name": "Island of Jaina = Isla de Jaina"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.611944,
+          17.2825
+        ]
+      },
+      "properties": {
+        "name": "Jimbal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Bambunal",
+        "acronym": "JMB",
+        "alt_name": "Bambunal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.321555,
+          17.351417
+        ]
+      },
+      "properties": {
+        "name": "Jolja",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions. Also known as: Ixtelha = Cueva de Jolja = Joloniel = Jolja'",
+        "acronym": "JOL",
+        "alt_name": "Ixtelha = Cueva de Jolja = Joloniel = Jolja'"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.72972,
+          17.81611
+        ]
+      },
+      "properties": {
+        "name": "Ka'Kabish",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Orange Walk",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.647778,
+          20.248921
+        ]
+      },
+      "properties": {
+        "name": "Kabah",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "KAB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.54847,
+          14.631257
+        ]
+      },
+      "properties": {
+        "name": "Kaminaljuyu",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Guatemala",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "KJU"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.14098,
+          19.66817
+        ]
+      },
+      "properties": {
+        "name": "Kayal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "KYL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.366402,
+          16.822541
+        ]
+      },
+      "properties": {
+        "name": "Kendal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Stann Creek",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "KEN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.46698,
+          17.996041
+        ]
+      },
+      "properties": {
+        "name": "Kichpanha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Orange Walk",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "KIP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.245351,
+          17.69965
+        ]
+      },
+      "properties": {
+        "name": "Kinal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Las Ruinas",
+        "acronym": "KNL",
+        "alt_name": "Las Ruinas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.551165,
+          20.096485
+        ]
+      },
+      "properties": {
+        "name": "Kiuic",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Kiwick = Kewick",
+        "acronym": "KUC",
+        "alt_name": "Kiwick = Kewick"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.79079,
+          18.41966
+        ]
+      },
+      "properties": {
+        "name": "Kohunlich",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "KOH"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.42417,
+          16.52944
+        ]
+      },
+      "properties": {
+        "name": "Amelia, La",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "AML"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.372226,
+          17.519746
+        ]
+      },
+      "properties": {
+        "name": "Corona, La",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "CRN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.811744,
+          17.229708
+        ]
+      },
+      "properties": {
+        "name": "Florida",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: LaOcultun = La Florida-Namaan = El Naranjo-Frontera",
+        "acronym": "FLD",
+        "alt_name": "LaOcultun = La Florida-Namaan = El Naranjo-Frontera"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.28288,
+          17.59798
+        ]
+      },
+      "properties": {
+        "name": "Honradez",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: LaCorozalÃ³n",
+        "acronym": "HRZ",
+        "alt_name": "LaCorozalÃ³n"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.568789,
+          17.23769
+        ]
+      },
+      "properties": {
+        "name": "Joyanca, La",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "JOY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.227358,
+          16.037312
+        ]
+      },
+      "properties": {
+        "name": "Linterna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Alta Verapaz",
+        "description": "Site with recorded Maya inscriptions. Also known as: LaLa Linterna II",
+        "acronym": "LTN",
+        "alt_name": "LaLa Linterna II"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.41003,
+          17.11178
+        ]
+      },
+      "properties": {
+        "name": "Mar, LaRabbit Stone",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "MAR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.055833,
+          17.821111
+        ]
+      },
+      "properties": {
+        "name": "Milpa, La",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Orange Walk",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "MLP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.988333,
+          17.208333
+        ]
+      },
+      "properties": {
+        "name": "Montura",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: LaKinin = La Monturita",
+        "acronym": "MTR",
+        "alt_name": "LaKinin = La Monturita"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.612303,
+          18.219269
+        ]
+      },
+      "properties": {
+        "name": "MuÃ±eca",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: LaXamantun = El Mirador = La Gran Parada",
+        "acronym": "MCA",
+        "alt_name": "LaXamantun = El Mirador = La Gran Parada"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.47767,
+          17.01617
+        ]
+      },
+      "properties": {
+        "name": "Naya, La",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "NAY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.055417,
+          16.990144
+        ]
+      },
+      "properties": {
+        "name": "Pasadita, La",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PSD"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.394,
+          17.109333
+        ]
+      },
+      "properties": {
+        "name": "Pochitoca, La",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PCT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.201877,
+          16.799541
+        ]
+      },
+      "properties": {
+        "name": "Rejolla",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: LaLa Rejoya",
+        "acronym": "REJ",
+        "alt_name": "LaLa Rejoya"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.285166,
+          17.304166
+        ]
+      },
+      "properties": {
+        "name": "Sufricaya",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: LaEl GÃ¼iro",
+        "acronym": "SUF",
+        "alt_name": "LaEl GÃ¼iro"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.578687,
+          20.17246
+        ]
+      },
+      "properties": {
+        "name": "Labna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "LAB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.100146,
+          16.713757
+        ]
+      },
+      "properties": {
+        "name": "Lacanha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions. Also known as: Lacanja = Lacanha Kuna = Nak Balum Winik",
+        "acronym": "LAC",
+        "alt_name": "Lacanja = Lacanha Kuna = Nak Balum Winik"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.1855,
+          17.072833
+        ]
+      },
+      "properties": {
+        "name": "Laguna Perdida",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: IILaguna Perdida",
+        "acronym": "LGP",
+        "alt_name": "IILaguna Perdida"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.65299,
+          17.76505
+        ]
+      },
+      "properties": {
+        "name": "Lamanai",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Orange Walk",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "LMN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.089809,
+          16.981835
+        ]
+      },
+      "properties": {
+        "name": "Lashtunich",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Laxtunich = Lamb Site = Site R",
+        "acronym": "LTI",
+        "alt_name": "Laxtunich = Lamb Site = Site R"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.45597,
+          20.25353
+        ]
+      },
+      "properties": {
+        "name": "Loltun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "LOL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.20944,
+          17.98167
+        ]
+      },
+      "properties": {
+        "name": "Alacranes, Los",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ALC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.176769,
+          18.215362
+        ]
+      },
+      "properties": {
+        "name": "Angeles, Los",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Los Ãngeles",
+        "alt_name": "Los Ãngeles"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.959555,
+          16.282028
+        ]
+      },
+      "properties": {
+        "name": "Lubaantun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Toledo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "LBT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.865615,
+          16.325373
+        ]
+      },
+      "properties": {
+        "name": "Machaquila",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "MQL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.460594,
+          20.629652
+        ]
+      },
+      "properties": {
+        "name": "Mayapan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "MPN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.314546,
+          17.816304
+        ]
+      },
+      "properties": {
+        "name": "Monumento 104Aguada Cancuen",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.297661,
+          17.769255
+        ]
+      },
+      "properties": {
+        "name": "Moral",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Tabasco",
+        "description": "Site with recorded Maya inscriptions. Also known as: Morales = Balancan = Balancan-Morales = Moral-Reforma = Acalan",
+        "acronym": "MRL",
+        "alt_name": "Morales = Balancan = Balancan-Morales = Moral-Reforma = Acalan"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.90115,
+          17.026517
+        ]
+      },
+      "properties": {
+        "name": "Motul de San Jose",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Motul",
+        "acronym": "MTL",
+        "alt_name": "Motul"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.049382,
+          16.789217
+        ]
+      },
+      "properties": {
+        "name": "Mountain Cow",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Tzimin Tunich = Tzimin Kax / Haatzcab Ceel = Hatzcab Ceel = Hatzcap Ceel / Cahal Cunil / Cahal Pichik",
+        "acronym": "MCW",
+        "alt_name": "Tzimin Tunich = Tzimin Kax / Haatzcab Ceel = Hatzcab Ceel = Hatzcap Ceel / Cahal Cunil / Cahal Pichik"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.72847,
+          17.79405
+        ]
+      },
+      "properties": {
+        "name": "Naachtun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Infiernon = La Ruinosa",
+        "acronym": "NCT",
+        "alt_name": "Infiernon = La Ruinosa"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.085833,
+          18.297222
+        ]
+      },
+      "properties": {
+        "name": "Nadzbeiltun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.845908,
+          18.606966
+        ]
+      },
+      "properties": {
+        "name": "Nadzcaan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Nadz Caan = NadzcÃ an = Nadzca'an",
+        "acronym": "NDZ",
+        "alt_name": "Nadz Caan = NadzcÃ an = Nadzca'an"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.259722,
+          16.275556
+        ]
+      },
+      "properties": {
+        "name": "Naj Tunich",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Najtunich",
+        "acronym": "NTN",
+        "alt_name": "Najtunich"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.835159,
+          17.679911
+        ]
+      },
+      "properties": {
+        "name": "Nakbe",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Zacatal",
+        "acronym": "NKB",
+        "alt_name": "Zacatal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.40514,
+          17.175941
+        ]
+      },
+      "properties": {
+        "name": "Nakum",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Nacun = Nakcun = NakÃºm",
+        "acronym": "NKM",
+        "alt_name": "Nacun = Nakcun = NakÃºm"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.262047,
+          17.133511
+        ]
+      },
+      "properties": {
+        "name": "Naranjo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Manantial = Naranjo Sa'al",
+        "acronym": "NAR",
+        "alt_name": "Manantial = Naranjo Sa'al"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.824074,
+          16.321899
+        ]
+      },
+      "properties": {
+        "name": "Nim Li Punit",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Toledo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Nimli Punit",
+        "acronym": "NMP",
+        "alt_name": "Nimli Punit"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.584749,
+          18.217315
+        ]
+      },
+      "properties": {
+        "name": "Nohmul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Orange Walk",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "NHM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.70597,
+          20.31428
+        ]
+      },
+      "properties": {
+        "name": "Nohpat",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "NPT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.154667,
+          16.855075
+        ]
+      },
+      "properties": {
+        "name": "Ojo de Agua",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions. Also known as: Ojos de Agua",
+        "acronym": "OAG",
+        "alt_name": "Ojos de Agua"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.250915,
+          17.940167
+        ]
+      },
+      "properties": {
+        "name": "Ojo de Agua",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "OJO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.459167,
+          19.965988
+        ]
+      },
+      "properties": {
+        "name": "Okop",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Yo'okop = La Aguada",
+        "acronym": "OKP",
+        "alt_name": "Yo'okop = La Aguada"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.953492,
+          20.562377
+        ]
+      },
+      "properties": {
+        "name": "Oxkintok",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "OXK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.778381,
+          18.319755
+        ]
+      },
+      "properties": {
+        "name": "Oxpemul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "OXP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.99433,
+          17.09211
+        ]
+      },
+      "properties": {
+        "name": "Pacbitun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Pakbitun",
+        "acronym": "PAC",
+        "alt_name": "Pakbitun"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.046888,
+          17.483877
+        ]
+      },
+      "properties": {
+        "name": "Palenque",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions. Also known as: Otulum",
+        "acronym": "PAL",
+        "alt_name": "Otulum"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.308934,
+          18.425171
+        ]
+      },
+      "properties": {
+        "name": "PasiÃ³n del Cristo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PCR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.010762,
+          16.890805
+        ]
+      },
+      "properties": {
+        "name": "Pestac",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PST"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.260188,
+          17.168695
+        ]
+      },
+      "properties": {
+        "name": "Piedras Negras",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PNG"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.445515,
+          19.92694
+        ]
+      },
+      "properties": {
+        "name": "Pistolas",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PIT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.746794,
+          19.819349
+        ]
+      },
+      "properties": {
+        "name": "Pixoy",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PIX"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.279784,
+          16.784024
+        ]
+      },
+      "properties": {
+        "name": "Plan de AyutlaSak Tz'i'",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PAY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.08282,
+          20.61497
+        ]
+      },
+      "properties": {
+        "name": "Playa del Carmen",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PLC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.2663,
+          18.38375
+        ]
+      },
+      "properties": {
+        "name": "Pok",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.843382,
+          18.543005
+        ]
+      },
+      "properties": {
+        "name": "Pol Box",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.20833,
+          16.788889
+        ]
+      },
+      "properties": {
+        "name": "Polol",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "POL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.374721,
+          16.989846
+        ]
+      },
+      "properties": {
+        "name": "Pomona",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Stann Creek",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PMB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.570211,
+          17.484629
+        ]
+      },
+      "properties": {
+        "name": "Pomona",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Tabasco",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PMT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.22544,
+          20.11094
+        ]
+      },
+      "properties": {
+        "name": "Pomuch",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Pokmuch = Tixpokmuch",
+        "acronym": "PMC",
+        "alt_name": "Pokmuch = Tixpokmuch"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.852032,
+          17.15418
+        ]
+      },
+      "properties": {
+        "name": "Pook's Hill",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PKH"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.633618,
+          20.581488
+        ]
+      },
+      "properties": {
+        "name": "PopolaPusil",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "PPL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.41,
+          16.337587
+        ]
+      },
+      "properties": {
+        "name": "Poptun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "POP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.122,
+          16.92
+        ]
+      },
+      "properties": {
+        "name": "Pottery Hill Cave",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.67155,
+          16.559623
+        ]
+      },
+      "properties": {
+        "name": "Primera Seccion Benemerito de las Americas",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.1922,
+          16.43196
+        ]
+      },
+      "properties": {
+        "name": "Punta Chimino",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Punta de Chimino",
+        "acronym": "PCH",
+        "alt_name": "Punta de Chimino"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.195278,
+          16.1125
+        ]
+      },
+      "properties": {
+        "name": "Pusilha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Toledo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Chumucha",
+        "acronym": "PUS",
+        "alt_name": "Chumucha"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.04033,
+          15.27046
+        ]
+      },
+      "properties": {
+        "name": "Quirigua",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Izabal",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "QRG"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.138013,
+          20.580423
+        ]
+      },
+      "properties": {
+        "name": "Rancho Ina",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "RIN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.493202,
+          19.97902
+        ]
+      },
+      "properties": {
+        "name": "Rancho Perez",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.663026,
+          15.657987
+        ]
+      },
+      "properties": {
+        "name": "Ratinlixul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Alta Verapaz",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "RTN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.003077,
+          14.889382
+        ]
+      },
+      "properties": {
+        "name": "RÃ­o Amarillo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Honduras, Copán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "RAM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.280009,
+          17.779073
+        ]
+      },
+      "properties": {
+        "name": "RÃ­o AzulIxcanrÃ­o = Las Gardenias",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "RAZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.3797,
+          18.33961
+        ]
+      },
+      "properties": {
+        "name": "RÃ­o Bec",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Rio Bec = Ixtinta",
+        "acronym": "RBC",
+        "alt_name": "Rio Bec = Ixtinta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.661763,
+          18.117915
+        ]
+      },
+      "properties": {
+        "name": "RÃ­o Hondo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Orange Walk",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "RHD"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.569717,
+          20.20395
+        ]
+      },
+      "properties": {
+        "name": "Sabacche",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SAB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.617333,
+          20.105633
+        ]
+      },
+      "properties": {
+        "name": "Sabana Piletas",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Savana Xpilha = Chuhe",
+        "alt_name": "Savana Xpilha = Chuhe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.78753,
+          16.0803
+        ]
+      },
+      "properties": {
+        "name": "Sacchana",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions. Also known as: Quen Santo",
+        "acronym": "SCN",
+        "alt_name": "Quen Santo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.585726,
+          20.204335
+        ]
+      },
+      "properties": {
+        "name": "Sacnicte",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Sac NictÃ© = Sanacte = Sannacte",
+        "acronym": "SNT",
+        "alt_name": "Sac NictÃ© = Sanacte = Sannacte"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.291883,
+          16.538017
+        ]
+      },
+      "properties": {
+        "name": "Sacul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SCU"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.61709,
+          15.989219
+        ]
+      },
+      "properties": {
+        "name": "Salinas de los Nueve Cerros",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Alta Verapaz",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SAL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.403888,
+          17.548333
+        ]
+      },
+      "properties": {
+        "name": "San Bartolo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SBR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.521133,
+          17.016816
+        ]
+      },
+      "properties": {
+        "name": "San Clemente",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Chichantun",
+        "acronym": "SCM",
+        "alt_name": "Chichantun"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.469883,
+          16.91705
+        ]
+      },
+      "properties": {
+        "name": "San Diego",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SDG"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.291483,
+          19.857717
+        ]
+      },
+      "properties": {
+        "name": "San Diego Becanchen",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: San Diego de Becanchen = San Diego bei Becanchen = San Diego Buenavista",
+        "acronym": "SDB",
+        "alt_name": "San Diego de Becanchen = San Diego bei Becanchen = San Diego Buenavista"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.846276,
+          20.499973
+        ]
+      },
+      "properties": {
+        "name": "San Gervasio",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SNG"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.10644,
+          20.17066
+        ]
+      },
+      "properties": {
+        "name": "San JoaquÃ­n",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: San JoaquÃ­n I",
+        "acronym": "SJQ",
+        "alt_name": "San JoaquÃ­n I"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.09892,
+          20.17343
+        ]
+      },
+      "properties": {
+        "name": "San JoaquÃ­n II",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.5475,
+          18.382333
+        ]
+      },
+      "properties": {
+        "name": "San Lorenzo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SLM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.811,
+          20.20283
+        ]
+      },
+      "properties": {
+        "name": "San Simon Pueblo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: San Simon = Hacienda San Simon",
+        "acronym": "SSM",
+        "alt_name": "San Simon = Hacienda San Simon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.11183,
+          20.70333
+        ]
+      },
+      "properties": {
+        "name": "Santa BÃ¡rbara",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Santa BÃ¡rbara, Campeche = Santa Barbara (Paraiso)  = Santa Barbara (YucatÃ¡n) [Hacienda Paraiso] = El ParaÃ­so =  Hunanhil",
+        "acronym": "SBB",
+        "alt_name": "Santa BÃ¡rbara, Campeche = Santa Barbara (Paraiso)  = Santa Barbara (YucatÃ¡n) [Hacienda Paraiso] = El ParaÃ­so =  Hunanhil"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.414444,
+          17.625003
+        ]
+      },
+      "properties": {
+        "name": "Santa Elena Balancan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Tabasco",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SEB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.739021,
+          16.587477
+        ]
+      },
+      "properties": {
+        "name": "Santa Elena Poco Uinic",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions. Also known as: Poco Uinic",
+        "acronym": "SEP",
+        "alt_name": "Poco Uinic"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.395094,
+          18.40232
+        ]
+      },
+      "properties": {
+        "name": "Santa Rita Corozal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Corozal",
+        "description": "Site with recorded Maya inscriptions. Also known as: Santa Rita",
+        "acronym": "SRC",
+        "alt_name": "Santa Rita"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.598232,
+          19.77258
+        ]
+      },
+      "properties": {
+        "name": "Santa Rosa Xtampak",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Santa Rosa Xlabpak",
+        "acronym": "SRX",
+        "alt_name": "Santa Rosa Xlabpak"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.651939,
+          20.177985
+        ]
+      },
+      "properties": {
+        "name": "Sayil",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SAY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.061565,
+          16.513575
+        ]
+      },
+      "properties": {
+        "name": "Seibal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: El Ceibal = Sactankiki = Saxtanquiqui",
+        "acronym": "SBL",
+        "alt_name": "El Ceibal = Sactankiki = Saxtanquiqui"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.171916,
+          20.489802
+        ]
+      },
+      "properties": {
+        "name": "Siho",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SHO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.888846,
+          20.220726
+        ]
+      },
+      "properties": {
+        "name": "SisilhaSisila",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "SIS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.733077,
+          14.634945
+        ]
+      },
+      "properties": {
+        "name": "Tak'alik Ab'aj",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Retalhuleu",
+        "description": "Site with recorded Maya inscriptions. Also known as: Abaj Takalik = Takalik Abaj = San Isidro Piedra Parada",
+        "acronym": "ABJ",
+        "alt_name": "Abaj Takalik = Takalik Abaj = San Isidro Piedra Parada"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.238642,
+          16.451161
+        ]
+      },
+      "properties": {
+        "name": "Tamarindito",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TAM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.41432,
+          20.24628
+        ]
+      },
+      "properties": {
+        "name": "Tancah",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TAN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.8969,
+          16.93762
+        ]
+      },
+      "properties": {
+        "name": "Tayasal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: TaizÃ¡ = TaitzÃ¡ = Noj Peten",
+        "acronym": "TSL",
+        "alt_name": "TaizÃ¡ = TaitzÃ¡ = Noj Peten"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.40335,
+          20.287296
+        ]
+      },
+      "properties": {
+        "name": "Techoh",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Tecoh",
+        "acronym": "TCH",
+        "alt_name": "Tecoh"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.089809,
+          16.981835
+        ]
+      },
+      "properties": {
+        "name": "Tecolote",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.623542,
+          17.222049
+        ]
+      },
+      "properties": {
+        "name": "Tikal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Mutul",
+        "acronym": "TIK",
+        "alt_name": "Mutul"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.996414,
+          17.580455
+        ]
+      },
+      "properties": {
+        "name": "Tintal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TNT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.8,
+          17.1
+        ]
+      },
+      "properties": {
+        "name": "Tipan Chen Uitz",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TCU"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.875133,
+          19.770274
+        ]
+      },
+      "properties": {
+        "name": "Tohcok",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TCK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.7652,
+          16.05601
+        ]
+      },
+      "properties": {
+        "name": "Tonala",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TNL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.00967,
+          16.90122
+        ]
+      },
+      "properties": {
+        "name": "Tonina",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions. Also known as: Aharicab = TulhÃ¡ = Tonila = Ocosingo = San Carlos",
+        "acronym": "TNA",
+        "alt_name": "Aharicab = TulhÃ¡ = Tonila = Ocosingo = San Carlos"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.424462,
+          17.062237
+        ]
+      },
+      "properties": {
+        "name": "Topoxte",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TPX"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.0529,
+          16.196947
+        ]
+      },
+      "properties": {
+        "name": "Tres Islas",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TRS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.42889,
+          20.21472
+        ]
+      },
+      "properties": {
+        "name": "Tulum",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TUL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.70823,
+          20.07128
+        ]
+      },
+      "properties": {
+        "name": "Tunkuyi",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TUN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.43444,
+          17.69056
+        ]
+      },
+      "properties": {
+        "name": "Tz'ibatnah",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.75866,
+          18.63841
+        ]
+      },
+      "properties": {
+        "name": "Tzibanche",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Dzibanche",
+        "acronym": "TZB",
+        "alt_name": "Dzibanche"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.799744,
+          16.393231
+        ]
+      },
+      "properties": {
+        "name": "Tzimin Che",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Toledo",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.97303,
+          20.20572
+        ]
+      },
+      "properties": {
+        "name": "Tzocchen",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Dzocchen = Tzochcen = Dzotchen = Tzotchen",
+        "acronym": "TZC",
+        "alt_name": "Dzocchen = Tzochcen = Dzotchen = Tzotchen"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.82075,
+          19.969483
+        ]
+      },
+      "properties": {
+        "name": "Tzum",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "TZM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.629533,
+          17.391196
+        ]
+      },
+      "properties": {
+        "name": "Uaxactun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Bambonal = San Leandro",
+        "acronym": "UAX",
+        "alt_name": "Bambonal = San Leandro"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.477431,
+          20.454841
+        ]
+      },
+      "properties": {
+        "name": "Uaymil",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Huaymil = Guaymil = Isla Uaymil = Uaymitun",
+        "acronym": "UYM",
+        "alt_name": "Huaymil = Guaymil = Isla Uaymil = Uaymitun"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.3625,
+          16.8405
+        ]
+      },
+      "properties": {
+        "name": "Ucanal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Yokanal",
+        "acronym": "UCN",
+        "alt_name": "Yokanal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.310834,
+          20.501666
+        ]
+      },
+      "properties": {
+        "name": "Ukum",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "UKM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.579932,
+          17.185279
+        ]
+      },
+      "properties": {
+        "name": "Uolantun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "UOL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.068708,
+          16.240205
+        ]
+      },
+      "properties": {
+        "name": "Uxbenka",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Toledo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "UXB"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.769316,
+          20.360732
+        ]
+      },
+      "properties": {
+        "name": "Uxmal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Ushmal",
+        "acronym": "UXM",
+        "alt_name": "Ushmal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.985,
+          17.85611
+        ]
+      },
+      "properties": {
+        "name": "Uxul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "UXL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.251,
+          17.426
+        ]
+      },
+      "properties": {
+        "name": "Witzna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Huitzna",
+        "acronym": "WIT",
+        "alt_name": "Huitzna"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.439167,
+          20.0455
+        ]
+      },
+      "properties": {
+        "name": "Xcakochna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.010194,
+          20.172139
+        ]
+      },
+      "properties": {
+        "name": "Xcalumkin",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Holactun = Yokactun",
+        "acronym": "XLM",
+        "alt_name": "Holactun = Yokactun"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.35394,
+          21.313471
+        ]
+      },
+      "properties": {
+        "name": "Xcambo",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XCM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.508487,
+          20.159403
+        ]
+      },
+      "properties": {
+        "name": "XcanahelebX",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Cana Heleb",
+        "acronym": "XCH",
+        "alt_name": "Cana Heleb"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.294631,
+          20.188891
+        ]
+      },
+      "properties": {
+        "name": "Xcanlol",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: X'canlol = Flor de Mayo",
+        "alt_name": "X'canlol = Flor de Mayo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.119497,
+          20.579287
+        ]
+      },
+      "properties": {
+        "name": "Xcaret",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XCT"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.02412,
+          20.05235
+        ]
+      },
+      "properties": {
+        "name": "Xchan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XCN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.103217,
+          20.065883
+        ]
+      },
+      "properties": {
+        "name": "Xcocha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XCA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.808182,
+          20.182862
+        ]
+      },
+      "properties": {
+        "name": "Xcochkax",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xkochkax",
+        "acronym": "XCK",
+        "alt_name": "Xkochkax"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.53465,
+          20.300317
+        ]
+      },
+      "properties": {
+        "name": "Xcorralche",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xcoralche = Pich Corralche = X Corralche = Tabi",
+        "acronym": "XCR",
+        "alt_name": "Xcoralche = Pich Corralche = X Corralche = Tabi"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.991928,
+          20.191565
+        ]
+      },
+      "properties": {
+        "name": "Xcucsuc",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xcuksuc",
+        "acronym": "XCU",
+        "alt_name": "Xcuksuc"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.829278,
+          20.186135
+        ]
+      },
+      "properties": {
+        "name": "Xculoc",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XCL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.366394,
+          20.319208
+        ]
+      },
+      "properties": {
+        "name": "Xelha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xel-ha",
+        "acronym": "XLH",
+        "alt_name": "Xel-ha"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.051777,
+          20.199658
+        ]
+      },
+      "properties": {
+        "name": "Xkalachetzimin",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xcalachetzimin",
+        "acronym": "XKA",
+        "alt_name": "Xcalachetzimin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.525174,
+          19.887364
+        ]
+      },
+      "properties": {
+        "name": "Xkichmook",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xkichmol",
+        "acronym": "XKM",
+        "alt_name": "Xkichmol"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.828531,
+          20.299769
+        ]
+      },
+      "properties": {
+        "name": "Xkipche",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Cibche = Pozo Cibiche",
+        "alt_name": "Cibche = Pozo Cibiche"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.399167,
+          20.164667
+        ]
+      },
+      "properties": {
+        "name": "Xkombec",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xcombec = Xumbec",
+        "acronym": "XKB",
+        "alt_name": "Xcombec = Xumbec"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.408333,
+          20.240566
+        ]
+      },
+      "properties": {
+        "name": "Xkukican",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: X-Kukican",
+        "acronym": "XKK",
+        "alt_name": "X-Kukican"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.236666,
+          17.517222
+        ]
+      },
+      "properties": {
+        "name": "Xmakabatun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xmacabatun = Piedras Negras",
+        "acronym": "XMK",
+        "alt_name": "Xmacabatun = Piedras Negras"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.9035,
+          16.2795
+        ]
+      },
+      "properties": {
+        "name": "Xnaheb",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Toledo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xnaheb Ahse Enel",
+        "acronym": "XNH",
+        "alt_name": "Xnaheb Ahse Enel"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.681029,
+          20.295903
+        ]
+      },
+      "properties": {
+        "name": "Xnucbec",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: San Andres",
+        "acronym": "XNC",
+        "alt_name": "San Andres"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.405,
+          18.50817
+        ]
+      },
+      "properties": {
+        "name": "Xpuhil II",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xpujil",
+        "acronym": "XPH",
+        "alt_name": "Xpujil"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.80525,
+          19.529863
+        ]
+      },
+      "properties": {
+        "name": "Xpulyaxche",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions. Also known as: Pakchen",
+        "acronym": "XPL",
+        "alt_name": "Pakchen"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.534833,
+          19.975333
+        ]
+      },
+      "properties": {
+        "name": "Xtablakal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Xtabla",
+        "acronym": "XTB",
+        "alt_name": "Xtabla"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.77589,
+          20.47592
+        ]
+      },
+      "properties": {
+        "name": "Xtelhu",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XTH"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.139515,
+          20.237426
+        ]
+      },
+      "properties": {
+        "name": "Xuelen",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XUE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.463532,
+          20.09773
+        ]
+      },
+      "properties": {
+        "name": "Xul",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XLY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.459773,
+          18.573087
+        ]
+      },
+      "properties": {
+        "name": "Xulha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Quintana Roo",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.313239,
+          17.53075
+        ]
+      },
+      "properties": {
+        "name": "Xultun",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: El Delirio = Los Tambos",
+        "acronym": "XUL",
+        "alt_name": "El Delirio = Los Tambos"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.14167,
+          17.08944
+        ]
+      },
+      "properties": {
+        "name": "Xunantunich",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Belize, Cayo",
+        "description": "Site with recorded Maya inscriptions. Also known as: Benque Viejo = Mount Maloney",
+        "acronym": "XUN",
+        "alt_name": "Benque Viejo = Mount Maloney"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.946583,
+          17.442083
+        ]
+      },
+      "properties": {
+        "name": "Xupa",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XUP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.531279,
+          16.190937
+        ]
+      },
+      "properties": {
+        "name": "Xutilha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "XTL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.07153,
+          20.19178
+        ]
+      },
+      "properties": {
+        "name": "Yakalmai",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "YAK"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.500367,
+          20.182217
+        ]
+      },
+      "properties": {
+        "name": "Yakalxiu",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "YKL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.37647,
+          16.85436
+        ]
+      },
+      "properties": {
+        "name": "Yaltutu",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Yaltatu = Yaltitud",
+        "acronym": "YLT",
+        "alt_name": "Yaltatu = Yaltitud"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.71365,
+          20.12437
+        ]
+      },
+      "properties": {
+        "name": "Yaxche Xlabpak",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "YXX"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.964698,
+          16.899712
+        ]
+      },
+      "properties": {
+        "name": "Yaxchilan",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Chiapas",
+        "description": "Site with recorded Maya inscriptions. Also known as: Menche = Menche Tinamit = La Ville Lorillard = Lorillard City = Lorillard Town = Usumacinta",
+        "acronym": "YAX",
+        "alt_name": "Menche = Menche Tinamit = La Ville Lorillard = Lorillard City = Lorillard Town = Usumacinta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.703474,
+          20.756915
+        ]
+      },
+      "properties": {
+        "name": "Yaxcopoil",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "YXP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.40248,
+          17.07588
+        ]
+      },
+      "properties": {
+        "name": "Yaxha",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: YaxhÃ¡ = YaxjÃ¡ = Ya'axjÃ¡",
+        "acronym": "YXH",
+        "alt_name": "YaxhÃ¡ = YaxjÃ¡ = Ya'axjÃ¡"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.48589,
+          20.241896
+        ]
+      },
+      "properties": {
+        "name": "Yaxhom",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions. Also known as: Yaaxhom",
+        "acronym": "YXM",
+        "alt_name": "Yaaxhom"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.662541,
+          20.541596
+        ]
+      },
+      "properties": {
+        "name": "Yaxuna",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "YXN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.07405,
+          20.17629
+        ]
+      },
+      "properties": {
+        "name": "Yohom",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Campeche",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "YOH"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.570021,
+          20.615642
+        ]
+      },
+      "properties": {
+        "name": "YulaUla",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Mexiko, Yucatán",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "YUL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.66114,
+          16.98846
+        ]
+      },
+      "properties": {
+        "name": "Zacpeten",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Sacpeten = Sakpeten",
+        "acronym": "ZPT",
+        "alt_name": "Sacpeten = Sakpeten"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.49275,
+          15.33379
+        ]
+      },
+      "properties": {
+        "name": "Zaculeu",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Huehuetenango",
+        "description": "Site with recorded Maya inscriptions.",
+        "acronym": "ZAC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.309259,
+          17.009164
+        ]
+      },
+      "properties": {
+        "name": "Zapote Bobal",
+        "culture": "Maya",
+        "layer": "maya-inscriptions",
+        "country": "Guatemala, Petén",
+        "description": "Site with recorded Maya inscriptions. Also known as: Hixwitz = Hix Witz",
+        "acronym": "ZPB",
+        "alt_name": "Hixwitz = Hix Witz"
+      }
+    }
+  ]
+}
