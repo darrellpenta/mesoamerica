@@ -1,0 +1,565 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1277007522943,
+          19.8094759464517
+        ]
+      },
+      "properties": {
+        "name": "Citlaltepec",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.0909234288363,
+          19.7935473225302
+        ]
+      },
+      "properties": {
+        "name": "Zumpango",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.0650811331877,
+          19.7338399942204
+        ]
+      },
+      "properties": {
+        "name": "Xaltocan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1982758021865,
+          19.7318520140593
+        ]
+      },
+      "properties": {
+        "name": "Tepotzotlan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1833659509778,
+          19.6781765506074
+        ]
+      },
+      "properties": {
+        "name": "Cuauhtitlan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1575222088828,
+          19.6354349771426
+        ]
+      },
+      "properties": {
+        "name": "Tultitlan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.0486717775804,
+          19.5869396221659
+        ]
+      },
+      "properties": {
+        "name": "Ecatepec",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1802735871563,
+          19.5629989354526
+        ]
+      },
+      "properties": {
+        "name": "Tenayuca",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1952938319448,
+          19.4923004082373
+        ]
+      },
+      "properties": {
+        "name": "Alzcapotzalco",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1933058517836,
+          19.4674506562229
+        ]
+      },
+      "properties": {
+        "name": "Tlacopan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1972818121059,
+          19.4177511530933
+        ]
+      },
+      "properties": {
+        "name": "Tacubaya",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.0123996598164,
+          19.6394109374648
+        ]
+      },
+      "properties": {
+        "name": "Chiconauhatla",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9736340475732,
+          19.6374229573037
+        ]
+      },
+      "properties": {
+        "name": "Tepexpan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9795979880566,
+          19.6175431565915
+        ]
+      },
+      "properties": {
+        "name": "Tequizistlan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9462272369973,
+          19.6381475842437
+        ]
+      },
+      "properties": {
+        "name": "Acolman",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9487463567589,
+          19.6171549183649
+        ]
+      },
+      "properties": {
+        "name": "Tezoyuca",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.8941654270927,
+          19.5995210791345
+        ]
+      },
+      "properties": {
+        "name": "Tepetlaoztoc",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9403492905873,
+          19.4156253302448
+        ]
+      },
+      "properties": {
+        "name": "Chimalhuacan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9101198525491,
+          19.4584503670908
+        ]
+      },
+      "properties": {
+        "name": "Coatlinchan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9052402975017,
+          19.5123172161667
+        ]
+      },
+      "properties": {
+        "name": "Huexotla",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9236212773001,
+          19.573794319952
+        ]
+      },
+      "properties": {
+        "name": "Chiauhla",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9175581991515,
+          19.5330850785136
+        ]
+      },
+      "properties": {
+        "name": "Texcoco",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.183467498826,
+          19.3459957992667
+        ]
+      },
+      "properties": {
+        "name": "Tenayuca",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.0951197836511,
+          19.3589881106129
+        ]
+      },
+      "properties": {
+        "name": "Ixtapalapa",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1557505687337,
+          19.3459957992667
+        ]
+      },
+      "properties": {
+        "name": "Huitzilopochco",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1089782482475,
+          19.3364681045194
+        ]
+      },
+      "properties": {
+        "name": "Colhuacan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1722074957793,
+          19.2819003975853
+        ]
+      },
+      "properties": {
+        "name": "Tlalpan",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1021703605737,
+          19.237213255987
+        ]
+      },
+      "properties": {
+        "name": "Xochimilco",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9270858938988,
+          19.3052865578284
+        ]
+      },
+      "properties": {
+        "name": "Ixtapaluca",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9362383923878,
+          19.2446557727458
+        ]
+      },
+      "properties": {
+        "name": "Chalco",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9712597510367,
+          19.2559157757925
+        ]
+      },
+      "properties": {
+        "name": "Xico",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9898241826399,
+          19.2045588338232
+        ]
+      },
+      "properties": {
+        "name": "Mixquic",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.9253535855995,
+          19.1441819003745
+        ]
+      },
+      "properties": {
+        "name": "Tenango",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.131498254341,
+          19.4412727467399
+        ]
+      },
+      "properties": {
+        "name": "TENOCHTITLAN",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.1768055540023,
+          19.8500404413291
+        ]
+      },
+      "properties": {
+        "name": "Huehuetoca",
+        "culture": "Aztec (Mexica)",
+        "layer": "aztec-villages",
+        "source": "ArcGIS / GIS for Humanities, San Antonio University"
+      }
+    }
+  ]
+}
