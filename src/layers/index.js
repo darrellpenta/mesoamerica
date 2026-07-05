@@ -8,6 +8,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/sites.geojson',
     visible: true,
     description: 'Known sites sourced from Pleiades and Wikidata',
+    sourceUrl: 'https://pleiades.stoa.org/',
   },
   {
     id: 'maya-inscriptions',
@@ -17,6 +18,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/maya-inscriptions.geojson',
     visible: false,
     description: '314 sites with recorded Maya inscriptions (Kaggle / ujwalkandi)',
+    sourceUrl: 'https://www.kaggle.com/datasets/ujwalkandi/maya-inscriptions',
   },
   {
     id: 'inah-archaeological-zones',
@@ -26,6 +28,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/inah-archaeological-zones.geojson',
     visible: false,
     description: '494 officially open pre-Hispanic zones in Mexico (INAH / Wikidata)',
+    sourceUrl: 'https://www.wikidata.org/',
   },
   {
     id: 'unesco-world-heritage',
@@ -35,6 +38,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/unesco-world-heritage.geojson',
     visible: false,
     description: '50 WHC sites in Mesoamerica — UNESCO DataHub (open access)',
+    sourceUrl: 'https://whc.unesco.org/en/list/',
   },
   {
     id: 'lidar-surveys-opentopography',
@@ -44,6 +48,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/lidar-surveys-opentopography.geojson',
     visible: false,
     description: '4 publicly archived archaeological LiDAR surveys — OpenTopography / NSF (CC-BY)',
+    sourceUrl: 'https://opentopography.org/catalog',
   },
 
   // ── Empires & Culture ────────────────────────────────────────────────────
@@ -55,6 +60,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/classical-empires.geojson',
     visible: false,
     description: 'Teotihuacan, Zapotec, Maya and others (~100 BCE–900 CE)',
+    sourceUrl: null,
   },
   {
     id: 'postclassical-empires',
@@ -64,6 +70,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/postclassical-empires.geojson',
     visible: false,
     description: 'Aztec, Tlaxcalan, Zapotec and others (~900–1521 CE)',
+    sourceUrl: null,
   },
   {
     id: 'maya-culture-areas',
@@ -73,6 +80,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/maya-culture-areas.geojson',
     visible: false,
     description: '39 Maya sub-regional culture zones',
+    sourceUrl: null,
   },
   {
     id: 'mayan-sites',
@@ -82,6 +90,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/mayan-sites.geojson',
     visible: false,
     description: '55 Maya sites (GIS for Humanities, San Antonio University)',
+    sourceUrl: null,
   },
   {
     id: 'aztec-villages',
@@ -91,6 +100,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/aztec-villages.geojson',
     visible: false,
     description: '35 Aztec villages near Tenochtitlan (GIS for Humanities)',
+    sourceUrl: null,
   },
 
   // ── Languages ────────────────────────────────────────────────────────────
@@ -103,6 +113,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/language-families.geojson',
     visible: false,
     description: '26 families — Asher & Moseley 2007, Atlas of the World\'s Languages (CC BY 4.0)',
+    sourceUrl: 'https://github.com/glottography/asher2007world',
   },
   {
     id: 'language-dialects',
@@ -113,6 +124,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/language-dialects.geojson',
     visible: false,
     description: '99 dialect/language polygons from Map 10 — Asher & Moseley 2007, Atlas of the World\'s Languages (CC BY 4.0)',
+    sourceUrl: 'https://github.com/glottography/asher2007world',
   },
 
   // ── LIDAR & Settlement ───────────────────────────────────────────────────
@@ -124,6 +136,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/lidar-coverage.geojson',
     visible: false,
     description: '99 LIDAR survey footprints across the Maya area, 2009–2019 (MarigisLab / MARI at Tulane University)',
+    sourceUrl: 'https://marigis.tulane.edu/',
   },
   {
     id: 'lidar-coverage-2022',
@@ -133,6 +146,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/lidar-coverage-2022.geojson',
     visible: false,
     description: '105 LIDAR survey footprints across the Maya area through 2022 — ancientmayasettlement.com / MARI at Tulane University',
+    sourceUrl: 'https://www.ancientmayasettlement.com/',
   },
   {
     id: 'maya-settlement-groups',
@@ -142,6 +156,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/maya-settlement-groups.geojson',
     visible: false,
     description: '1,499 large & medium settlement group polygons from Tikal, Holmul, La Corona, Chactun, G-LiHT & EREDD LIDAR surveys — Estrada-Belli et al., PACUNAM / NASA G-LiHT (MarigisLab / MARI at Tulane University)',
+    sourceUrl: 'https://marigis.tulane.edu/',
   },
   {
     id: 'pacunam-survey-units',
@@ -151,6 +166,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/pacunam-survey-units.geojson',
     visible: false,
     description: '12 PACUNAM LiDAR Initiative survey unit polygons — Estrada-Belli et al. (MarigisLab / MARI at Tulane University)',
+    sourceUrl: 'https://marigis.tulane.edu/',
   },
   {
     id: 'la-milpa',
@@ -160,6 +176,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/la-milpa.geojson',
     visible: false,
     description: '~10,000 structures, berms & survey boundaries across 4 field campaigns (LMBU, Scarborough, Kunen, Robichaux) — Boston University / Tulane University La Milpa project (MarigisLab / MARI at Tulane University)',
+    sourceUrl: 'https://marigis.tulane.edu/',
   },
   {
     id: 'pulltrouser-swamp',
@@ -169,6 +186,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/pulltrouser-swamp.geojson',
     visible: false,
     description: '525 structure polygons + 13 survey areas, Pulltrouser Swamp, Belize — ancientmayasettlement.com / MARI at Tulane University',
+    sourceUrl: 'https://www.ancientmayasettlement.com/',
   },
   {
     id: 'pulltrouser-swamp-points',
@@ -178,6 +196,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/pulltrouser-swamp-points.geojson',
     visible: false,
     description: '399 structure & platform points, Pulltrouser Swamp, Belize — ancientmayasettlement.com / MARI at Tulane University',
+    sourceUrl: 'https://www.ancientmayasettlement.com/',
   },
   {
     id: 'becan',
@@ -187,6 +206,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/becan.geojson',
     visible: false,
     description: '2,295 structure polygons + survey area & blocks, Becan, Campeche, Mexico — ancientmayasettlement.com / MARI at Tulane University',
+    sourceUrl: 'https://www.ancientmayasettlement.com/',
   },
   {
     id: 'becan-points',
@@ -196,6 +216,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/becan-points.geojson',
     visible: false,
     description: '1,270 structure & platform points, Becan, Campeche, Mexico — ancientmayasettlement.com / MARI at Tulane University',
+    sourceUrl: 'https://www.ancientmayasettlement.com/',
   },
 
   // ── Physical Geography ───────────────────────────────────────────────────
@@ -207,6 +228,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/volcanoes.geojson',
     visible: false,
     description: '87 Holocene volcanoes — Smithsonian Global Volcanism Program (public domain)',
+    sourceUrl: 'https://volcano.si.edu/volcanolist_countries.cfm',
   },
   {
     id: 'faults-central-america',
@@ -217,6 +239,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/faults-central-america.geojson',
     visible: false,
     description: '180 fault traces with slip rates and kinematics — CCAF-DB, GEM Foundation (CC-BY 4.0)',
+    sourceUrl: 'https://github.com/GEMScienceTools/gem-global-active-faults',
   },
   {
     id: 'faults-mexico',
@@ -227,6 +250,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/faults-mexico.geojson',
     visible: false,
     description: '715 fault traces — GEM Global Active Faults, Mexico portion (CC-BY-SA 4.0)',
+    sourceUrl: 'https://github.com/GEMScienceTools/gem-global-active-faults',
   },
   {
     id: 'earthquakes',
@@ -236,6 +260,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/earthquakes.geojson',
     visible: false,
     description: '2,000 largest M5.0+ earthquakes — USGS Earthquake Catalog (public domain)',
+    sourceUrl: 'https://earthquake.usgs.gov/earthquakes/search/',
   },
   {
     id: 'major-rivers',
@@ -246,6 +271,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/major-rivers.geojson',
     visible: false,
     description: '21,531 river segments (Strahler order ≥5) — HydroRIVERS v10, WWF / USGS HydroSHEDS (CC-BY 4.0)',
+    sourceUrl: 'https://www.hydrosheds.org/products/hydrorivers',
   },
   {
     id: 'major-lakes',
@@ -255,6 +281,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/major-lakes.geojson',
     visible: false,
     description: '23 major lakes — Natural Earth 10m Physical (public domain)',
+    sourceUrl: 'https://www.naturalearthdata.com/downloads/10m-physical-vectors/',
   },
   {
     id: 'hurricane-tracks',
@@ -265,6 +292,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/hurricane-tracks.geojson',
     visible: false,
     description: '1,614 Atlantic basin storm tracks intersecting Mesoamerica — NOAA IBTrACS v04r01 (public domain)',
+    sourceUrl: 'https://www.ncei.noaa.gov/products/international-best-track-archive',
   },
   {
     id: 'coral-reefs',
@@ -274,6 +302,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/coral-reefs.geojson',
     visible: false,
     description: '328 reef polygons in the Caribbean — OpenStreetMap (ODbL)',
+    sourceUrl: 'https://www.openstreetmap.org/',
   },
   {
     id: 'ramsar-wetlands',
@@ -283,6 +312,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/ramsar-wetlands.geojson',
     visible: false,
     description: '23 Ramsar-designated wetlands of international importance — OpenStreetMap / Ramsar Convention (ODbL)',
+    sourceUrl: 'https://rsis.ramsar.org/',
   },
 
   // ── Ecology & Environment ────────────────────────────────────────────────
@@ -295,6 +325,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/ecoregions.geojson',
     visible: false,
     description: '69 ecoregions — RESOLVE Ecoregions 2017, WWF / Dinerstein et al. (CC-BY 4.0)',
+    sourceUrl: 'https://ecoregions.appspot.com/',
   },
   {
     id: 'mangroves-2020',
@@ -304,6 +335,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/mangroves-2020.geojson',
     visible: false,
     description: '147 mangrove tile polygons — Global Mangrove Watch 2020, JAXA / Aberystwyth (CC-BY 4.0)',
+    sourceUrl: 'https://www.globalmangrovewatch.org/',
   },
   {
     id: 'protected-areas',
@@ -313,6 +345,7 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/protected-areas.geojson',
     visible: false,
     description: '2,043 protected areas — World Database on Protected Areas, UNEP-WCMC / IUCN',
+    sourceUrl: 'https://www.protectedplanet.net/en',
   },
   {
     id: 'culturally-significant-species',
@@ -322,37 +355,8 @@ export const LAYER_REGISTRY = [
     featureColor: true,
     dataUrl: './data/culturally-significant-species.geojson',
     visible: false,
-    description: '900 occurrences: Resplendent Quetzal, Jaguar, Baird\'s Tapir — GBIF / iNaturalist (CC-BY)',
-  },
-
-  // ── Modern Administrative ────────────────────────────────────────────────
-  {
-    id: 'admin2-boundaries',
-    label: 'Municipalities / Districts (ADM-2)',
-    color: '#455a64',
-    mapboxType: 'fill',
-    dataUrl: './data/admin2-boundaries.geojson',
-    visible: false,
-    description: '3,636 municipalities & districts across 7 countries — geoBoundaries v6.0 (CC-BY 4.0)',
-  },
-  {
-    id: 'urban-areas',
-    label: 'Urban Areas',
-    color: '#78909c',
-    mapboxType: 'fill',
-    dataUrl: './data/urban-areas.geojson',
-    visible: false,
-    description: '289 urban footprint polygons — Natural Earth 10m Cultural (public domain)',
-  },
-  {
-    id: 'major-roads',
-    label: 'Major Roads',
-    color: '#546e7a',
-    mapboxType: 'line',
-    lineWidth: 1,
-    dataUrl: './data/major-roads.geojson',
-    visible: false,
-    description: '329 major road segments — Natural Earth 10m Cultural (public domain)',
+    description: '600 occurrences: Resplendent Quetzal, Jaguar — GBIF / iNaturalist (CC-BY)',
+    sourceUrl: 'https://www.gbif.org/',
   },
 
   // ── Conflict & Security ──────────────────────────────────────────────────
@@ -364,6 +368,40 @@ export const LAYER_REGISTRY = [
     dataUrl: './data/conflict-events.geojson',
     visible: false,
     description: '10,781 georeferenced conflict/violence events — HDX / ACLED-sourced (CC BY-NC-SA)',
+    sourceUrl: 'https://data.humdata.org/',
+  },
+
+  // ── Modern Administrative ────────────────────────────────────────────────
+  {
+    id: 'admin2-boundaries',
+    label: 'Municipalities / Districts (ADM-2)',
+    color: '#455a64',
+    mapboxType: 'fill',
+    dataUrl: './data/admin2-boundaries.geojson',
+    visible: false,
+    description: '3,636 municipalities & districts across 7 countries — geoBoundaries v6.0 (CC-BY 4.0)',
+    sourceUrl: 'https://www.geoboundaries.org/',
+  },
+  {
+    id: 'urban-areas',
+    label: 'Urban Areas',
+    color: '#78909c',
+    mapboxType: 'fill',
+    dataUrl: './data/urban-areas.geojson',
+    visible: false,
+    description: '289 urban footprint polygons — Natural Earth 10m Cultural (public domain)',
+    sourceUrl: 'https://www.naturalearthdata.com/downloads/10m-cultural-vectors/',
+  },
+  {
+    id: 'major-roads',
+    label: 'Major Roads',
+    color: '#546e7a',
+    mapboxType: 'line',
+    lineWidth: 1,
+    dataUrl: './data/major-roads.geojson',
+    visible: false,
+    description: '329 major road segments — Natural Earth 10m Cultural (public domain)',
+    sourceUrl: 'https://www.naturalearthdata.com/downloads/10m-cultural-vectors/',
   },
 
   // ── Disabled / Pending ───────────────────────────────────────────────────
@@ -375,6 +413,7 @@ export const LAYER_REGISTRY = [
     dataUrl: null,
     visible: false,
     description: 'Excavated artifacts by location (add via form)',
+    sourceUrl: null,
     disabled: true,
   },
 ]

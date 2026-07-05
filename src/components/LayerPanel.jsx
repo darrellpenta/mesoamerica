@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 const MAP_TYPES = [
   { id: 'default',     label: 'Default',     icon: '🗺' },
@@ -8,7 +8,7 @@ const MAP_TYPES = [
 ]
 
 export default function LayerPanel({
-  layers, onToggle,
+  layers, onToggle, onReorderLayers,
   mapType='default', onMapTypeChange,
   snapLayerId, onToggleSnap,
   userLayers, onToggleUserLayer, onDeleteUserLayer, onExportLayer,
@@ -17,9 +17,43 @@ export default function LayerPanel({
   activeDrawLayerId, onSetActiveDrawLayer, onNewLayer, onEnterRegionBuild,
   helperLayers = [], onToggleHelper, onRemoveHelper, onSetHelperOpacity,
 }) {
-  const importRef = useRef(null)
+  const importRef    = useRef(null)
+  const dragId       = useRef(null)       // layer ID being dragged
+  const [dragOverId, setDragOverId] = useState(null)
 
   const fillLayers = layers.filter(l => l.mapboxType === 'fill' && !l.disabled)
+
+  // ── Drag-to-reorder handlers ─────────────────────────────────────────────
+  const handleDragStart = (e, id) => {
+    dragId.current = id
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e, id) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (id !== dragOverId) setDragOverId(id)
+  }
+
+  const handleDragEnd = () => {
+    dragId.current = null
+    setDragOverId(null)
+  }
+
+  const handleDrop = (e, targetId) => {
+    e.preventDefault()
+    const fromId = dragId.current
+    if (!fromId || fromId === targetId) { handleDragEnd(); return }
+    const ids = layers.map(l => l.id)
+    const fromIdx = ids.indexOf(fromId)
+    const toIdx   = ids.indexOf(targetId)
+    if (fromIdx === -1 || toIdx === -1) { handleDragEnd(); return }
+    const reordered = [...ids]
+    reordered.splice(fromIdx, 1)
+    reordered.splice(toIdx, 0, fromId)
+    onReorderLayers?.(reordered)
+    handleDragEnd()
+  }
 
   return (
     <aside className="layer-panel">
@@ -45,19 +79,50 @@ export default function LayerPanel({
       </div>
 
       {/* ── Data Layers ──────────────────────────────────────────────── */}
-      <div className="layer-panel__section-label">Data Layers</div>
+      <div className="layer-panel__section-label">
+        Data Layers
+        <span className="layer-panel__region-note" style={{marginLeft:6}}>drag to reorder</span>
+      </div>
       <div className="layer-panel__list">
         {layers.map(layer => (
           <div
             key={layer.id}
-            className={['layer-item', layer.visible&&!layer.disabled?'layer-item--active':'', layer.disabled?'layer-item--disabled':''].join(' ')}
+            className={[
+              'layer-item',
+              layer.visible && !layer.disabled ? 'layer-item--active' : '',
+              layer.disabled ? 'layer-item--disabled' : '',
+              dragOverId === layer.id && dragId.current !== layer.id ? 'layer-item--drag-over' : '',
+            ].join(' ')}
             style={{ '--layer-color': layer.color }}
-            onClick={() => !layer.disabled && onToggle(layer.id)}
-            title={layer.disabled ? 'Data not yet available' : undefined}
+            onDragOver={layer.disabled ? undefined : e => handleDragOver(e, layer.id)}
+            onDrop={layer.disabled ? undefined : e => handleDrop(e, layer.id)}
           >
-            <div className="layer-item__toggle" />
+            {/* Drag handle */}
+            {!layer.disabled && (
+              <div
+                className="layer-item__drag-handle"
+                draggable
+                onDragStart={e => handleDragStart(e, layer.id)}
+                onDragEnd={handleDragEnd}
+                title="Drag to reorder"
+              >
+                ⠿
+              </div>
+            )}
+
+            <div
+              className="layer-item__toggle"
+              onClick={() => !layer.disabled && onToggle(layer.id)}
+              title={layer.disabled ? 'Data not yet available' : undefined}
+            />
             <div className="layer-item__text">
-              <div className="layer-item__name">{layer.label}</div>
+              <div
+                className="layer-item__name"
+                onClick={() => !layer.disabled && onToggle(layer.id)}
+                style={layer.disabled ? undefined : { cursor: 'pointer' }}
+              >
+                {layer.label}
+              </div>
               <div className="layer-item__desc">{layer.description}</div>
               {/* Snap-to-boundary toggle — only on polygon fill layers */}
               {layer.mapboxType === 'fill' && !layer.disabled && layer.visible && (
@@ -81,22 +146,22 @@ export default function LayerPanel({
           {helperLayers.map(hl => (
             <div
               key={hl.id}
-              className={['layer-item', hl.visible?'layer-item--active':''].join(' ')}
+              className={['layer-item', hl.visible ? 'layer-item--active' : ''].join(' ')}
               style={{ '--layer-color': '#4a90d9' }}
             >
-              <div className="layer-item__toggle" onClick={() => onToggleHelper(hl.id)} style={{cursor:'pointer'}} />
+              <div className="layer-item__toggle" onClick={() => onToggleHelper(hl.id)} style={{ cursor: 'pointer' }} />
               <div className="layer-item__text">
-                <div className="layer-item__name" onClick={() => onToggleHelper(hl.id)} style={{cursor:'pointer'}}>
+                <div className="layer-item__name" onClick={() => onToggleHelper(hl.id)} style={{ cursor: 'pointer' }}>
                   {hl.label}
                 </div>
                 <div className="layer-item__desc">Attached to map coords</div>
-                <div className="layer-item__actions" style={{alignItems:'center'}}>
+                <div className="layer-item__actions" style={{ alignItems: 'center' }}>
                   <input
                     type="range" min={0.05} max={1} step={0.05}
                     value={hl.opacity}
                     onChange={e => onSetHelperOpacity(hl.id, parseFloat(e.target.value))}
-                    title={`Opacity: ${Math.round(hl.opacity*100)}%`}
-                    style={{width:72, accentColor:'#4a90d9'}}
+                    title={`Opacity: ${Math.round(hl.opacity * 100)}%`}
+                    style={{ width: 72, accentColor: '#4a90d9' }}
                   />
                   <button
                     className="layer-item__action-btn layer-item__action-btn--delete"
@@ -113,45 +178,35 @@ export default function LayerPanel({
       {/* ── My Layers (user-drawn) ───────────────────────────────────── */}
       <div className="layer-panel__user-section">
         <div className="layer-panel__section-header">
-          <div className="layer-panel__section-label" style={{margin:0}}>My Layers</div>
+          <div className="layer-panel__section-label" style={{ margin: 0 }}>My Layers</div>
           <div className="layer-panel__undo-row">
-            <button
-              className="layer-panel__undo-btn"
-              onClick={onUndo}
-              disabled={!canUndo}
-              title="Undo (Ctrl+Z)"
-            >↩</button>
-            <button
-              className="layer-panel__undo-btn"
-              onClick={onRedo}
-              disabled={!canRedo}
-              title="Redo (Ctrl+Y)"
-            >↪</button>
+            <button className="layer-panel__undo-btn" onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)">↩</button>
+            <button className="layer-panel__undo-btn" onClick={onRedo} disabled={!canRedo} title="Redo (Ctrl+Y)">↪</button>
           </div>
         </div>
 
         {userLayers.map(layer => (
           <div
             key={layer.id}
-            className={['layer-item', layer.visible?'layer-item--active':'', activeDrawLayerId===layer.id?'layer-item--editing':''].join(' ')}
+            className={['layer-item', layer.visible ? 'layer-item--active' : '', activeDrawLayerId === layer.id ? 'layer-item--editing' : ''].join(' ')}
             style={{ '--layer-color': layer.color }}
           >
-            <div className="layer-item__toggle" onClick={() => onToggleUserLayer(layer.id)} style={{cursor:'pointer'}} />
+            <div className="layer-item__toggle" onClick={() => onToggleUserLayer(layer.id)} style={{ cursor: 'pointer' }} />
             <div className="layer-item__text">
-              <div className="layer-item__name" onClick={() => onToggleUserLayer(layer.id)} style={{cursor:'pointer'}}>
+              <div className="layer-item__name" onClick={() => onToggleUserLayer(layer.id)} style={{ cursor: 'pointer' }}>
                 {layer.label}
-                {activeDrawLayerId===layer.id && <span className="layer-item__editing-badge"> editing</span>}
+                {activeDrawLayerId === layer.id && <span className="layer-item__editing-badge"> editing</span>}
               </div>
               <div className="layer-item__desc">
-                {layer.features.length} shape{layer.features.length!==1?'s':''}
+                {layer.features.length} shape{layer.features.length !== 1 ? 's' : ''}
               </div>
               <div className="layer-item__actions">
                 <button
                   className="layer-item__action-btn"
-                  onClick={() => onSetActiveDrawLayer(activeDrawLayerId===layer.id ? null : layer.id)}
-                  title={activeDrawLayerId===layer.id?'Stop editing':'Edit this layer'}
+                  onClick={() => onSetActiveDrawLayer(activeDrawLayerId === layer.id ? null : layer.id)}
+                  title={activeDrawLayerId === layer.id ? 'Stop editing' : 'Edit this layer'}
                 >
-                  {activeDrawLayerId===layer.id ? 'Stop' : 'Edit'}
+                  {activeDrawLayerId === layer.id ? 'Stop' : 'Edit'}
                 </button>
                 <button
                   className="layer-item__action-btn layer-item__action-btn--export"
@@ -170,7 +225,7 @@ export default function LayerPanel({
 
         <div className="layer-panel__layer-actions">
           <button className="layer-panel__new-btn" onClick={onNewLayer}>
-            <span style={{fontSize:16}}>+</span>
+            <span style={{ fontSize: 16 }}>+</span>
             <span>New Layer</span>
           </button>
 
@@ -180,7 +235,7 @@ export default function LayerPanel({
               onClick={onEnterRegionBuild}
               title="Click polygons from any visible data layer to select and merge them into a new shape"
             >
-              <span style={{fontSize:14}}>&#8862;</span>
+              <span style={{ fontSize: 14 }}>&#8862;</span>
               <span>Build from map polygons</span>
             </button>
           )}
@@ -195,7 +250,7 @@ export default function LayerPanel({
               ref={importRef}
               type="file"
               accept=".json,.geojson"
-              style={{display:'none'}}
+              style={{ display: 'none' }}
               onChange={onImportLayers}
             />
             <button

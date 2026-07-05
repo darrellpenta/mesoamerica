@@ -227,7 +227,7 @@ const MapView = forwardRef(function MapView({
   layers, userLayers, helperLayers=[], activeTool, snapConfig=null,
   mapType='default',
   pendingReEdit=null, regionBuildMode=false, selectedCells=[],
-  onFeatureClick, onFeatureDrawn, onAttachHelper, onCellToggle,
+  onFeatureClick, onFeatureDrawn, onAttachHelper, onCellToggle, onMapClick,
 }, ref) {
   const containerRef         = useRef(null)
   const mapRef               = useRef(null)
@@ -237,7 +237,7 @@ const MapView = forwardRef(function MapView({
   const iaRef                = useRef(null)
   // callbacksRef: always-current props, safe to use inside Mapbox closures
   const callbacksRef         = useRef({})
-  callbacksRef.current = { onFeatureClick, onFeatureDrawn, snapConfig, onAttachHelper, regionBuildMode, onCellToggle }
+  callbacksRef.current = { onFeatureClick, onFeatureDrawn, snapConfig, onAttachHelper, regionBuildMode, onCellToggle, onMapClick, layers, pendingReEdit: !!pendingReEdit }
 
   const [overlay, setOverlay]       = useState(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -266,6 +266,21 @@ const MapView = forwardRef(function MapView({
         { padding: 80, maxZoom: 12, duration: 700 }
       )
     },
+    syncLayerOrder: (orderedLayers) => {
+      const map = mapRef.current
+      if (!map) return
+      const anchor = map.getLayer('region-selection-fill') ? 'region-selection-fill' : undefined
+      // Process bottom-to-top so the first item in the array ends up lowest in the stack
+      const reversed = [...orderedLayers].reverse()
+      for (const layer of reversed) {
+        const sfxList = layer.mapboxType === 'fill' ? ['', '-outline', '-labels']
+                      : layer.mapboxType === 'line' ? ['']
+                      : ['', '-labels']
+        for (const sfx of sfxList) {
+          try { if (map.getLayer(`${layer.id}${sfx}`)) map.moveLayer(`${layer.id}${sfx}`, anchor) } catch(_) {}
+        }
+      }
+    },
   }))
 
   // ── Map init ───────────────────────────────────────────────────────────────
@@ -292,6 +307,18 @@ const MapView = forwardRef(function MapView({
       map.addSource('region-selection',{type:'geojson',data:{type:'FeatureCollection',features:[]}})
       map.addLayer({id:'region-selection-fill',type:'fill',source:'region-selection',paint:{'fill-color':'#f4a46a','fill-opacity':0.48}})
       map.addLayer({id:'region-selection-outline',type:'line',source:'region-selection',paint:{'line-color':'#e85d04','line-width':2.5}})
+
+      // General click — query all visible data layers to power "what's here"
+      map.on('click', e => {
+        const { onMapClick: omc, layers: currentLayers, regionBuildMode: rm, pendingReEdit: re } = callbacksRef.current
+        if (!omc || rm || re) return
+        const visIds = (currentLayers || [])
+          .filter(l => l.visible && !l.disabled && l.dataUrl)
+          .map(l => l.id)
+          .filter(id => map.getLayer(id))
+        const features = visIds.length ? map.queryRenderedFeatures(e.point, { layers: visIds }) : []
+        omc(features, e.lngLat)
+      })
 
       map.on('draw.create', e => {
         const f = e.features[0]

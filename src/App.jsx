@@ -21,6 +21,9 @@ function loadSavedLayers() {
 export default function App() {
   const [layers, setLayers] = useState(LAYER_REGISTRY)
   const [selectedFeature, setSelectedFeature] = useState(null)
+  const [selectedLayer, setSelectedLayer]     = useState(null)
+  const [whatIsHere, setWhatIsHere]           = useState([])
+  const layerOrderRef = useRef(null)
 
   // ── User draw layers — undo/redo enabled ────────────────────────────────
   const { value: userLayers, set: setUserLayers, undo, redo, canUndo, canRedo } = useUndoable(loadSavedLayers())
@@ -81,8 +84,45 @@ export default function App() {
   }, [undo, redo, pendingReEdit])
 
   // ── Base layer toggle ────────────────────────────────────────────────────
-  const toggleLayer = id =>
+  const toggleLayer = id => {
+    const current = layers.find(l => l.id === id)
+    if (!current) return
     setLayers(prev => prev.map(l => l.id === id ? { ...l, visible: !l.visible } : l))
+    if (!current.visible) {
+      // Turning ON — show citation panel for this layer
+      setSelectedLayer({ ...current, visible: true })
+      setSelectedFeature(null)
+      setWhatIsHere([])
+    } else {
+      // Turning OFF — clear citation if it was this layer
+      setSelectedLayer(prev => prev?.id === id ? null : prev)
+    }
+  }
+
+  // ── Layer reorder ────────────────────────────────────────────────────────
+  const reorderLayers = useCallback((newIds) => {
+    setLayers(prev => {
+      const map = new Map(prev.map(l => [l.id, l]))
+      const next = newIds.map(id => map.get(id)).filter(Boolean)
+      // Sync Mapbox render order after state updates
+      setTimeout(() => mapViewRef.current?.syncLayerOrder?.(next.filter(l => !l.disabled)), 0)
+      return next
+    })
+  }, [])
+
+  // ── Map click — what's here across all visible layers ────────────────────
+  const handleMapClick = useCallback((features, _lngLat) => {
+    if (pendingReEdit || regionBuildMode) return
+    const byLayer = {}
+    for (const f of features) {
+      const reg = layers.find(l => l.id === f.source)
+      if (!reg) continue
+      if (!byLayer[f.source]) byLayer[f.source] = { layer: reg, features: [] }
+      if (!byLayer[f.source].features.some(x => x.id === f.id))
+        byLayer[f.source].features.push(f)
+    }
+    setWhatIsHere(Object.values(byLayer))
+  }, [layers, pendingReEdit, regionBuildMode])
 
   // ── Snap layer toggle ────────────────────────────────────────────────────
   const toggleSnapLayer = useCallback((layerId) => {
@@ -288,6 +328,7 @@ export default function App() {
       <LayerPanel
         layers={layers}
         onToggle={toggleLayer}
+        onReorderLayers={reorderLayers}
         mapType={mapType}
         onMapTypeChange={setMapType}
         snapLayerId={snapLayerId}
@@ -322,6 +363,7 @@ export default function App() {
           activeTool={effectiveTool}
           snapConfig={snapConfig}
           pendingReEdit={pendingReEdit}
+          onMapClick={handleMapClick}
           onFeatureClick={feature => {
             if (pendingReEdit) return
             // Mapbox click events drop non-integer string IDs; look up original from userLayers
@@ -377,11 +419,13 @@ export default function App() {
         )}
       </div>
 
-      {selectedFeature && (
+      {(selectedFeature || (selectedLayer && !whatIsHere.length) || whatIsHere.length > 0) && (
         <DetailPanel
           feature={selectedFeature}
+          layer={selectedFeature ? null : selectedLayer}
+          whatIsHere={whatIsHere}
           userLayers={userLayers}
-          onClose={() => setSelectedFeature(null)}
+          onClose={() => { setSelectedFeature(null); setSelectedLayer(null); setWhatIsHere([]) }}
           onReEdit={startReEdit}
         />
       )}

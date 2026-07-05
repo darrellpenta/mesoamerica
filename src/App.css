@@ -999,3 +999,124 @@ html, body, #root {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+/* =====================================================================
+   DETAIL PANEL — citation link & what's-here
+   ===================================================================== */
+.detail-panel__badge {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(232, 93, 4, 0.25);
+  color: #f4a46a;
+}
+
+.detail-panel__badge--layer {
+  background: rgba(100, 181, 246, 0.2);
+  color: #64b5f6;
+}
+
+.detail-panel__badge--user {
+  background: rgba(0, 119, 182, 0.2);
+  color: #64b5f6;
+  margin-left: 4px;
+}
+
+.detail-panel__link {
+  color: #1565c0;
+  font-size: 12px;
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.detail-panel__link:hover {
+  text-decoration: underline;
+}
+
+.detail-panel__whats-here {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #eee;
+}
+
+.detail-panel__whats-here-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.whats-here-row {
+  margin-bottom: 10px;
+}
+
+.whats-here-row__layer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 3px;
+}
+
+.whats-here-row__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--layer-color, #888);
+  flex-shrink: 0;
+}
+
+.whats-here-row__features {
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.whats-here-row__feat {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.whats-here-row__more {
+  font-size: 11px;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* =====================================================================
+   LAYER PANEL — drag-to-reorder
+   ===================================================================== */
+.layer-item__drag-handle {
+  font-size: 14px;
+  color: #404870;
+  cursor: grab;
+  padding: 0 2px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  user-select: none;
+  line-height: 1;
+  transition: color 0.12s;
+}
+
+.layer-item__drag-handle:hover {
+  color: #8090c0;
+}
+
+.layer-item__drag-handle:active {
+  cursor: grabbing;
+}
+
+.layer-item--drag-over {
+  border-top: 2px solid #64b5f6;
+  background: rgba(100, 181, 246, 0.06);
+}

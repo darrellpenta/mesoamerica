@@ -9,40 +9,129 @@ function coords(geometry) {
   ]
 }
 
-// Keys that are rendered via dedicated fields — hidden in the "extra" dump
-const KNOWN_KEYS = new Set(['name','culture','period','country','description','significance','glottocode','source','_layerId'])
+const KNOWN_KEYS = new Set([
+  'name','culture','period','country','description','significance',
+  'glottocode','source','_layerId','_id','color','fill-opacity','note',
+  'number','family','title','event_date','event_type','fatalities',
+  'BIOME_NAME','ECO_NAME','NNH_NAME',
+])
 
-export default function DetailPanel({ feature, userLayers = [], onClose, onReEdit }) {
+// ── Layer citation panel ────────────────────────────────────────────────────
+function CitationPanel({ layer, onClose }) {
+  return (
+    <aside className="detail-panel">
+      <div className="detail-panel__header">
+        <div>
+          <div className="detail-panel__name">{layer.label}</div>
+          <span className="detail-panel__badge detail-panel__badge--layer">Data Layer</span>
+        </div>
+        <button className="detail-panel__close" onClick={onClose} aria-label="Close">×</button>
+      </div>
+      <div className="detail-panel__body">
+        <Field label="Description" value={layer.description} />
+        {layer.sourceUrl && (
+          <div className="detail-field">
+            <div className="detail-field__label">Source</div>
+            <div className="detail-field__value">
+              <a
+                href={layer.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="detail-panel__link"
+              >
+                {layer.sourceUrl}
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+    </aside>
+  )
+}
+
+// ── What's here section ─────────────────────────────────────────────────────
+function WhatsHere({ items }) {
+  if (!items.length) return null
+  return (
+    <div className="detail-panel__whats-here">
+      <div className="detail-panel__whats-here-title">Also at this location</div>
+      {items.map(({ layer, features }) => (
+        <div key={layer.id} className="whats-here-row">
+          <div className="whats-here-row__layer" style={{ '--layer-color': layer.color }}>
+            <span className="whats-here-row__dot" />
+            <span>{layer.label}</span>
+          </div>
+          <div className="whats-here-row__features">
+            {features.slice(0, 3).map((f, i) => (
+              <span key={i} className="whats-here-row__feat">
+                {f.properties?.name || f.properties?.ECO_NAME || f.properties?.event_type
+                  || f.properties?.BIOME_NAME || f.properties?.title || '—'}
+              </span>
+            ))}
+            {features.length > 3 && (
+              <span className="whats-here-row__more">+{features.length - 3} more</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── Main export ─────────────────────────────────────────────────────────────
+export default function DetailPanel({ feature, layer, whatIsHere = [], userLayers = [], onClose, onReEdit }) {
+  // Citation mode: layer activated, no feature selected
+  if (!feature && layer) {
+    return <CitationPanel layer={layer} onClose={onClose} />
+  }
+
+  // Location summary: map click with layer hits but no specific feature
+  if (!feature && whatIsHere.length > 0) {
+    return (
+      <aside className="detail-panel">
+        <div className="detail-panel__header">
+          <div><div className="detail-panel__name">Location Summary</div></div>
+          <button className="detail-panel__close" onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <div className="detail-panel__body">
+          <WhatsHere items={whatIsHere} />
+        </div>
+      </aside>
+    )
+  }
+
+  if (!feature) return null
+
+  // Feature detail mode (existing behaviour + optional whatIsHere)
   const p   = feature.properties ?? {}
   const [lon, lat] = coords(feature.geometry)
-
-  // Determine if this is a user-drawn feature (has _layerId property)
   const isUserFeature = !!p._layerId
   const parentLayer   = isUserFeature ? userLayers.find(l => l.id === p._layerId) : null
-
-  // Collect extra custom key-value pairs the user annotated
-  const extraKeys = Object.keys(p).filter(k => !KNOWN_KEYS.has(k))
+  const extraKeys     = Object.keys(p).filter(k => !KNOWN_KEYS.has(k))
+  const displayName   = p.name || p.ECO_NAME || p.BIOME_NAME || p.event_type || p.title || '(unnamed)'
 
   return (
     <aside className="detail-panel">
       <div className="detail-panel__header">
         <div>
-          <div className="detail-panel__name">{p.name || '(unnamed)'}</div>
-          {p.culture && <span className="detail-panel__culture-badge">{p.culture}</span>}
+          <div className="detail-panel__name">{displayName}</div>
+          {p.culture && <span className="detail-panel__badge">{p.culture}</span>}
           {isUserFeature && parentLayer && (
-            <span className="detail-panel__culture-badge" style={{background:'rgba(0,119,182,0.2)',color:'#64b5f6',marginLeft:4}}>
-              {parentLayer.label}
-            </span>
+            <span className="detail-panel__badge detail-panel__badge--user">{parentLayer.label}</span>
           )}
         </div>
         <button className="detail-panel__close" onClick={onClose} aria-label="Close">×</button>
       </div>
 
       <div className="detail-panel__body">
-        {p.period && <Field label="Period" value={p.period} />}
-        {p.country && <Field label="Modern Location" value={p.country} />}
-        {p.description && <Field label="About" value={p.description} />}
-        {p.significance && <Field label="Significance" value={p.significance} />}
+        {p.period      && <Field label="Period"          value={p.period} />}
+        {p.country     && <Field label="Modern Location" value={p.country} />}
+        {p.description && <Field label="About"           value={p.description} />}
+        {p.significance && <Field label="Significance"   value={p.significance} />}
+        {p.BIOME_NAME  && <Field label="Biome"           value={p.BIOME_NAME} />}
+        {p.ECO_NAME && p.ECO_NAME !== p.name && <Field label="Ecoregion" value={p.ECO_NAME} />}
+        {p.event_date  && <Field label="Date"            value={p.event_date} />}
+        {p.fatalities != null && <Field label="Fatalities" value={String(p.fatalities)} />}
 
         <Field
           label="Coordinates"
@@ -53,14 +142,12 @@ export default function DetailPanel({ feature, userLayers = [], onClose, onReEdi
         {p.glottocode && <Field label="Glottocode" value={p.glottocode} mono />}
         {p.source      && <Field label="Source"    value={p.source}    small />}
 
-        {/* Custom annotations (user-drawn features) */}
         {extraKeys.length > 0 && (
-          <div style={{marginTop:12,borderTop:'1px solid #eee',paddingTop:12}}>
+          <div style={{ marginTop: 12, borderTop: '1px solid #eee', paddingTop: 12 }}>
             {extraKeys.map(k => <Field key={k} label={k} value={String(p[k])} />)}
           </div>
         )}
 
-        {/* Re-edit button for user-drawn features */}
         {isUserFeature && onReEdit && (
           <button
             className="detail-panel__reedit-btn"
@@ -71,13 +158,14 @@ export default function DetailPanel({ feature, userLayers = [], onClose, onReEdi
           </button>
         )}
 
-        {/* Artifacts placeholder for non-user, non-language features */}
         {!p.glottocode && !isUserFeature && (
           <div className="detail-panel__placeholder">
             <div className="detail-panel__placeholder-label">Artifacts</div>
             <div className="detail-panel__placeholder-text">No artifacts recorded yet.</div>
           </div>
         )}
+
+        <WhatsHere items={whatIsHere} />
       </div>
     </aside>
   )
@@ -87,8 +175,10 @@ function Field({ label, value, mono, small }) {
   return (
     <div className="detail-field">
       <div className="detail-field__label">{label}</div>
-      <div className={`detail-field__value${mono ? ' detail-field__value--coords' : ''}`}
-           style={small ? {fontSize:11,color:'#888'} : undefined}>
+      <div
+        className={`detail-field__value${mono ? ' detail-field__value--coords' : ''}`}
+        style={small ? { fontSize: 11, color: '#888' } : undefined}
+      >
         {value}
       </div>
     </div>
