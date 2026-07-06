@@ -155,13 +155,130 @@ def cfg_conflict(f):
     }
 
 
+def cfg_unesco(f):
+    p = f['properties']
+    yr = p.get('date_inscribed')
+    return {
+        'entity_type': 'place',
+        'name':        p.get('name') or 'Unknown Heritage Site',
+        'ext_table':   'places',
+        'ext': {
+            'place_type':     'heritage_site',
+            'date_start':     int(yr) if yr else None,
+            'date_label':     f"Inscribed {int(yr)}" if yr else None,
+            'date_precision': 'exact' if yr else 'unknown',
+        },
+    }
+
+
+def cfg_mayan_sites(f):
+    p = f['properties']
+    return {
+        'entity_type': 'place',
+        'name':        p.get('name') or 'Unknown Maya Site',
+        'ext_table':   'places',
+        'ext': {
+            'place_type':     'archaeological_site',
+            'date_precision': 'period_only',
+        },
+    }
+
+
+def cfg_aztec_villages(f):
+    p = f['properties']
+    return {
+        'entity_type': 'place',
+        'name':        p.get('name') or 'Unknown Settlement',
+        'ext_table':   'places',
+        'ext': {
+            'place_type':     'historic_city',
+            'date_precision': 'period_only',
+        },
+    }
+
+
+def cfg_ramsar(f):
+    p = f['properties']
+    return {
+        'entity_type': 'geo_feature',
+        'name':        p.get('official_name_e') or 'Unknown Wetland',
+        'ext_table':   'geo_features',
+        'ext': {
+            'feature_type': 'wetland',
+            'subtype':      'ramsar',
+        },
+    }
+
+
+def cfg_lidar_opentopo(f):
+    p = f['properties']
+    return {
+        'entity_type': 'place',
+        'name':        p.get('name') or 'Unknown LiDAR Survey',
+        'ext_table':   'places',
+        'ext': {
+            'place_type':     'survey_area',
+            'date_label':     p.get('dateCollected'),
+            'date_precision': 'exact' if p.get('dateCollected') else 'unknown',
+        },
+    }
+
+
+def cfg_pulltrouser_points(f):
+    p = f['properties']
+    return {
+        'entity_type': 'place',
+        'name':        p.get('Name') or 'Unknown Structure',
+        'ext_table':   'places',
+        'ext': {
+            'place_type':     'structure',
+            'date_precision': 'period_only',
+        },
+    }
+
+
+def cfg_becan_points(f):
+    p = f['properties']
+    num = p.get('Str_numb', '')
+    return {
+        'entity_type': 'place',
+        'name':        f"Becan Structure {num}" if num else 'Becan Structure',
+        'ext_table':   'places',
+        'ext': {
+            'place_type':     'structure',
+            'date_precision': 'period_only',
+        },
+    }
+
+
+def cfg_species(f):
+    p = f['properties']
+    return {
+        'entity_type': 'geo_feature',
+        'name':        p.get('species') or 'Unknown Species Occurrence',
+        'ext_table':   'geo_features',
+        'ext': {
+            'feature_type': 'species_occurrence',
+            'subtype':      p.get('species', '').split()[0] if p.get('species') else None,
+        },
+    }
+
+
 LAYERS = {
-    'sites':                      cfg_sites,
-    'maya-inscriptions':          cfg_maya_inscriptions,
-    'inah-archaeological-zones':  cfg_inah,
-    'volcanoes':                  cfg_volcanoes,
-    'earthquakes':                cfg_earthquakes,
-    'conflict-events':            cfg_conflict,
+    'sites':                        cfg_sites,
+    'maya-inscriptions':            cfg_maya_inscriptions,
+    'inah-archaeological-zones':    cfg_inah,
+    'volcanoes':                    cfg_volcanoes,
+    'earthquakes':                  cfg_earthquakes,
+    'conflict-events':              cfg_conflict,
+    'unesco-world-heritage':        cfg_unesco,
+    'mayan-sites':                  cfg_mayan_sites,
+    'aztec-villages':               cfg_aztec_villages,
+    'ramsar-wetlands':              cfg_ramsar,
+    'lidar-surveys-opentopography': cfg_lidar_opentopo,
+    'pulltrouser-swamp-points':     cfg_pulltrouser_points,
+    'becan-points':                 cfg_becan_points,
+    'culturally-significant-species': cfg_species,
 }
 
 
