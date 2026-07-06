@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.5.1",
+    "@supabase/supabase-js": "^2.110.0",
     "@turf/helpers": "^7.3.5",
     "@turf/union": "^7.3.5",
     "mapbox-gl": "^3.0.0",
     "react": "^18.3.0",
-    "react-dom": "^18.3.0"
+    "react-dom": "^18.3.0",
+    "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.0",
