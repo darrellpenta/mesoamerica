@@ -37,6 +37,7 @@ function EntitySection({ entityId }) {
     let cancelled = false
 
     async function load() {
+      if (!supabase) { setLoading(false); return }
       const [entityRes, outRes, inRes] = await Promise.all([
         supabase.from('entities')
           .select('id, name, entity_type, persons(birth_year, death_year, floruit_start, floruit_end, date_label, person_type)')

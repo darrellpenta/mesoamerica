@@ -69,6 +69,7 @@ export default function TimelinePage() {
 
   useEffect(() => {
     async function load() {
+      if (!supabase) { setLoading(false); return }
       setLoading(true)
 
       // 1. Persons + their entity names

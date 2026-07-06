@@ -13,7 +13,7 @@ function useEntitySearch(query) {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!query || query.length < 2) { setResults([]); return }
+    if (!supabase || !query || query.length < 2) { setResults([]); return }
     let cancelled = false
     setLoading(true)
     const timer = setTimeout(async () => {
@@ -67,7 +67,7 @@ function RelationshipList({ entityId, onDelete }) {
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
-    if (!entityId) return
+    if (!entityId || !supabase) return
     setLoading(true)
     const [outRes, inRes] = await Promise.all([
       supabase.from('relationships')
