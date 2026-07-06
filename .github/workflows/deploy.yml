@@ -19,6 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Regenerate GeoJSON from Supabase before building
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install psycopg2-binary python-dotenv
+      - run: python scripts/generate_geojson.py
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
