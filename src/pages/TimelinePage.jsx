@@ -72,17 +72,16 @@ export default function TimelinePage() {
       if (!supabase) { setLoading(false); return }
       setLoading(true)
 
-      // 1. Persons + their entity names
-      const { data: personRows } = await supabase
-        .from('entities')
-        .select('id, name, persons(birth_year, death_year, floruit_start, floruit_end, date_label, person_type)')
-        .eq('entity_type', 'person')
-
-      // 2. RULED relationships to get city grouping and reign dates
-      const { data: ruled } = await supabase
-        .from('relationships')
-        .select('from_entity_id, valid_from, valid_to, to_entity:to_entity_id(name)')
-        .eq('relation_type', 'RULED')
+      // Query from persons table (FK persons.entity_id→entities.id is recognized this direction)
+      const [{ data: personRows }, { data: ruled }] = await Promise.all([
+        supabase
+          .from('persons')
+          .select('entity_id, birth_year, death_year, floruit_start, floruit_end, date_label, person_type, entity:entity_id(id, name)'),
+        supabase
+          .from('relationships')
+          .select('from_entity_id, valid_from, valid_to, to_entity:to_entity_id(name)')
+          .eq('relation_type', 'RULED'),
+      ])
 
       const ruledByPerson = {}
       for (const r of (ruled ?? [])) {
@@ -90,10 +89,11 @@ export default function TimelinePage() {
         ruledByPerson[r.from_entity_id].push(r)
       }
 
-      const built = (personRows ?? []).map(e => {
-        const p = e.persons?.[0] ?? {}
-        const rels = ruledByPerson[e.id] ?? []
-        const city = rels[0]?.to_entity?.name ?? 'Unknown'
+      const built = (personRows ?? []).map(p => {
+        const entityId = p.entity_id
+        const name     = p.entity?.name ?? '(unknown)'
+        const rels     = ruledByPerson[entityId] ?? []
+        const city     = rels[0]?.to_entity?.name ?? 'Unknown'
 
         let startYear = p.birth_year ?? p.floruit_start
         let endYear   = p.death_year ?? p.floruit_end
@@ -107,7 +107,7 @@ export default function TimelinePage() {
           if (!isFinite(endYear)) endYear = null
         }
 
-        return { id: e.id, name: e.name, city, startYear, endYear, dateLabel: p.date_label, personType: p.person_type }
+        return { id: entityId, name, city, startYear, endYear, dateLabel: p.date_label, personType: p.person_type }
       }).filter(r => r.startYear != null || r.endYear != null)
 
       // Sort: group by city, then by startYear

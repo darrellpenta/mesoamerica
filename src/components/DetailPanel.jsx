@@ -38,11 +38,15 @@ function EntitySection({ entityId }) {
 
     async function load() {
       if (!supabase) { setLoading(false); return }
-      const [entityRes, outRes, inRes] = await Promise.all([
+      const [entityRes, personRes, outRes, inRes] = await Promise.all([
         supabase.from('entities')
-          .select('id, name, entity_type, persons(birth_year, death_year, floruit_start, floruit_end, date_label, person_type)')
+          .select('id, name, entity_type')
           .eq('id', entityId)
           .single(),
+        supabase.from('persons')
+          .select('birth_year, death_year, floruit_start, floruit_end, date_label, person_type')
+          .eq('entity_id', entityId)
+          .maybeSingle(),
         supabase.from('relationships')
           .select('id, relation_type, valid_from, valid_to, to_entity:to_entity_id(id, name, entity_type)')
           .eq('from_entity_id', entityId),
@@ -51,7 +55,8 @@ function EntitySection({ entityId }) {
           .eq('to_entity_id', entityId),
       ])
       if (cancelled) return
-      setData({ entity: entityRes.data, outgoing: outRes.data ?? [], incoming: inRes.data ?? [] })
+      const entity = entityRes.data ? { ...entityRes.data, persons: personRes.data ? [personRes.data] : [] } : null
+      setData({ entity, outgoing: outRes.data ?? [], incoming: inRes.data ?? [] })
       setLoading(false)
     }
 
