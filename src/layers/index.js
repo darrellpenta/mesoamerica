@@ -2,6 +2,7 @@ export const LAYER_REGISTRY = [
   // ── Archaeology & Sites ──────────────────────────────────────────────────
   {
     id: 'sites',
+    group: 'Archaeology & Sites',
     label: 'Archaeological Sites',
     color: '#e85d04',
     mapboxType: 'circle',
@@ -12,7 +13,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'maya-inscriptions',
-    label: 'Maya Inscription Sites',
+    group: 'Archaeology & Sites',
+        label: 'Maya Inscription Sites',
     color: '#0077b6',
     mapboxType: 'circle',
     dataUrl: './data/maya-inscriptions.geojson',
@@ -22,7 +24,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'inah-archaeological-zones',
-    label: 'INAH Archaeological Zones (Mexico)',
+    group: 'Archaeology & Sites',
+        label: 'INAH Archaeological Zones (Mexico)',
     color: '#b5451b',
     mapboxType: 'circle',
     dataUrl: './data/inah-archaeological-zones.geojson',
@@ -32,7 +35,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'unesco-world-heritage',
-    label: 'UNESCO World Heritage Sites',
+    group: 'Archaeology & Sites',
+        label: 'UNESCO World Heritage Sites',
     color: '#1565c0',
     mapboxType: 'circle',
     dataUrl: './data/unesco-world-heritage.geojson',
@@ -42,7 +46,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'lidar-surveys-opentopography',
-    label: 'Open LiDAR Surveys (OpenTopography)',
+    group: 'Archaeology & Sites',
+        label: 'Open LiDAR Surveys (OpenTopography)',
     color: '#7b1fa2',
     mapboxType: 'circle',
     dataUrl: './data/lidar-surveys-opentopography.geojson',
@@ -54,7 +59,8 @@ export const LAYER_REGISTRY = [
   // ── Empires & Culture ────────────────────────────────────────────────────
   {
     id: 'classical-empires',
-    label: 'Classical Empires',
+    group: 'Empires & Culture',
+        label: 'Classical Empires',
     color: '#7b2d8b',
     mapboxType: 'fill',
     dataUrl: './data/classical-empires.geojson',
@@ -64,7 +70,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'postclassical-empires',
-    label: 'Post-Classical Empires',
+    group: 'Empires & Culture',
+        label: 'Post-Classical Empires',
     color: '#c2185b',
     mapboxType: 'fill',
     dataUrl: './data/postclassical-empires.geojson',
@@ -74,7 +81,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'maya-culture-areas',
-    label: 'Maya Culture Areas',
+    group: 'Empires & Culture',
+        label: 'Maya Culture Areas',
     color: '#2e7d32',
     mapboxType: 'fill',
     dataUrl: './data/maya-culture-areas.geojson',
@@ -84,7 +92,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'mayan-sites',
-    label: 'Maya Sites (ArcGIS)',
+    group: 'Empires & Culture',
+        label: 'Maya Sites (ArcGIS)',
     color: '#00838f',
     mapboxType: 'circle',
     dataUrl: './data/mayan-sites.geojson',
@@ -94,7 +103,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'aztec-villages',
-    label: 'Aztec Villages',
+    group: 'Empires & Culture',
+        label: 'Aztec Villages',
     color: '#e65100',
     mapboxType: 'circle',
     dataUrl: './data/aztec-villages.geojson',
@@ -106,7 +116,8 @@ export const LAYER_REGISTRY = [
   // ── Languages ────────────────────────────────────────────────────────────
   {
     id: 'language-families',
-    label: 'Language Families',
+    group: 'Languages',
+        label: 'Language Families',
     color: '#4527a0',
     mapboxType: 'fill',
     featureColor: true,
@@ -117,7 +128,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'language-dialects',
-    label: 'Language Dialects (Meso-America)',
+    group: 'Languages',
+        label: 'Language Dialects (Meso-America)',
     color: '#4527a0',
     mapboxType: 'fill',
     featureColor: true,
@@ -130,7 +142,8 @@ export const LAYER_REGISTRY = [
   // ── LIDAR & Settlement ───────────────────────────────────────────────────
   {
     id: 'lidar-coverage',
-    label: 'LIDAR Survey Coverage (2019)',
+    group: 'LiDAR & Settlement',
+        label: 'LIDAR Survey Coverage (2019)',
     color: '#00bcd4',
     mapboxType: 'fill',
     dataUrl: './data/lidar-coverage.geojson',
@@ -140,7 +153,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'lidar-coverage-2022',
-    label: 'LIDAR Survey Coverage (2022)',
+    group: 'LiDAR & Settlement',
+        label: 'LIDAR Survey Coverage (2022)',
     color: '#0097a7',
     mapboxType: 'fill',
     dataUrl: './data/lidar-coverage-2022.geojson',
@@ -150,7 +164,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'maya-settlement-groups',
-    label: 'Maya Settlement Groups (LIDAR)',
+    group: 'LiDAR & Settlement',
+        label: 'Maya Settlement Groups (LIDAR)',
     color: '#ff7043',
     mapboxType: 'fill',
     dataUrl: './data/maya-settlement-groups.geojson',
@@ -160,7 +175,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'pacunam-survey-units',
-    label: 'PACUNAM LiDAR Survey Units',
+    group: 'LiDAR & Settlement',
+        label: 'PACUNAM LiDAR Survey Units',
     color: '#26c6da',
     mapboxType: 'fill',
     dataUrl: './data/pacunam-survey-units.geojson',
@@ -170,7 +186,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'la-milpa',
-    label: 'La Milpa Settlement, Belize',
+    group: 'LiDAR & Settlement',
+        label: 'La Milpa Settlement, Belize',
     color: '#ab47bc',
     mapboxType: 'fill',
     dataUrl: './data/la-milpa.geojson',
@@ -180,7 +197,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'pulltrouser-swamp',
-    label: 'Pulltrouser Swamp Settlement (Belize)',
+    group: 'LiDAR & Settlement',
+        label: 'Pulltrouser Swamp Settlement (Belize)',
     color: '#43a047',
     mapboxType: 'fill',
     dataUrl: './data/pulltrouser-swamp.geojson',
@@ -190,7 +208,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'pulltrouser-swamp-points',
-    label: 'Pulltrouser Swamp Structures (points)',
+    group: 'LiDAR & Settlement',
+        label: 'Pulltrouser Swamp Structures (points)',
     color: '#66bb6a',
     mapboxType: 'circle',
     dataUrl: './data/pulltrouser-swamp-points.geojson',
@@ -200,7 +219,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'becan',
-    label: 'Becan Settlement, Campeche (polygons)',
+    group: 'LiDAR & Settlement',
+        label: 'Becan Settlement, Campeche (polygons)',
     color: '#f57f17',
     mapboxType: 'fill',
     dataUrl: './data/becan.geojson',
@@ -210,7 +230,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'becan-points',
-    label: 'Becan Structures, Campeche (points)',
+    group: 'LiDAR & Settlement',
+        label: 'Becan Structures, Campeche (points)',
     color: '#ffb300',
     mapboxType: 'circle',
     dataUrl: './data/becan-points.geojson',
@@ -222,7 +243,8 @@ export const LAYER_REGISTRY = [
   // ── Physical Geography ───────────────────────────────────────────────────
   {
     id: 'volcanoes',
-    label: 'Holocene Volcanoes',
+    group: 'Physical Geography',
+        label: 'Holocene Volcanoes',
     color: '#d32f2f',
     mapboxType: 'circle',
     dataUrl: './data/volcanoes.geojson',
@@ -232,7 +254,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'faults-central-america',
-    label: 'Active Faults — Central America',
+    group: 'Physical Geography',
+        label: 'Active Faults — Central America',
     color: '#b71c1c',
     mapboxType: 'line',
     lineWidth: 1.5,
@@ -243,7 +266,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'faults-mexico',
-    label: 'Active Faults — Mexico',
+    group: 'Physical Geography',
+        label: 'Active Faults — Mexico',
     color: '#c62828',
     mapboxType: 'line',
     lineWidth: 1.5,
@@ -254,7 +278,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'earthquakes',
-    label: 'Earthquakes (M5.0+, 1900–2024)',
+    group: 'Physical Geography',
+        label: 'Earthquakes (M5.0+, 1900–2024)',
     color: '#ff6f00',
     mapboxType: 'circle',
     dataUrl: './data/earthquakes.geojson',
@@ -264,7 +289,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'major-rivers',
-    label: 'Major Rivers',
+    group: 'Physical Geography',
+        label: 'Major Rivers',
     color: '#0288d1',
     mapboxType: 'line',
     lineWidth: 1.5,
@@ -275,7 +301,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'major-lakes',
-    label: 'Major Lakes',
+    group: 'Physical Geography',
+        label: 'Major Lakes',
     color: '#0277bd',
     mapboxType: 'fill',
     dataUrl: './data/major-lakes.geojson',
@@ -285,7 +312,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'hurricane-tracks',
-    label: 'Hurricane Tracks (1851–2023)',
+    group: 'Physical Geography',
+        label: 'Hurricane Tracks (1851–2023)',
     color: '#6a1b9a',
     mapboxType: 'line',
     lineWidth: 1,
@@ -296,7 +324,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'coral-reefs',
-    label: 'Coral Reefs',
+    group: 'Physical Geography',
+        label: 'Coral Reefs',
     color: '#ff6e40',
     mapboxType: 'fill',
     dataUrl: './data/coral-reefs.geojson',
@@ -306,7 +335,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'ramsar-wetlands',
-    label: 'Ramsar Wetlands',
+    group: 'Physical Geography',
+        label: 'Ramsar Wetlands',
     color: '#00796b',
     mapboxType: 'circle',
     dataUrl: './data/ramsar-wetlands.geojson',
@@ -318,7 +348,8 @@ export const LAYER_REGISTRY = [
   // ── Ecology & Environment ────────────────────────────────────────────────
   {
     id: 'ecoregions',
-    label: 'Terrestrial Ecoregions',
+    group: 'Ecology & Environment',
+        label: 'Terrestrial Ecoregions',
     color: '#558b2f',
     mapboxType: 'fill',
     featureColor: true,
@@ -329,7 +360,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'mangroves-2020',
-    label: 'Mangrove Coverage (2020)',
+    group: 'Ecology & Environment',
+        label: 'Mangrove Coverage (2020)',
     color: '#1b5e20',
     mapboxType: 'fill',
     dataUrl: './data/mangroves-2020.geojson',
@@ -339,7 +371,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'protected-areas',
-    label: 'Protected Areas (WDPA)',
+    group: 'Ecology & Environment',
+        label: 'Protected Areas (WDPA)',
     color: '#33691e',
     mapboxType: 'fill',
     dataUrl: './data/protected-areas.geojson',
@@ -349,7 +382,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'culturally-significant-species',
-    label: 'Culturally Significant Species',
+    group: 'Ecology & Environment',
+        label: 'Culturally Significant Species',
     color: '#00c853',
     mapboxType: 'circle',
     featureColor: true,
@@ -362,7 +396,8 @@ export const LAYER_REGISTRY = [
   // ── Conflict & Security ──────────────────────────────────────────────────
   {
     id: 'modern-conflict-sites',
-    label: 'Modern Conflict Sites',
+    group: 'Conflict & History',
+        label: 'Modern Conflict Sites',
     color: '#b71c1c',
     mapboxType: 'circle',
     dataUrl: './data/modern-conflict-sites.geojson',
@@ -372,7 +407,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'conflict-events',
-    label: 'Conflict Events (2022–2023)',
+    group: 'Conflict & History',
+        label: 'Conflict Events (2022–2023)',
     color: '#c62828',
     mapboxType: 'circle',
     dataUrl: './data/conflict-events.geojson',
@@ -384,7 +420,8 @@ export const LAYER_REGISTRY = [
   // ── Modern Administrative ────────────────────────────────────────────────
   {
     id: 'admin2-boundaries',
-    label: 'Municipalities / Districts (ADM-2)',
+    group: 'Modern Administrative',
+        label: 'Municipalities / Districts (ADM-2)',
     color: '#455a64',
     mapboxType: 'fill',
     dataUrl: './data/admin2-boundaries.geojson',
@@ -394,7 +431,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'urban-areas',
-    label: 'Urban Areas',
+    group: 'Modern Administrative',
+        label: 'Urban Areas',
     color: '#78909c',
     mapboxType: 'fill',
     dataUrl: './data/urban-areas.geojson',
@@ -404,7 +442,8 @@ export const LAYER_REGISTRY = [
   },
   {
     id: 'major-roads',
-    label: 'Major Roads',
+    group: 'Modern Administrative',
+        label: 'Major Roads',
     color: '#546e7a',
     mapboxType: 'line',
     lineWidth: 1,
@@ -417,7 +456,8 @@ export const LAYER_REGISTRY = [
   // ── Disabled / Pending ───────────────────────────────────────────────────
   {
     id: 'artifacts',
-    label: 'Artifacts',
+    group: 'Modern Administrative',
+        label: 'Artifacts',
     color: '#1565c0',
     mapboxType: 'circle',
     dataUrl: null,

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 const MAP_TYPES = [
   { id: 'default',     label: 'Default',     icon: '🗺' },
@@ -84,9 +84,14 @@ export default function LayerPanel({
         <span className="layer-panel__region-note" style={{marginLeft:6}}>drag to reorder</span>
       </div>
       <div className="layer-panel__list">
-        {layers.map(layer => (
+        {layers.map((layer, i) => {
+          const showGroupHeader = layer.group && (i === 0 || layer.group !== layers[i - 1].group)
+          return (
+          <React.Fragment key={layer.id}>
+            {showGroupHeader && (
+              <div className="layer-panel__group-header">{layer.group}</div>
+            )}
           <div
-            key={layer.id}
             className={[
               'layer-item',
               layer.visible && !layer.disabled ? 'layer-item--active' : '',
@@ -136,7 +141,8 @@ export default function LayerPanel({
               )}
             </div>
           </div>
-        ))}
+          </React.Fragment>
+        )})}
       </div>
 
       {/* ── Guide Images (attached from overlay) ─────────────────────── */}
