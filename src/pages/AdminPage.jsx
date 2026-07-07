@@ -819,15 +819,104 @@ function AnnotationsSection({ entityId }) {
   )
 }
 
+// ── New entity panel ──────────────────────────────────────────────────────────
+function NewEntityPanel({ onCreated, onCancel }) {
+  const [name, setName]           = useState('')
+  const [entityType, setEntityType] = useState('person')
+  const [creating, setCreating]   = useState(false)
+  const [err, setErr]             = useState(null)
+
+  const { results: similar } = useEntitySearch(name)
+
+  const create = async () => {
+    const trimmed = name.trim()
+    if (!trimmed || !supabase) return
+    setCreating(true); setErr(null)
+    const { data, error } = await supabase
+      .from('entities')
+      .insert({ name: trimmed, entity_type: entityType })
+      .select('id, name, entity_type')
+      .single()
+    setCreating(false)
+    if (error) { setErr(error.message); return }
+    onCreated(data)
+  }
+
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter') create()
+    if (e.key === 'Escape') onCancel()
+  }
+
+  return (
+    <div className="admin-new-entity">
+      <div className="admin-new-entity__title">New entity</div>
+
+      <div className="admin-form-row">
+        <label className="admin-label">Name</label>
+        <input
+          className="admin-search-input"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="Entity name…"
+          autoFocus
+        />
+      </div>
+
+      {/* Duplicate warning */}
+      {similar.length > 0 && name.length >= 2 && (
+        <div className="admin-new-entity__warning">
+          <div className="admin-new-entity__warning-title">Similar entities already exist:</div>
+          {similar.slice(0, 4).map(e => (
+            <div key={e.id} className="admin-new-entity__match">
+              <span className="admin-new-entity__match-name">{e.name}</span>
+              <TypeBadge type={e.entity_type} />
+            </div>
+          ))}
+          {similar.length > 4 && (
+            <div className="admin-new-entity__more">+{similar.length - 4} more</div>
+          )}
+        </div>
+      )}
+
+      <div className="admin-form-row">
+        <label className="admin-label">Entity type</label>
+        <select
+          className="admin-select"
+          value={entityType}
+          onChange={e => setEntityType(e.target.value)}
+        >
+          {Object.keys(EXT_TABLES).map(t => (
+            <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
+          ))}
+        </select>
+      </div>
+
+      {err && <div className="admin-error">{err}</div>}
+
+      <div className="admin-edit-actions">
+        <button
+          className="admin-save-btn admin-save-btn--sm"
+          onClick={create}
+          disabled={creating || !name.trim()}
+        >
+          {creating ? 'Creating…' : 'Create entity'}
+        </button>
+        <button className="admin-cancel-btn" onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function AdminPage() {
-  const [query, setQuery]       = useState('')
-  const [selected, setSelected] = useState(null)
-  const [history, setHistory]   = useState([])
+  const [query, setQuery]         = useState('')
+  const [selected, setSelected]   = useState(null)
+  const [history, setHistory]     = useState([])
+  const [showNew, setShowNew]     = useState(false)
 
   const { results, loading: searching } = useEntitySearch(query)
 
-  // Navigate to a related entity, pushing current onto history stack
   const navigate = (entity) => {
     setHistory(h => selected ? [...h, selected] : h)
     setSelected(entity)
@@ -842,6 +931,13 @@ export default function AdminPage() {
   const selectFromSidebar = (entity) => {
     setSelected(entity)
     setHistory([])
+    setShowNew(false)
+  }
+
+  const handleCreated = (entity) => {
+    setShowNew(false)
+    setQuery(entity.name)
+    selectFromSidebar(entity)
   }
 
   return (
@@ -850,34 +946,53 @@ export default function AdminPage() {
       {/* Sidebar */}
       <div className="admin-sidebar">
         <div className="admin-sidebar__header">
-          <div className="admin-sidebar__title">Entity Browser</div>
-          <input
-            className="admin-search-input"
-            placeholder="Search entities…"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            autoFocus
-          />
+          <div className="admin-sidebar__header-row">
+            <div className="admin-sidebar__title">Entity Browser</div>
+            <button
+              className="admin-new-btn"
+              onClick={() => setShowNew(v => !v)}
+              title="Create a new entity"
+            >
+              {showNew ? '✕' : '+ New'}
+            </button>
+          </div>
+
+          {showNew ? (
+            <NewEntityPanel
+              onCreated={handleCreated}
+              onCancel={() => setShowNew(false)}
+            />
+          ) : (
+            <input
+              className="admin-search-input"
+              placeholder="Search entities…"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              autoFocus
+            />
+          )}
         </div>
 
-        <ul className="admin-entity-list">
-          {results.map(e => (
-            <li
-              key={e.id}
-              className={`admin-entity-item${selected?.id === e.id ? ' admin-entity-item--active' : ''}`}
-              onClick={() => selectFromSidebar(e)}
-            >
-              <span className="admin-entity-name">{e.name}</span>
-              <TypeBadge type={e.entity_type} />
-            </li>
-          ))}
-          {!searching && !results.length && query.length >= 2 && (
-            <li className="admin-empty">No entities found.</li>
-          )}
-          {query.length < 2 && (
-            <li className="admin-hint">Type 2+ characters to search</li>
-          )}
-        </ul>
+        {!showNew && (
+          <ul className="admin-entity-list">
+            {results.map(e => (
+              <li
+                key={e.id}
+                className={`admin-entity-item${selected?.id === e.id ? ' admin-entity-item--active' : ''}`}
+                onClick={() => selectFromSidebar(e)}
+              >
+                <span className="admin-entity-name">{e.name}</span>
+                <TypeBadge type={e.entity_type} />
+              </li>
+            ))}
+            {!searching && !results.length && query.length >= 2 && (
+              <li className="admin-empty">No entities found.</li>
+            )}
+            {query.length < 2 && !showNew && (
+              <li className="admin-hint">Type 2+ characters to search</li>
+            )}
+          </ul>
+        )}
       </div>
 
       {/* Main area */}
@@ -894,7 +1009,9 @@ export default function AdminPage() {
 
         {!selected ? (
           <div className="admin-placeholder">
-            <div className="admin-placeholder__text">Search and select an entity to view its record</div>
+            <div className="admin-placeholder__text">
+              Search for an entity or click + New to create one
+            </div>
           </div>
         ) : (
           <EntityRecord

@@ -2262,3 +2262,86 @@ html, body, #root {
   gap: 10px;
   align-items: end;
 }
+
+/* =====================================================================
+   ADMIN — NEW ENTITY (Phase 4)
+   ===================================================================== */
+
+.admin-sidebar__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.admin-new-btn {
+  background: none;
+  border: 1px solid #2a2e44;
+  color: #505878;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.admin-new-btn:hover {
+  border-color: #5060a0;
+  color: #8898c8;
+}
+
+.admin-new-entity {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0 4px;
+}
+
+.admin-new-entity__title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #404868;
+}
+
+/* Duplicate / similar entity warning */
+.admin-new-entity__warning {
+  background: rgba(251, 146, 60, 0.07);
+  border: 1px solid rgba(251, 146, 60, 0.2);
+  border-radius: 5px;
+  padding: 8px 10px;
+}
+
+.admin-new-entity__warning-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #a0602a;
+  margin-bottom: 6px;
+}
+
+.admin-new-entity__match {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: 12px;
+}
+
+.admin-new-entity__match-name {
+  color: #c08050;
+  flex: 1;
+}
+
+.admin-new-entity__more {
+  font-size: 11px;
+  color: #705030;
+  font-style: italic;
+  margin-top: 2px;
+}
