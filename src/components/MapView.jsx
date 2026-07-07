@@ -82,20 +82,30 @@ const FreehandPolygonMode = {
 // ---------------------------------------------------------------------------
 // Static GeoJSON layer
 // ---------------------------------------------------------------------------
+function buildColorExpr(layer) {
+  // Prefer explicit match expressions keyed on a categorical property
+  if (layer.colorBy && layer.colorLegend?.length) {
+    const pairs = layer.colorLegend.flatMap(e => [e.value, e.color])
+    return ['match', ['get', layer.colorBy], ...pairs, layer.color]
+  }
+  // Fallback: read a 'color' property stored directly on each GeoJSON feature
+  if (layer.featureColor) return ['coalesce', ['get', 'color'], layer.color]
+  return layer.color
+}
+
 function addLayerToMap(map, layer, cbRef) {
   map.addSource(layer.id,{type:'geojson',data:layer.dataUrl})
+  const ce = buildColorExpr(layer)
   if(layer.mapboxType==='circle'){
-    const cc=layer.featureColor?['coalesce',['get','color'],layer.color]:layer.color
-    map.addLayer({id:layer.id,type:'circle',source:layer.id,layout:{visibility:layer.visible?'visible':'none'},paint:{'circle-radius':['interpolate',['linear'],['zoom'],4,5,10,9],'circle-color':cc,'circle-stroke-width':1.5,'circle-stroke-color':'#fff','circle-opacity':0.9}})
+    map.addLayer({id:layer.id,type:'circle',source:layer.id,layout:{visibility:layer.visible?'visible':'none'},paint:{'circle-radius':['interpolate',['linear'],['zoom'],4,5,10,9],'circle-color':ce,'circle-stroke-width':1.5,'circle-stroke-color':'#fff','circle-opacity':0.9}})
     map.addLayer({id:`${layer.id}-labels`,type:'symbol',source:layer.id,minzoom:6,layout:{visibility:layer.visible?'visible':'none','text-field':['get','name'],'text-size':['interpolate',['linear'],['zoom'],6,10,12,13],'text-offset':[0,1.2],'text-anchor':'top','text-max-width':8},paint:{'text-color':'#1e2030','text-halo-color':'#fff','text-halo-width':1.5}})
     map.on('click',layer.id,e=>cbRef.current.onFeatureClick?.(e.features[0]))
     map.on('mouseenter',layer.id,()=>{map.getCanvas().style.cursor='pointer'})
     map.on('mouseleave',layer.id,()=>{map.getCanvas().style.cursor=''})
   }
   if(layer.mapboxType==='fill'){
-    const fc=layer.featureColor?['coalesce',['get','color'],layer.color]:layer.color
-    map.addLayer({id:layer.id,type:'fill',source:layer.id,layout:{visibility:layer.visible?'visible':'none'},paint:{'fill-color':fc,'fill-opacity':0.25}})
-    map.addLayer({id:`${layer.id}-outline`,type:'line',source:layer.id,layout:{visibility:layer.visible?'visible':'none'},paint:{'line-color':fc,'line-width':1.5,'line-opacity':0.6}})
+    map.addLayer({id:layer.id,type:'fill',source:layer.id,layout:{visibility:layer.visible?'visible':'none'},paint:{'fill-color':ce,'fill-opacity':0.25}})
+    map.addLayer({id:`${layer.id}-outline`,type:'line',source:layer.id,layout:{visibility:layer.visible?'visible':'none'},paint:{'line-color':ce,'line-width':1.5,'line-opacity':0.6}})
     map.addLayer({id:`${layer.id}-labels`,type:'symbol',source:layer.id,minzoom:4,layout:{visibility:layer.visible?'visible':'none','text-field':['get','name'],'text-size':['interpolate',['linear'],['zoom'],4,9,10,13],'text-max-width':10},paint:{'text-color':'#1e2030','text-halo-color':'#fff','text-halo-width':1.5}})
     map.on('click',layer.id,e=>{
       const{regionBuildMode:rm,onCellToggle:oct,onFeatureClick:ofc}=cbRef.current
@@ -105,8 +115,7 @@ function addLayerToMap(map, layer, cbRef) {
     map.on('mouseleave',layer.id,()=>{ if(!cbRef.current.regionBuildMode)return; map.getCanvas().style.cursor='crosshair' })
   }
   if(layer.mapboxType==='line'){
-    const lc=layer.featureColor?['coalesce',['get','color'],layer.color]:layer.color
-    map.addLayer({id:layer.id,type:'line',source:layer.id,layout:{visibility:layer.visible?'visible':'none','line-cap':'round','line-join':'round'},paint:{'line-color':lc,'line-width':layer.lineWidth||1.5,'line-opacity':0.75}})
+    map.addLayer({id:layer.id,type:'line',source:layer.id,layout:{visibility:layer.visible?'visible':'none','line-cap':'round','line-join':'round'},paint:{'line-color':ce,'line-width':layer.lineWidth||1.5,'line-opacity':0.75}})
     map.on('click',layer.id,e=>cbRef.current.onFeatureClick?.(e.features[0]))
     map.on('mouseenter',layer.id,()=>{map.getCanvas().style.cursor='pointer'})
     map.on('mouseleave',layer.id,()=>{map.getCanvas().style.cursor=''})
