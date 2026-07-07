@@ -248,6 +248,7 @@ On every push to `main`:
 | `scripts/add_layer_id.sql` | Added `layer_id` column to entities table | Already run in Supabase SQL Editor |
 | `scripts/phase1_schema.sql` | Initial schema creation | Already run |
 | `scripts/phase1_seed.sql` | Seed `layer_definitions` table | Already run |
+| `scripts/create_annotations_table.sql` | Create `annotations` table for admin freeform notes | **Run in Supabase SQL Editor** |
 
 ---
 
@@ -278,12 +279,16 @@ python3 scripts/generate_geojson.py
 - **Draw tools** — polygon/point drawing, freehand mode, undo/redo, snap-to-boundary, region-build mode, image overlay, vertex re-edit
 - **User layers** — persistent to localStorage, export/import GeoJSON
 - **Timeline** (`/#/timeline`) — SVG timeline of 92 rulers grouped by city, with birth/reign date bars
-- **Admin** (`/#/admin`) — entity search, relationship viewer, add/delete relationships
+- **Admin — Entity Record** — master/detail layout; clicking an entity shows full record with extension fields, relationships (in/out), geo connections, and a reign-period sparkline for persons
+- **Admin — Inline editing** — edit entity name in-place; edit all extension fields (persons dates, place type, etc.) via section edit mode; upserts extension table row
+- **Admin — Relationship management** — collapsible add-relationship form with entity search, direction, type, date range, and notes; delete relationships
+- **Admin — Annotations** — freeform key-value notes on any entity (text/number/date/url/markdown types); click-to-edit values; requires `annotations` table migration (see below)
+- **Admin — Create entity** — "+ New" button with live duplicate detection; opens entity record after creation
+- **Admin — Suggested connections** — surfaces co-rulers and name-similar entities not yet linked; inline quick-connect form per suggestion
 - **Knowledge graph** — 92 rulers seeded from Wikidata with RULED relationships to cities
 
 ### Not Yet Implemented
 
-- Rich admin annotations (markdown notes on any entity, stored in Supabase `annotations` table — table not yet created)
 - Admin point placement (drop a new point on the map from the admin interface)
 - Timeline filtering by time period / entity type beyond city grouping
 - Polity, culture, time_period entity types (schema supports them; no data seeded)
