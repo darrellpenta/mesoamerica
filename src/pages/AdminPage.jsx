@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabase.js'
 
 const REL_TYPES = [
@@ -15,27 +15,34 @@ const EXT_TABLES = {
   event:            'events',
 }
 
+// Colors chosen to read well on white backgrounds (outlined badge style)
 const TYPE_COLORS = {
-  person:           '#a78bfa',
-  place:            '#34d399',
-  geo_feature:      '#60a5fa',
-  territory:        '#f59e0b',
-  admin_boundary:   '#e879f9',
-  event:            '#fb923c',
+  person:           '#7c3aed',
+  place:            '#059669',
+  geo_feature:      '#2563eb',
+  territory:        '#d97706',
+  admin_boundary:   '#9333ea',
+  event:            '#dc2626',
 }
 
-// Fields to strip from extension table display
+const TYPE_INFO = [
+  { type: 'person',         label: 'Persons',          icon: '👤' },
+  { type: 'event',          label: 'Events',            icon: '⚡' },
+  { type: 'place',          label: 'Places',            icon: '📍' },
+  { type: 'territory',      label: 'Territories',       icon: '🗺' },
+  { type: 'geo_feature',    label: 'Geo Features',      icon: '🏔' },
+  { type: 'admin_boundary', label: 'Admin Boundaries',  icon: '🔲' },
+]
+
 const SYSTEM_FIELDS = new Set([
   'id', 'entity_id', 'created_at', 'updated_at', 'source_id', 'geom', 'geometry',
 ])
 
-// Year-valued fields that should render as "615 CE" / "300 BCE"
 const YEAR_KEYS = new Set([
   'birth_year', 'death_year', 'floruit_start', 'floruit_end',
   'date_start', 'date_end', 'date_year_start',
 ])
 
-// Canonical editable fields per entity type (shown in edit mode even if currently null)
 const KNOWN_EXT_FIELDS = {
   person: [
     { key: 'person_type',    type: 'text',   label: 'Person Type',    placeholder: 'e.g. ruler' },
@@ -67,10 +74,11 @@ const KNOWN_EXT_FIELDS = {
     { key: 'iso_code',    type: 'text',   label: 'ISO Code' },
   ],
   event: [
-    { key: 'event_type',    type: 'text',   label: 'Event Type' },
-    { key: 'event_subtype', type: 'text',   label: 'Event Subtype' },
-    { key: 'event_date',    type: 'text',   label: 'Event Date' },
-    { key: 'fatalities',    type: 'number', label: 'Fatalities' },
+    { key: 'event_type',       type: 'text',   label: 'Event Type' },
+    { key: 'event_subtype',    type: 'text',   label: 'Event Subtype' },
+    { key: 'date_year_start',  type: 'number', label: 'Year Start' },
+    { key: 'date_year_end',    type: 'number', label: 'Year End' },
+    { key: 'fatalities',       type: 'number', label: 'Fatalities' },
   ],
 }
 
@@ -90,7 +98,7 @@ function TypeBadge({ type }) {
   return (
     <span
       className="admin-type-badge"
-      style={{ '--type-color': TYPE_COLORS[type] ?? '#8890b0' }}
+      style={{ '--type-color': TYPE_COLORS[type] ?? '#7a82a8' }}
     >
       {type?.replace(/_/g, ' ') ?? 'unknown'}
     </span>
@@ -121,7 +129,7 @@ function useEntitySearch(query) {
   return { results, loading }
 }
 
-// ── Entity picker (used in add-relationship form) ─────────────────────────────
+// ── Entity picker ─────────────────────────────────────────────────────────────
 function EntityPicker({ label, value, onChange, exclude }) {
   const [q, setQ] = useState(value?.name ?? '')
   const [open, setOpen] = useState(false)
@@ -290,12 +298,12 @@ function PersonSparkline({ startYear, endYear }) {
   return (
     <div className="admin-person-sparkline">
       <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
-        <line x1={PAD} y1={H / 2} x2={W - PAD} y2={H / 2} stroke="#252840" strokeWidth={1} />
+        <line x1={PAD} y1={H / 2} x2={W - PAD} y2={H / 2} stroke="#e0e4f0" strokeWidth={1} />
         <line
           x1={toX(0)} y1={2} x2={toX(0)} y2={H - 2}
-          stroke="#2a2e50" strokeWidth={1} strokeDasharray="3 3"
+          stroke="#d0d4e8" strokeWidth={1} strokeDasharray="3 3"
         />
-        <rect x={x1} y={5} width={barW} height={H - 10} rx={2} fill="#6070c0" opacity={0.85} />
+        <rect x={x1} y={5} width={barW} height={H - 10} rx={2} fill="#2563eb" opacity={0.85} />
       </svg>
       <div className="admin-person-sparkline__labels">
         <span>{startYear != null ? formatYear(startYear) : '?'}</span>
@@ -382,13 +390,11 @@ function EditableDetails({ entityType, entityId, ext, onSaved }) {
   const [saving, setSaving]     = useState(false)
   const [err, setErr]           = useState(null)
 
-  // Visible read-only fields: from ext, minus system keys, minus nulls
   const extFields = ext
     ? Object.entries(ext).filter(([k, v]) => !SYSTEM_FIELDS.has(k) && v != null && v !== '')
     : []
 
   const startEdit = () => {
-    // Populate form from current ext data + ensure all KNOWN fields present
     const initial = {}
     for (const f of fields) {
       const raw = ext?.[f.key]
@@ -551,7 +557,6 @@ function EntityRecord({ entity: initialEntity, onNavigate }) {
 
   return (
     <div className="admin-record">
-      {/* Header */}
       <div className="admin-record__header">
         <EditableName
           entity={entity}
@@ -560,12 +565,10 @@ function EntityRecord({ entity: initialEntity, onNavigate }) {
         <TypeBadge type={entity.entity_type} />
       </div>
 
-      {/* Person sparkline */}
       {entity.entity_type === 'person' && (
         <PersonSparkline startYear={personStart} endYear={personEnd} />
       )}
 
-      {/* Extension fields — editable */}
       <EditableDetails
         entityType={entity.entity_type}
         entityId={entity.id}
@@ -573,7 +576,6 @@ function EntityRecord({ entity: initialEntity, onNavigate }) {
         onSaved={load}
       />
 
-      {/* Relationships */}
       <Section title="Relationships" count={totalRels}>
         {outgoing.length > 0 && (
           <div className="admin-rels-group">
@@ -604,7 +606,6 @@ function EntityRecord({ entity: initialEntity, onNavigate }) {
         />
       </Section>
 
-      {/* Geo connections */}
       {geoRels.length > 0 && (
         <Section title="Geographic Connections" count={geoRels.length}>
           <div className="admin-geo-list">
@@ -627,20 +628,18 @@ function EntityRecord({ entity: initialEntity, onNavigate }) {
         </Section>
       )}
 
-      {/* Suggested connections */}
       <SuggestionsSection
         entity={entity}
         rels={rels ?? []}
         onRelAdded={load}
       />
 
-      {/* Freeform annotations */}
       <AnnotationsSection entityId={entity.id} />
     </div>
   )
 }
 
-// ── Inline markdown renderer (bold + links only) ──────────────────────────────
+// ── Inline markdown renderer ──────────────────────────────────────────────────
 function renderInline(text) {
   const tokens = []
   let remaining = text
@@ -685,7 +684,6 @@ function MarkdownBlock({ content }) {
 }
 
 // ── Annotations section ───────────────────────────────────────────────────────
-// The annotations table stores one content_md (markdown blob) per entity.
 function AnnotationsSection({ entityId }) {
   const [row, setRow]         = useState(null)
   const [loading, setLoading] = useState(true)
@@ -783,16 +781,13 @@ function AnnotationsSection({ entityId }) {
   )
 }
 
-// ── Suggestion loader ─────────────────────────────────────────────────────────
+// ── Suggestion helpers ────────────────────────────────────────────────────────
 async function buildSuggestions(entity, rels) {
   if (!supabase) return []
-
   const connectedIds = new Set([entity.id])
   for (const r of rels) { if (r.other?.id) connectedIds.add(r.other.id) }
-
   const suggestions = []
 
-  // Strategy 1: for persons — find co-rulers at the same city
   if (entity.entity_type === 'person') {
     const ruledCityIds = rels
       .filter(r => r.direction === 'out' && r.relation_type === 'RULED' && r.other?.id)
@@ -816,7 +811,6 @@ async function buildSuggestions(entity, rels) {
     }
   }
 
-  // Strategy 2: entities with similar name fragments
   const words = entity.name.split(/[\s,.']+/).filter(w => w.length >= 4)
   if (words.length > 0 && suggestions.length < 8) {
     const { data: nameMatches } = await supabase
@@ -837,7 +831,6 @@ async function buildSuggestions(entity, rels) {
   return suggestions.slice(0, 8)
 }
 
-// ── Quick-connect inline form ─────────────────────────────────────────────────
 function QuickConnectForm({ fromEntity, toEntity, onSaved, onCancel }) {
   const [relType, setRelType]     = useState('SUCCEEDED')
   const [direction, setDirection] = useState('out')
@@ -889,11 +882,10 @@ function QuickConnectForm({ fromEntity, toEntity, onSaved, onCancel }) {
   )
 }
 
-// ── Suggestions section ───────────────────────────────────────────────────────
 function SuggestionsSection({ entity, rels, onRelAdded }) {
-  const [items, setItems]       = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [dismissed, setDismissed] = useState(new Set())
+  const [items, setItems]           = useState([])
+  const [loading, setLoading]       = useState(true)
+  const [dismissed, setDismissed]   = useState(new Set())
   const [connecting, setConnecting] = useState(null)
 
   useEffect(() => {
@@ -903,7 +895,7 @@ function SuggestionsSection({ entity, rels, onRelAdded }) {
       if (!cancelled) { setItems(s); setLoading(false) }
     })
     return () => { cancelled = true }
-  }, [entity.id]) // intentionally not tracking rels to avoid re-running on every load
+  }, [entity.id])
 
   const dismiss = (id) => setDismissed(d => new Set([...d, id]))
 
@@ -914,7 +906,6 @@ function SuggestionsSection({ entity, rels, onRelAdded }) {
   }
 
   const visible = items.filter(s => !dismissed.has(s.id))
-
   if (loading || !visible.length) return null
 
   return (
@@ -953,10 +944,10 @@ function SuggestionsSection({ entity, rels, onRelAdded }) {
 
 // ── New entity panel ──────────────────────────────────────────────────────────
 function NewEntityPanel({ onCreated, onCancel }) {
-  const [name, setName]           = useState('')
+  const [name, setName]             = useState('')
   const [entityType, setEntityType] = useState('person')
-  const [creating, setCreating]   = useState(false)
-  const [err, setErr]             = useState(null)
+  const [creating, setCreating]     = useState(false)
+  const [err, setErr]               = useState(null)
 
   const { results: similar } = useEntitySearch(name)
 
@@ -995,7 +986,6 @@ function NewEntityPanel({ onCreated, onCancel }) {
         />
       </div>
 
-      {/* Duplicate warning */}
       {similar.length > 0 && name.length >= 2 && (
         <div className="admin-new-entity__warning">
           <div className="admin-new-entity__warning-title">Similar entities already exist:</div>
@@ -1040,14 +1030,307 @@ function NewEntityPanel({ onCreated, onCancel }) {
   )
 }
 
+// ── Force-directed graph simulation ──────────────────────────────────────────
+function runForceSimulation(nodes, edges, width, height) {
+  if (!nodes || !nodes.length) return {}
+  const pos = {}
+  const vel = {}
+
+  nodes.forEach((n, i) => {
+    const angle = (i / nodes.length) * Math.PI * 2
+    const r = Math.min(width, height) * 0.3
+    pos[n.id] = { x: width / 2 + r * Math.cos(angle), y: height / 2 + r * Math.sin(angle) }
+    vel[n.id] = { vx: 0, vy: 0 }
+  })
+
+  const REPEL = 1600, ATTRACT = 0.05, CENTER = 0.003, DAMP = 0.86
+
+  for (let step = 0; step < 280; step++) {
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i].id, b = nodes[j].id
+        const dx = pos[b].x - pos[a].x
+        const dy = pos[b].y - pos[a].y
+        const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 0.5)
+        const force = REPEL / (dist * dist)
+        const fx = (dx / dist) * force, fy = (dy / dist) * force
+        vel[a].vx -= fx; vel[a].vy -= fy
+        vel[b].vx += fx; vel[b].vy += fy
+      }
+    }
+    for (const e of edges) {
+      const a = pos[e.from_entity_id], b = pos[e.to_entity_id]
+      if (!a || !b) continue
+      const dx = b.x - a.x, dy = b.y - a.y
+      vel[e.from_entity_id].vx += dx * ATTRACT
+      vel[e.from_entity_id].vy += dy * ATTRACT
+      vel[e.to_entity_id].vx -= dx * ATTRACT
+      vel[e.to_entity_id].vy -= dy * ATTRACT
+    }
+    for (const n of nodes) {
+      vel[n.id].vx += (width / 2 - pos[n.id].x) * CENTER
+      vel[n.id].vy += (height / 2 - pos[n.id].y) * CENTER
+      vel[n.id].vx *= DAMP
+      vel[n.id].vy *= DAMP
+      pos[n.id].x = Math.max(28, Math.min(width - 28, pos[n.id].x + vel[n.id].vx))
+      pos[n.id].y = Math.max(20, Math.min(height - 20, pos[n.id].y + vel[n.id].vy))
+    }
+  }
+
+  return pos
+}
+
+// ── Mini knowledge graph ──────────────────────────────────────────────────────
+function MiniGraph({ data, onSelect }) {
+  const { nodes, edges } = data
+  const W = 580, H = 360
+
+  const [positions] = useState(() => runForceSimulation(nodes, edges, W, H))
+  const [hover, setHover] = useState(null)
+
+  const seen = new Set()
+  const dedupedEdges = []
+  for (const e of edges) {
+    const key = [e.from_entity_id, e.to_entity_id].sort().join('-')
+    if (!seen.has(key)) { seen.add(key); dedupedEdges.push(e) }
+  }
+
+  return (
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} className="admin-graph-svg">
+      {dedupedEdges.map((e, i) => {
+        const a = positions[e.from_entity_id], b = positions[e.to_entity_id]
+        if (!a || !b) return null
+        return (
+          <line key={i}
+            x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+            stroke="#dde1f0" strokeWidth={1} opacity={0.8}
+          />
+        )
+      })}
+      {nodes.map(n => {
+        const p = positions[n.id]
+        if (!p) return null
+        const color = TYPE_COLORS[n.entity_type] ?? '#7a82a8'
+        const isHover = hover === n.id
+        return (
+          <g key={n.id} className="admin-graph-node"
+            onClick={() => onSelect(n)}
+            onMouseEnter={() => setHover(n.id)}
+            onMouseLeave={() => setHover(null)}
+          >
+            <circle
+              cx={p.x} cy={p.y}
+              r={isHover ? 10 : 7}
+              fill={color}
+              fillOpacity={isHover ? 1 : 0.85}
+              stroke="white"
+              strokeWidth={isHover ? 2 : 1.5}
+            />
+            <text
+              x={p.x} y={p.y + (isHover ? 22 : 18)}
+              textAnchor="middle"
+              fontSize={isHover ? 10 : 9}
+              fill={isHover ? '#1a1d2e' : '#7a82a8'}
+              fontWeight={isHover ? '600' : '400'}
+              style={{ pointerEvents: 'none', userSelect: 'none' }}
+            >
+              {n.name.length > 14 ? n.name.slice(0, 13) + '…' : n.name}
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+// ── Admin dashboard ───────────────────────────────────────────────────────────
+function AdminDashboard({ onSelectEntity, onBrowseType }) {
+  const [stats, setStats]           = useState(null)
+  const [recent, setRecent]         = useState([])
+  const [graphData, setGraphData]   = useState(null)
+  const [graphLoading, setGraphLoading] = useState(true)
+
+  useEffect(() => {
+    if (!supabase) return
+    let cancelled = false
+
+    async function load() {
+      const [entRes, relCountRes, recentRes] = await Promise.all([
+        supabase.from('entities').select('entity_type'),
+        supabase.from('relationships').select('id', { count: 'exact', head: true }),
+        supabase.from('entities')
+          .select('id, name, entity_type')
+          .order('created_at', { ascending: false })
+          .limit(12),
+      ])
+
+      if (cancelled) return
+
+      const counts = {}
+      for (const e of (entRes.data ?? [])) {
+        counts[e.entity_type] = (counts[e.entity_type] || 0) + 1
+      }
+      counts._total = (entRes.data ?? []).length
+      counts._rels = relCountRes.count ?? 0
+
+      setStats(counts)
+      setRecent(recentRes.data ?? [])
+
+      // Load graph data
+      const { data: rels } = await supabase
+        .from('relationships')
+        .select('from_entity_id, to_entity_id, relation_type')
+
+      if (!cancelled && rels && rels.length) {
+        const connCount = {}
+        for (const r of rels) {
+          connCount[r.from_entity_id] = (connCount[r.from_entity_id] || 0) + 1
+          connCount[r.to_entity_id]   = (connCount[r.to_entity_id]   || 0) + 1
+        }
+
+        const topIds = Object.entries(connCount)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 28)
+          .map(([id]) => id)
+
+        const { data: topEntities } = await supabase
+          .from('entities')
+          .select('id, name, entity_type')
+          .in('id', topIds)
+
+        const topSet = new Set(topIds)
+        const graphEdges = rels.filter(
+          r => topSet.has(r.from_entity_id) && topSet.has(r.to_entity_id)
+        )
+
+        if (!cancelled) setGraphData({ nodes: topEntities ?? [], edges: graphEdges })
+      }
+
+      if (!cancelled) setGraphLoading(false)
+    }
+
+    load()
+    return () => { cancelled = true }
+  }, [])
+
+  return (
+    <div className="admin-dashboard">
+      {/* Header */}
+      <div className="admin-dash-header">
+        <div className="admin-dash-title">Knowledge Browser</div>
+        <div className="admin-dash-subtitle">Mesoamerica Research Database — click any entity to open its record</div>
+      </div>
+
+      {/* Stats bar */}
+      {stats && (
+        <div className="admin-dash-stats">
+          <div className="admin-dash-stat admin-dash-stat--total">
+            <span className="admin-dash-stat__count">{stats._total}</span>
+            <span className="admin-dash-stat__label">Total Entities</span>
+          </div>
+          <div className="admin-dash-stat">
+            <span className="admin-dash-stat__count">{stats._rels}</span>
+            <span className="admin-dash-stat__label">Relationships</span>
+          </div>
+          {TYPE_INFO.map(t => stats[t.type] ? (
+            <div key={t.type} className="admin-dash-stat" style={{ '--type-color': TYPE_COLORS[t.type] }}>
+              <span className="admin-dash-stat__count">{stats[t.type]}</span>
+              <span className="admin-dash-stat__label">{t.label}</span>
+            </div>
+          ) : null)}
+        </div>
+      )}
+
+      {/* Browse by type */}
+      <div className="admin-dash-section">
+        <div className="admin-dash-section__title">Browse by Type</div>
+        <div className="admin-dash-type-grid">
+          {TYPE_INFO.map(t => (
+            <button
+              key={t.type}
+              className="admin-dash-type-card"
+              style={{ '--type-color': TYPE_COLORS[t.type] ?? '#7a82a8' }}
+              onClick={() => onBrowseType(t.type)}
+            >
+              <span className="admin-dash-type-card__icon">{t.icon}</span>
+              <span className="admin-dash-type-card__label">{t.label}</span>
+              {stats?.[t.type] != null && (
+                <span className="admin-dash-type-card__count">{stats[t.type]}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Two-column: recent + graph */}
+      <div className="admin-dash-cols">
+
+        {/* Recently added */}
+        <div className="admin-dash-panel admin-dash-panel--recent">
+          <div className="admin-dash-panel__title">Recently Added</div>
+          <div className="admin-dash-recent-list">
+            {recent.map(e => (
+              <button key={e.id} className="admin-dash-recent-item" onClick={() => onSelectEntity(e)}>
+                <span className="admin-dash-recent-item__name">{e.name}</span>
+                <TypeBadge type={e.entity_type} />
+              </button>
+            ))}
+            {!recent.length && (
+              <div className="admin-empty-state">No entities yet.</div>
+            )}
+          </div>
+        </div>
+
+        {/* Knowledge graph */}
+        <div className="admin-dash-panel admin-dash-panel--graph">
+          <div className="admin-dash-panel__title">
+            Relationship Network
+            <span className="admin-dash-panel__subtitle"> — top 28 most-connected entities</span>
+          </div>
+          {graphLoading && (
+            <div className="admin-dash-graph-loading">
+              <div className="admin-spinner" />
+              <span>Building graph…</span>
+            </div>
+          )}
+          {!graphLoading && graphData && (
+            <MiniGraph data={graphData} onSelect={onSelectEntity} />
+          )}
+          {!graphLoading && !graphData && (
+            <div className="admin-empty-state">No relationship data to display.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   const [query, setQuery]         = useState('')
   const [selected, setSelected]   = useState(null)
   const [history, setHistory]     = useState([])
   const [showNew, setShowNew]     = useState(false)
+  const [browseType, setBrowseType]       = useState(null)
+  const [browseResults, setBrowseResults] = useState([])
+  const [browseLoading, setBrowseLoading] = useState(false)
 
   const { results, loading: searching } = useEntitySearch(query)
+
+  // Load entities when a type filter is selected
+  useEffect(() => {
+    if (!browseType || !supabase) { setBrowseResults([]); return }
+    setBrowseLoading(true)
+    supabase.from('entities')
+      .select('id, name, entity_type')
+      .eq('entity_type', browseType)
+      .order('name')
+      .limit(100)
+      .then(({ data }) => {
+        setBrowseResults(data ?? [])
+        setBrowseLoading(false)
+      })
+  }, [browseType])
 
   const navigate = (entity) => {
     setHistory(h => selected ? [...h, selected] : h)
@@ -1072,6 +1355,15 @@ export default function AdminPage() {
     selectFromSidebar(entity)
   }
 
+  const handleBrowseType = (type) => {
+    setBrowseType(prev => prev === type ? null : type)
+    setQuery('')
+    setShowNew(false)
+  }
+
+  // The displayed list: search takes priority, then browse type
+  const displayList = query.length >= 2 ? results : browseResults
+
   return (
     <div className="admin-page">
 
@@ -1089,6 +1381,23 @@ export default function AdminPage() {
             </button>
           </div>
 
+          {/* Type filter pills */}
+          {!showNew && (
+            <div className="admin-type-pills">
+              {TYPE_INFO.map(t => (
+                <button
+                  key={t.type}
+                  className={`admin-type-pill${browseType === t.type ? ' admin-type-pill--active' : ''}`}
+                  style={{ '--type-color': TYPE_COLORS[t.type] }}
+                  onClick={() => handleBrowseType(t.type)}
+                  title={`Browse ${t.label}`}
+                >
+                  {t.icon} {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           {showNew ? (
             <NewEntityPanel
               onCreated={handleCreated}
@@ -1097,17 +1406,20 @@ export default function AdminPage() {
           ) : (
             <input
               className="admin-search-input"
-              placeholder="Search entities…"
+              placeholder={browseType ? `Search in ${TYPE_INFO.find(t => t.type === browseType)?.label ?? browseType}…` : 'Search all entities…'}
               value={query}
               onChange={e => setQuery(e.target.value)}
-              autoFocus
             />
           )}
         </div>
 
         {!showNew && (
           <ul className="admin-entity-list">
-            {results.map(e => (
+            {browseLoading && query.length < 2 && (
+              <li className="admin-hint">Loading…</li>
+            )}
+
+            {displayList.map(e => (
               <li
                 key={e.id}
                 className={`admin-entity-item${selected?.id === e.id ? ' admin-entity-item--active' : ''}`}
@@ -1117,11 +1429,13 @@ export default function AdminPage() {
                 <TypeBadge type={e.entity_type} />
               </li>
             ))}
-            {!searching && !results.length && query.length >= 2 && (
+
+            {!searching && !browseLoading && !displayList.length && query.length >= 2 && (
               <li className="admin-empty">No entities found.</li>
             )}
-            {query.length < 2 && !showNew && (
-              <li className="admin-hint">Type 2+ characters to search</li>
+
+            {query.length < 2 && !browseType && !showNew && (
+              <li className="admin-hint">Select a type above or type to search</li>
             )}
           </ul>
         )}
@@ -1140,11 +1454,10 @@ export default function AdminPage() {
         )}
 
         {!selected ? (
-          <div className="admin-placeholder">
-            <div className="admin-placeholder__text">
-              Search for an entity or click + New to create one
-            </div>
-          </div>
+          <AdminDashboard
+            onSelectEntity={selectFromSidebar}
+            onBrowseType={handleBrowseType}
+          />
         ) : (
           <EntityRecord
             key={selected.id}
