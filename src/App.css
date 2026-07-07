@@ -2691,24 +2691,46 @@ html, body, #root {
 
 .timeline-toolbar {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
+  flex-direction: column;
+  gap: 0;
   border-bottom: 1px solid #e0e4f0;
   background: #ffffff;
   flex-shrink: 0;
-  overflow-x: auto;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
+.timeline-toolbar__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  overflow-x: auto;
+}
+
+.timeline-toolbar__row + .timeline-toolbar__row {
+  border-top: 1px solid #eef0f8;
+  padding-top: 7px;
+  padding-bottom: 9px;
+}
+
 .timeline-toolbar__label {
-  font-size: 11px;
-  color: #9098b8;
+  font-size: 10px;
+  color: #b0b8cc;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
-  margin-right: 4px;
+  flex-shrink: 0;
+  min-width: 32px;
+}
+
+.timeline-toolbar__summary {
+  margin-left: auto;
+  font-size: 11px;
+  color: #9098b8;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .timeline-filter-btn {
@@ -2721,16 +2743,61 @@ html, body, #root {
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
+  font-family: inherit;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .timeline-filter-btn:hover { background: #eef2ff; color: #1a1d2e; border-color: #c0c4d8; }
 
 .timeline-filter-btn--active {
-  background: rgba(37,99,235,0.08);
+  background: rgba(37,99,235,0.07);
   border-color: var(--city-color, #2563eb);
   color: var(--city-color, #2563eb);
   font-weight: 700;
+}
+
+/* Entity type toggle pills */
+.timeline-type-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 3px 8px;
+  border: 1.5px solid #e0e4f0;
+  border-radius: 14px;
+  background: #f8f9fd;
+  color: #9098b8;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.timeline-type-btn:hover {
+  border-color: var(--type-color, #2563eb);
+  color: var(--type-color, #2563eb);
+  background: #f0f2fb;
+}
+
+.timeline-type-btn--active {
+  border-color: var(--type-color, #2563eb);
+  color: var(--type-color, #2563eb);
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.timeline-type-btn__count {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--type-color, #2563eb);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 0 5px;
+  min-width: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
 }
 
 .timeline-scroll {
