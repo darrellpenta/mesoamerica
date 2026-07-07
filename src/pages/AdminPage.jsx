@@ -35,6 +35,45 @@ const YEAR_KEYS = new Set([
   'date_start', 'date_end', 'date_year_start',
 ])
 
+// Canonical editable fields per entity type (shown in edit mode even if currently null)
+const KNOWN_EXT_FIELDS = {
+  person: [
+    { key: 'person_type',    type: 'text',   label: 'Person Type',    placeholder: 'e.g. ruler' },
+    { key: 'birth_year',     type: 'number', label: 'Birth Year',     placeholder: 'e.g. -615' },
+    { key: 'death_year',     type: 'number', label: 'Death Year',     placeholder: 'e.g. -683' },
+    { key: 'floruit_start',  type: 'number', label: 'Floruit Start',  placeholder: 'year' },
+    { key: 'floruit_end',    type: 'number', label: 'Floruit End',    placeholder: 'year' },
+    { key: 'date_label',     type: 'text',   label: 'Date Label',     placeholder: 'e.g. 615–683 CE' },
+  ],
+  place: [
+    { key: 'place_type',  type: 'text',   label: 'Place Type',  placeholder: 'e.g. city' },
+    { key: 'elevation_m', type: 'number', label: 'Elevation (m)' },
+    { key: 'date_start',  type: 'number', label: 'Date Start (year)' },
+    { key: 'date_end',    type: 'number', label: 'Date End (year)' },
+    { key: 'date_label',  type: 'text',   label: 'Date Label' },
+  ],
+  geo_feature: [
+    { key: 'feature_type', type: 'text', label: 'Feature Type' },
+    { key: 'subtype',      type: 'text', label: 'Subtype' },
+  ],
+  territory: [
+    { key: 'territory_type',  type: 'text',   label: 'Territory Type' },
+    { key: 'date_start',      type: 'number', label: 'Date Start (year)' },
+    { key: 'date_end',        type: 'number', label: 'Date End (year)' },
+    { key: 'date_precision',  type: 'text',   label: 'Date Precision' },
+  ],
+  admin_boundary: [
+    { key: 'admin_level', type: 'number', label: 'Admin Level' },
+    { key: 'iso_code',    type: 'text',   label: 'ISO Code' },
+  ],
+  event: [
+    { key: 'event_type',    type: 'text',   label: 'Event Type' },
+    { key: 'event_subtype', type: 'text',   label: 'Event Subtype' },
+    { key: 'event_date',    type: 'text',   label: 'Event Date' },
+    { key: 'fatalities',    type: 'number', label: 'Fatalities' },
+  ],
+}
+
 function formatYear(y) {
   if (y == null) return ''
   return y < 0 ? `${Math.abs(y)} BCE` : `${y} CE`
@@ -268,24 +307,194 @@ function PersonSparkline({ startYear, endYear }) {
 }
 
 // ── Section wrapper ───────────────────────────────────────────────────────────
-function Section({ title, count, children }) {
+function Section({ title, count, action, children }) {
   return (
     <div className="admin-record__section">
       <div className="admin-section-header">
         <span className="admin-section-title">{title}</span>
         {count != null && <span className="admin-section-count">{count}</span>}
+        {action && <div className="admin-section-action">{action}</div>}
       </div>
       {children}
     </div>
   )
 }
 
+// ── Editable name field ───────────────────────────────────────────────────────
+function EditableName({ entity, onSaved }) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue]     = useState(entity.name)
+  const [saving, setSaving]   = useState(false)
+  const [err, setErr]         = useState(null)
+
+  const save = async () => {
+    const trimmed = value.trim()
+    if (!trimmed || trimmed === entity.name) { setEditing(false); return }
+    setSaving(true); setErr(null)
+    const { error } = await supabase.from('entities').update({ name: trimmed }).eq('id', entity.id)
+    setSaving(false)
+    if (error) { setErr(error.message); return }
+    setEditing(false)
+    onSaved?.(trimmed)
+  }
+
+  const cancel = () => { setValue(entity.name); setEditing(false); setErr(null) }
+
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter') save()
+    if (e.key === 'Escape') cancel()
+  }
+
+  if (editing) {
+    return (
+      <div className="admin-name-edit">
+        <input
+          className="admin-name-input"
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onKeyDown={onKeyDown}
+          autoFocus
+        />
+        <button className="admin-name-save" onClick={save} disabled={saving}>
+          {saving ? '…' : 'Save'}
+        </button>
+        <button className="admin-name-cancel" onClick={cancel}>Cancel</button>
+        {err && <div className="admin-error" style={{ marginTop: 4 }}>{err}</div>}
+      </div>
+    )
+  }
+
+  return (
+    <div className="admin-record__name-row">
+      <div className="admin-record__name">{entity.name}</div>
+      <button className="admin-edit-icon-btn" onClick={() => setEditing(true)} title="Edit name">
+        ✎
+      </button>
+    </div>
+  )
+}
+
+// ── Editable details section ──────────────────────────────────────────────────
+function EditableDetails({ entityType, entityId, ext, onSaved }) {
+  const fields = KNOWN_EXT_FIELDS[entityType] ?? []
+  const [editing, setEditing]   = useState(false)
+  const [form, setForm]         = useState({})
+  const [saving, setSaving]     = useState(false)
+  const [err, setErr]           = useState(null)
+
+  // Visible read-only fields: from ext, minus system keys, minus nulls
+  const extFields = ext
+    ? Object.entries(ext).filter(([k, v]) => !SYSTEM_FIELDS.has(k) && v != null && v !== '')
+    : []
+
+  const startEdit = () => {
+    // Populate form from current ext data + ensure all KNOWN fields present
+    const initial = {}
+    for (const f of fields) {
+      const raw = ext?.[f.key]
+      initial[f.key] = raw != null ? String(raw) : ''
+    }
+    setForm(initial)
+    setEditing(true)
+    setErr(null)
+  }
+
+  const cancel = () => { setEditing(false); setErr(null) }
+
+  const save = async () => {
+    setSaving(true); setErr(null)
+    const table = EXT_TABLES[entityType]
+    if (!table) { setSaving(false); setEditing(false); return }
+
+    const updates = {}
+    for (const f of fields) {
+      const raw = form[f.key]
+      if (raw === '' || raw == null) {
+        updates[f.key] = null
+      } else if (f.type === 'number') {
+        const parsed = parseInt(raw, 10)
+        updates[f.key] = isNaN(parsed) ? null : parsed
+      } else {
+        updates[f.key] = raw
+      }
+    }
+
+    let error
+    if (ext) {
+      ({ error } = await supabase.from(table).update(updates).eq('entity_id', entityId))
+    } else {
+      ({ error } = await supabase.from(table).insert({ entity_id: entityId, ...updates }))
+    }
+
+    setSaving(false)
+    if (error) { setErr(error.message); return }
+    setEditing(false)
+    onSaved?.()
+  }
+
+  if (!editing) {
+    return (
+      <Section
+        title="Details"
+        action={fields.length > 0
+          ? <button className="admin-section-edit-btn" onClick={startEdit}>Edit</button>
+          : null
+        }
+      >
+        {extFields.length > 0 ? (
+          <div className="admin-fields-grid">
+            {extFields.map(([k, v]) => (
+              <div key={k} className="admin-field">
+                <div className="admin-field__label">{k.replace(/_/g, ' ')}</div>
+                <div className="admin-field__value">{formatFieldValue(k, v)}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="admin-empty-state">
+            {fields.length > 0 ? 'No details recorded. Click Edit to add.' : 'No editable fields for this entity type.'}
+          </div>
+        )}
+      </Section>
+    )
+  }
+
+  return (
+    <Section title="Details">
+      <div className="admin-edit-form">
+        <div className="admin-fields-edit-grid">
+          {fields.map(f => (
+            <div key={f.key} className="admin-field-edit">
+              <label className="admin-field__label">{f.label}</label>
+              <input
+                className="admin-input admin-input--compact"
+                type={f.type}
+                value={form[f.key] ?? ''}
+                placeholder={f.placeholder ?? ''}
+                onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+              />
+            </div>
+          ))}
+        </div>
+        {err && <div className="admin-error">{err}</div>}
+        <div className="admin-edit-actions">
+          <button className="admin-save-btn admin-save-btn--sm" onClick={save} disabled={saving}>
+            {saving ? 'Saving…' : 'Save changes'}
+          </button>
+          <button className="admin-cancel-btn" onClick={cancel}>Cancel</button>
+        </div>
+      </div>
+    </Section>
+  )
+}
+
 // ── Entity Record ─────────────────────────────────────────────────────────────
-function EntityRecord({ entity, onNavigate }) {
-  const [ext, setExt]       = useState(undefined)
-  const [rels, setRels]     = useState(null)
+function EntityRecord({ entity: initialEntity, onNavigate }) {
+  const [entity, setEntity]   = useState(initialEntity)
+  const [ext, setExt]         = useState(undefined)
+  const [rels, setRels]       = useState(null)
   const [loading, setLoading] = useState(true)
-  const [relKey, setRelKey] = useState(0)
+  const [relKey, setRelKey]   = useState(0)
 
   const load = useCallback(async () => {
     if (!supabase || !entity) return
@@ -329,21 +538,13 @@ function EntityRecord({ entity, onNavigate }) {
     )
   }
 
-  // Extension fields: strip system keys and nulls, format year values
-  const extFields = ext
-    ? Object.entries(ext).filter(([k, v]) => !SYSTEM_FIELDS.has(k) && v != null && v !== '')
-    : []
-
-  // Person date range for sparkline
   const personStart = ext?.birth_year ?? ext?.floruit_start ?? null
   const personEnd   = ext?.death_year ?? ext?.floruit_end   ?? null
 
-  // Separate relationships by direction
   const outgoing = (rels ?? []).filter(r => r.direction === 'out')
   const incoming = (rels ?? []).filter(r => r.direction === 'in')
   const totalRels = (rels ?? []).length
 
-  // Geo connections: related entities that are places or geo_features
   const geoRels = (rels ?? []).filter(r =>
     r.other?.entity_type === 'place' || r.other?.entity_type === 'geo_feature'
   )
@@ -352,28 +553,25 @@ function EntityRecord({ entity, onNavigate }) {
     <div className="admin-record">
       {/* Header */}
       <div className="admin-record__header">
-        <div className="admin-record__name">{entity.name}</div>
+        <EditableName
+          entity={entity}
+          onSaved={(newName) => setEntity(e => ({ ...e, name: newName }))}
+        />
         <TypeBadge type={entity.entity_type} />
       </div>
 
-      {/* Person timeline sparkline */}
+      {/* Person sparkline */}
       {entity.entity_type === 'person' && (
         <PersonSparkline startYear={personStart} endYear={personEnd} />
       )}
 
-      {/* Extension / detail fields */}
-      {extFields.length > 0 && (
-        <Section title="Details">
-          <div className="admin-fields-grid">
-            {extFields.map(([k, v]) => (
-              <div key={k} className="admin-field">
-                <div className="admin-field__label">{k.replace(/_/g, ' ')}</div>
-                <div className="admin-field__value">{formatFieldValue(k, v)}</div>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
+      {/* Extension fields — editable */}
+      <EditableDetails
+        entityType={entity.entity_type}
+        entityId={entity.id}
+        ext={ext}
+        onSaved={load}
+      />
 
       {/* Relationships */}
       <Section title="Relationships" count={totalRels}>
@@ -406,7 +604,7 @@ function EntityRecord({ entity, onNavigate }) {
         />
       </Section>
 
-      {/* Geo connections (derived from relationships) */}
+      {/* Geo connections */}
       {geoRels.length > 0 && (
         <Section title="Geographic Connections" count={geoRels.length}>
           <div className="admin-geo-list">

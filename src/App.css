@@ -1988,3 +1988,165 @@ html, body, #root {
 .admin-breadcrumb__current {
   color: #606888;
 }
+
+/* =====================================================================
+   ADMIN — INLINE EDITING (Phase 2)
+   ===================================================================== */
+
+/* Name row with edit pencil */
+.admin-record__name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-edit-icon-btn {
+  background: none;
+  border: none;
+  color: #303450;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: color 0.1s, background 0.1s;
+}
+
+.admin-edit-icon-btn:hover {
+  color: #8898c8;
+  background: rgba(136, 152, 200, 0.1);
+}
+
+/* Inline name edit */
+.admin-name-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.admin-name-input {
+  flex: 1;
+  min-width: 160px;
+  background: #1a1c30;
+  border: 1px solid #5060a0;
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: #e8eaff;
+  font-size: 18px;
+  font-weight: 600;
+  outline: none;
+  font-family: inherit;
+}
+
+.admin-name-save {
+  background: #4a5aaa;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+
+.admin-name-save:hover:not(:disabled) { background: #5568c0; }
+.admin-name-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.admin-name-cancel {
+  background: none;
+  border: none;
+  color: #505870;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: color 0.1s;
+}
+
+.admin-name-cancel:hover { color: #8890b0; }
+
+/* Section header action slot */
+.admin-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.admin-section-action {
+  margin-left: auto;
+}
+
+.admin-section-edit-btn {
+  background: none;
+  border: 1px solid #252840;
+  color: #404868;
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.admin-section-edit-btn:hover {
+  border-color: #5060a0;
+  color: #8898c8;
+}
+
+/* Edit form inside a section */
+.admin-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.admin-fields-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px 16px;
+  margin-bottom: 14px;
+}
+
+.admin-field-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-input--compact {
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+/* Edit action bar */
+.admin-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-save-btn--sm {
+  padding: 6px 16px;
+  font-size: 12px;
+  width: auto;
+}
+
+.admin-cancel-btn {
+  background: none;
+  border: none;
+  color: #505870;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: color 0.1s;
+}
+
+.admin-cancel-btn:hover { color: #8890b0; }
