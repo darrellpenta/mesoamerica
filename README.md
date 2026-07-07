@@ -132,10 +132,16 @@ notes          text
 | admin_boundaries | 3,636 |
 | geo_features | 35,314 |
 | persons | 92 |
-| **Total entities** | **~61,600** |
-| **Relationships** | **145** |
+| **Total entities** | **~61,650** |
+| **Relationships** | **~195** |
 
-The 92 persons are Maya and Aztec rulers seeded from Wikidata (see `scripts/seed_from_wikidata.py`). Cities covered: Palenque (19), Copán (19), Tenochtitlan (21), Calakmul (15), Piedras Negras (12), Yaxchilan (6).
+**Person cohorts:**
+- 92 Maya/Aztec rulers seeded from Wikidata — Palenque (19), Copán (19), Tenochtitlan (21), Calakmul (15), Piedras Negras (12), Yaxchilan (6)
+- 20 modern Central American historical figures from *The Long Shadow* (Walker, Zemurray, Sandino, Árbenz, Ríos Montt, Romero, D'Aubuisson, Noriega, et al.)
+
+**Events cohort (The Long Shadow):** La Matanza, Operation PBSUCCESS, El Mozote, Río Negro Massacres, Gerardi Assassination, Iran-Contra, Panama Invasion, Honduras Coup, and 8 others
+
+**Places cohort (The Long Shadow):** El Mozote, Pantzós, Ixil Triangle, Río Negro, El Aguacate (massacre sites and strategic locations)
 
 ### RLS policies
 
@@ -248,7 +254,8 @@ On every push to `main`:
 | `scripts/add_layer_id.sql` | Added `layer_id` column to entities table | Already run in Supabase SQL Editor |
 | `scripts/phase1_schema.sql` | Initial schema creation | Already run |
 | `scripts/phase1_seed.sql` | Seed `layer_definitions` table | Already run |
-| `scripts/create_annotations_table.sql` | Create `annotations` table for admin freeform notes | **Run in Supabase SQL Editor** |
+| `scripts/create_annotations_table.sql` | Create `annotations` table (key/value schema) | **Pending** — existing annotations table uses `content_md` blob schema; see note below |
+| `scripts/seed_long_shadow.py` | Seed 20 persons, 16 events, 5 places, ~50 relationships and annotations from *The Long Shadow* | `python3 scripts/seed_long_shadow.py [--dry-run]` |
 
 ---
 
