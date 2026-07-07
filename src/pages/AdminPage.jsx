@@ -640,114 +640,99 @@ function EntityRecord({ entity: initialEntity, onNavigate }) {
   )
 }
 
-// ── Annotation value — editable in-place ─────────────────────────────────────
-function EditableAnnotationValue({ annotation, onUpdate }) {
-  const [editing, setEditing] = useState(false)
-  const [value, setValue]     = useState(annotation.value)
-
-  const save = () => {
-    const trimmed = value.trim()
-    if (!trimmed) { setValue(annotation.value); setEditing(false); return }
-    setEditing(false)
-    if (trimmed !== annotation.value) onUpdate(trimmed)
+// ── Inline markdown renderer (bold + links only) ──────────────────────────────
+function renderInline(text) {
+  const tokens = []
+  let remaining = text
+  let key = 0
+  while (remaining.length > 0) {
+    const boldMatch = remaining.match(/^([\s\S]*?)\*\*([^*]+)\*\*/)
+    const linkMatch = remaining.match(/^([\s\S]*?)\[([^\]]+)\]\(([^)]+)\)/)
+    if (!boldMatch && !linkMatch) {
+      tokens.push(<span key={key++}>{remaining}</span>)
+      break
+    }
+    const boldIdx = boldMatch ? boldMatch[1].length : Infinity
+    const linkIdx = linkMatch ? linkMatch[1].length : Infinity
+    if (boldIdx <= linkIdx && boldMatch) {
+      if (boldMatch[1]) tokens.push(<span key={key++}>{boldMatch[1]}</span>)
+      tokens.push(<strong key={key++}>{boldMatch[2]}</strong>)
+      remaining = remaining.slice(boldMatch[0].length)
+    } else if (linkMatch) {
+      if (linkMatch[1]) tokens.push(<span key={key++}>{linkMatch[1]}</span>)
+      tokens.push(
+        <a key={key++} href={linkMatch[3]} target="_blank" rel="noopener noreferrer"
+           className="admin-annotation-link">{linkMatch[2]}</a>
+      )
+      remaining = remaining.slice(linkMatch[0].length)
+    } else break
   }
+  return tokens
+}
 
-  const onKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save() }
-    if (e.key === 'Escape') { setValue(annotation.value); setEditing(false) }
-  }
-
-  if (editing) {
-    return (
-      <textarea
-        className="admin-annotation-input"
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        onBlur={save}
-        onKeyDown={onKeyDown}
-        autoFocus
-        rows={Math.max(2, value.split('\n').length)}
-      />
-    )
-  }
-
-  const { data_type, value: val } = annotation
-
-  let rendered
-  if (data_type === 'url') {
-    rendered = <a className="admin-annotation-link" href={val} target="_blank" rel="noopener noreferrer">{val}</a>
-  } else if (data_type === 'markdown') {
-    rendered = <pre className="admin-annotation-pre">{val}</pre>
-  } else {
-    rendered = <span>{val}</span>
-  }
-
+function MarkdownBlock({ content }) {
   return (
-    <div
-      className="admin-annotation-value"
-      onClick={() => setEditing(true)}
-      title="Click to edit"
-    >
-      {rendered}
+    <div className="admin-annotation-md-content">
+      {content.split('\n\n').map((para, i) => (
+        <p key={i} className="admin-annotation-md-para">
+          {para.split('\n').map((line, j) => (
+            <span key={j}>{j > 0 && <br />}{renderInline(line)}</span>
+          ))}
+        </p>
+      ))}
     </div>
   )
 }
 
 // ── Annotations section ───────────────────────────────────────────────────────
-const ANNOTATION_TYPES = [
-  { value: 'text',     label: 'Text' },
-  { value: 'number',   label: 'Number' },
-  { value: 'date',     label: 'Date' },
-  { value: 'url',      label: 'URL' },
-  { value: 'markdown', label: 'Markdown' },
-]
-
+// The annotations table stores one content_md (markdown blob) per entity.
 function AnnotationsSection({ entityId }) {
-  const [items, setItems]   = useState([])
+  const [row, setRow]         = useState(null)
   const [loading, setLoading] = useState(true)
-  const [adding, setAdding] = useState(false)
-  const [newKey, setNewKey] = useState('')
-  const [newVal, setNewVal] = useState('')
-  const [newType, setNewType] = useState('text')
-  const [saving, setSaving] = useState(false)
-  const [err, setErr]       = useState(null)
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft]     = useState('')
+  const [saving, setSaving]   = useState(false)
+  const [err, setErr]         = useState(null)
 
   const load = useCallback(async () => {
     if (!supabase) { setLoading(false); return }
     const { data } = await supabase
       .from('annotations')
-      .select('*')
+      .select('id, content_md')
       .eq('entity_id', entityId)
-      .order('created_at')
-    setItems(data ?? [])
+      .maybeSingle()
+    setRow(data ?? null)
     setLoading(false)
   }, [entityId])
 
   useEffect(() => { load() }, [load])
 
-  const add = async () => {
-    if (!newKey.trim() || !newVal.trim()) return
+  const startEdit = () => {
+    setDraft(row?.content_md ?? '')
+    setEditing(true)
+    setErr(null)
+  }
+
+  const save = async () => {
+    const trimmed = draft.trim()
+    if (!trimmed) return
     setSaving(true); setErr(null)
-    const { error } = await supabase.from('annotations').insert({
-      entity_id: entityId,
-      key:       newKey.trim(),
-      value:     newVal.trim(),
-      data_type: newType,
-    })
+    let error
+    if (row) {
+      ;({ error } = await supabase.from('annotations').update({ content_md: trimmed }).eq('id', row.id))
+    } else {
+      ;({ error } = await supabase.from('annotations').insert({ entity_id: entityId, content_md: trimmed }))
+    }
     setSaving(false)
     if (error) { setErr(error.message); return }
-    setNewKey(''); setNewVal(''); setAdding(false)
+    setEditing(false)
     load()
   }
 
-  const del = async (id) => {
-    await supabase.from('annotations').delete().eq('id', id)
-    setItems(prev => prev.filter(a => a.id !== id))
-  }
-
-  const update = async (id, value) => {
-    const { error } = await supabase.from('annotations').update({ value }).eq('id', id)
-    if (!error) setItems(prev => prev.map(a => a.id === id ? { ...a, value } : a))
+  const del = async () => {
+    if (!row) return
+    await supabase.from('annotations').delete().eq('id', row.id)
+    setRow(null)
   }
 
   if (loading) return null
@@ -755,70 +740,42 @@ function AnnotationsSection({ entityId }) {
   return (
     <Section
       title="Notes & Annotations"
-      count={items.length || undefined}
       action={
-        !adding
-          ? <button className="admin-section-edit-btn" onClick={() => setAdding(true)}>+ Add</button>
+        !editing
+          ? <button className="admin-section-edit-btn" onClick={startEdit}>
+              {row ? 'Edit' : '+ Add'}
+            </button>
           : null
       }
     >
-      {/* Existing annotations */}
-      {items.length > 0 && (
-        <div className="admin-annotation-list">
-          {items.map(a => (
-            <div key={a.id} className="admin-annotation-card">
-              <div className="admin-annotation-card__header">
-                <span className="admin-annotation-key">{a.key}</span>
-                <span className="admin-annotation-type">{a.data_type}</span>
-                <button className="admin-rel-card__del" onClick={() => del(a.id)} title="Delete">✕</button>
-              </div>
-              <EditableAnnotationValue annotation={a} onUpdate={v => update(a.id, v)} />
-            </div>
-          ))}
+      {!editing && !row && (
+        <div className="admin-empty-state">No notes yet. Click + Add to write freeform markdown notes.</div>
+      )}
+
+      {!editing && row && (
+        <div className="admin-annotation-md">
+          <MarkdownBlock content={row.content_md} />
+          <button className="admin-rel-card__del admin-annotation-del" onClick={del} title="Clear annotation">✕</button>
         </div>
       )}
 
-      {items.length === 0 && !adding && (
-        <div className="admin-empty-state">No annotations. Click + Add to record freeform notes.</div>
-      )}
-
-      {/* Add form */}
-      {adding && (
+      {editing && (
         <div className="admin-annotation-add">
-          <div className="admin-annotation-add__row">
-            <div>
-              <label className="admin-field__label">Key / label</label>
-              <input
-                className="admin-input admin-input--compact"
-                value={newKey}
-                onChange={e => setNewKey(e.target.value)}
-                placeholder="e.g. Wikipedia URL, Notes, Source"
-                autoFocus
-              />
-            </div>
-            <div>
-              <label className="admin-field__label">Type</label>
-              <select className="admin-select admin-input--compact" value={newType} onChange={e => setNewType(e.target.value)}>
-                {ANNOTATION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="admin-field__label">Value</label>
-            <textarea
-              className="admin-input admin-annotation-input"
-              value={newVal}
-              onChange={e => setNewVal(e.target.value)}
-              placeholder={newType === 'url' ? 'https://…' : newType === 'markdown' ? 'Markdown supported…' : 'Value…'}
-              rows={3}
-            />
-          </div>
+          <textarea
+            className="admin-input admin-annotation-input admin-annotation-input--full"
+            value={draft}
+            onChange={e => setDraft(e.target.value)}
+            placeholder={'Write notes in markdown…\n\n**Source:** …\n**Key facts:** …'}
+            rows={10}
+            autoFocus
+          />
           {err && <div className="admin-error">{err}</div>}
           <div className="admin-edit-actions">
-            <button className="admin-save-btn admin-save-btn--sm" onClick={add} disabled={saving || !newKey.trim() || !newVal.trim()}>
-              {saving ? 'Saving…' : 'Save annotation'}
+            <button className="admin-save-btn admin-save-btn--sm" onClick={save}
+              disabled={saving || !draft.trim()}>
+              {saving ? 'Saving…' : 'Save'}
             </button>
-            <button className="admin-cancel-btn" onClick={() => { setAdding(false); setErr(null) }}>Cancel</button>
+            <button className="admin-cancel-btn" onClick={() => { setEditing(false); setErr(null) }}>Cancel</button>
           </div>
         </div>
       )}

@@ -2155,80 +2155,48 @@ html, body, #root {
    ADMIN — ANNOTATIONS (Phase 3)
    ===================================================================== */
 
-.admin-annotation-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.admin-annotation-card {
+/* Markdown display block */
+.admin-annotation-md {
+  position: relative;
   background: #141628;
   border: 1px solid #222440;
   border-radius: 6px;
-  padding: 10px 12px;
+  padding: 12px 36px 12px 14px;
 }
 
-.admin-annotation-card__header {
+.admin-annotation-md-content {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.admin-annotation-key {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #606888;
-  flex: 1;
-}
-
-.admin-annotation-type {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: #1e2038;
-  color: #404868;
-  padding: 1px 5px;
-  border-radius: 4px;
-}
-
-.admin-annotation-value {
+.admin-annotation-md-para {
   font-size: 13px;
   color: #b0b8d8;
-  cursor: text;
-  line-height: 1.5;
-  min-height: 20px;
-  border-radius: 3px;
-  padding: 2px 3px;
-  margin: -2px -3px;
-  transition: background 0.1s;
+  line-height: 1.6;
+  margin: 0;
+  word-break: break-word;
 }
 
-.admin-annotation-value:hover {
-  background: rgba(255,255,255,0.03);
+.admin-annotation-md-para strong {
+  color: #c8cce8;
+  font-weight: 600;
 }
 
 .admin-annotation-link {
   color: #6080d0;
   word-break: break-all;
-  font-size: 12px;
 }
 
 .admin-annotation-link:hover { color: #90b0f0; }
 
-.admin-annotation-pre {
-  font-family: 'SF Mono', 'Fira Code', monospace;
-  font-size: 11px;
-  color: #8898c8;
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin: 0;
+.admin-annotation-del {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
+/* Edit / add textarea */
 .admin-annotation-input {
   width: 100%;
   background: #1a1c30;
@@ -2243,6 +2211,8 @@ html, body, #root {
   line-height: 1.5;
 }
 
+.admin-annotation-input--full { min-height: 160px; }
+
 .admin-annotation-input:focus { border-color: #7080c0; }
 
 .admin-annotation-add {
@@ -2254,13 +2224,6 @@ html, body, #root {
   border: 1px dashed #2a2e44;
   border-radius: 6px;
   margin-top: 8px;
-}
-
-.admin-annotation-add__row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: end;
 }
 
 /* =====================================================================
