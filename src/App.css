@@ -206,6 +206,45 @@ html, body, #root {
   line-height: 1.4;
 }
 
+/* ── Color legend chips ──────────────────────────────────────────────────── */
+.layer-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin-top: 6px;
+}
+.layer-legend__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #4a5270;
+  background: #f0f2fa;
+  border: 1px solid #e0e4f0;
+  border-radius: 10px;
+  padding: 2px 6px 2px 4px;
+  white-space: nowrap;
+  line-height: 1;
+}
+.layer-legend__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip-color, #888);
+  flex-shrink: 0;
+}
+.layer-legend__name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.layer-legend__count {
+  font-size: 9px;
+  color: #9098b8;
+  margin-left: 1px;
+}
+
 .layer-panel__footer {
   padding: 14px 16px;
   border-top: 1px solid #e8ecf4;

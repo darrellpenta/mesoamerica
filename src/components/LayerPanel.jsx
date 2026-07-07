@@ -129,6 +129,17 @@ export default function LayerPanel({
                 {layer.label}
               </div>
               <div className="layer-item__desc">{layer.description}</div>
+              {layer.colorLegend && layer.colorLegend.length > 0 && layer.visible && (
+                <div className="layer-legend">
+                  {layer.colorLegend.map(entry => (
+                    <div key={entry.value} className="layer-legend__chip" style={{ '--chip-color': entry.color }}>
+                      <span className="layer-legend__dot" />
+                      <span className="layer-legend__name">{entry.label}</span>
+                      {entry.count > 1 && <span className="layer-legend__count">{entry.count}</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
               {/* Snap-to-boundary toggle — only on polygon fill layers */}
               {layer.mapboxType === 'fill' && !layer.disabled && layer.visible && (
                 <button

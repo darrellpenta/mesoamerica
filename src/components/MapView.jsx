@@ -85,7 +85,8 @@ const FreehandPolygonMode = {
 function addLayerToMap(map, layer, cbRef) {
   map.addSource(layer.id,{type:'geojson',data:layer.dataUrl})
   if(layer.mapboxType==='circle'){
-    map.addLayer({id:layer.id,type:'circle',source:layer.id,layout:{visibility:layer.visible?'visible':'none'},paint:{'circle-radius':['interpolate',['linear'],['zoom'],4,5,10,9],'circle-color':layer.color,'circle-stroke-width':1.5,'circle-stroke-color':'#fff','circle-opacity':0.9}})
+    const cc=layer.featureColor?['coalesce',['get','color'],layer.color]:layer.color
+    map.addLayer({id:layer.id,type:'circle',source:layer.id,layout:{visibility:layer.visible?'visible':'none'},paint:{'circle-radius':['interpolate',['linear'],['zoom'],4,5,10,9],'circle-color':cc,'circle-stroke-width':1.5,'circle-stroke-color':'#fff','circle-opacity':0.9}})
     map.addLayer({id:`${layer.id}-labels`,type:'symbol',source:layer.id,minzoom:6,layout:{visibility:layer.visible?'visible':'none','text-field':['get','name'],'text-size':['interpolate',['linear'],['zoom'],6,10,12,13],'text-offset':[0,1.2],'text-anchor':'top','text-max-width':8},paint:{'text-color':'#1e2030','text-halo-color':'#fff','text-halo-width':1.5}})
     map.on('click',layer.id,e=>cbRef.current.onFeatureClick?.(e.features[0]))
     map.on('mouseenter',layer.id,()=>{map.getCanvas().style.cursor='pointer'})
