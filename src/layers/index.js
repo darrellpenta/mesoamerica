@@ -361,6 +361,16 @@ export const LAYER_REGISTRY = [
 
   // ── Conflict & Security ──────────────────────────────────────────────────
   {
+    id: 'modern-conflict-sites',
+    label: 'Modern Conflict Sites',
+    color: '#b71c1c',
+    mapboxType: 'circle',
+    dataUrl: './data/modern-conflict-sites.geojson',
+    visible: false,
+    description: 'Massacre sites, military bases, and conflict zones — 20th-century US intervention in Central America (The Long Shadow)',
+    sourceUrl: null,
+  },
+  {
     id: 'conflict-events',
     label: 'Conflict Events (2022–2023)',
     color: '#c62828',
