@@ -3,11 +3,12 @@ import { supabase } from '../lib/supabase.js'
 
 // Era definitions — eStart/eEnd are historical boundaries; dMin/dMax are the axis display range
 const ERAS = [
-  { key: 'all',         label: 'All Eras',    dMin: -800, dMax: 1600, color: null },
+  { key: 'all',         label: 'All Eras',    dMin: -800, dMax: 2030, color: null },
   { key: 'preclassic',  label: 'Preclassic',  dMin: -900, dMax:  350, color: '#2d9a6b', eStart: -800, eEnd:  250 },
   { key: 'classic',     label: 'Classic',      dMin:  150, dMax: 1000, color: '#d97706', eStart:  250, eEnd:  900 },
   { key: 'postclassic', label: 'Postclassic', dMin:  800, dMax: 1600, color: '#dc4a26', eStart:  900, eEnd: 1521 },
-  { key: 'colonial',    label: 'Colonial',    dMin: 1450, dMax: 1625, color: '#6366f1', eStart: 1521, eEnd: 1600 },
+  { key: 'colonial',    label: 'Colonial',    dMin: 1450, dMax: 1850, color: '#6366f1', eStart: 1521, eEnd: 1821 },
+  { key: 'modern',      label: 'Modern',      dMin: 1800, dMax: 2030, color: '#64748b', eStart: 1821, eEnd: 2030 },
 ]
 
 const ENTITY_TYPES = [
@@ -106,7 +107,7 @@ function Axis({ width, dMin, dMax, svgH }) {
       )}
 
       {/* Era period boundary lines */}
-      {[250, 900, 1521].filter(y => y > dMin && y < dMax).map(y => (
+      {[250, 900, 1521, 1821].filter(y => y > dMin && y < dMax).map(y => (
         <line
           key={y}
           x1={yearToX(y, width, dMin, dMax)} y1={ERA_STRIP_H}
