@@ -627,6 +627,13 @@ function EntityRecord({ entity: initialEntity, onNavigate }) {
         </Section>
       )}
 
+      {/* Suggested connections */}
+      <SuggestionsSection
+        entity={entity}
+        rels={rels ?? []}
+        onRelAdded={load}
+      />
+
       {/* Freeform annotations */}
       <AnnotationsSection entityId={entity.id} />
     </div>
@@ -815,6 +822,174 @@ function AnnotationsSection({ entityId }) {
           </div>
         </div>
       )}
+    </Section>
+  )
+}
+
+// ── Suggestion loader ─────────────────────────────────────────────────────────
+async function buildSuggestions(entity, rels) {
+  if (!supabase) return []
+
+  const connectedIds = new Set([entity.id])
+  for (const r of rels) { if (r.other?.id) connectedIds.add(r.other.id) }
+
+  const suggestions = []
+
+  // Strategy 1: for persons — find co-rulers at the same city
+  if (entity.entity_type === 'person') {
+    const ruledCityIds = rels
+      .filter(r => r.direction === 'out' && r.relation_type === 'RULED' && r.other?.id)
+      .map(r => r.other.id)
+
+    if (ruledCityIds.length > 0) {
+      const { data: coRulerRels } = await supabase
+        .from('relationships')
+        .select('from_entity:from_entity_id(id, name, entity_type)')
+        .eq('relation_type', 'RULED')
+        .in('to_entity_id', ruledCityIds)
+        .limit(25)
+
+      for (const r of (coRulerRels ?? [])) {
+        const e = r.from_entity
+        if (e?.id && !connectedIds.has(e.id)) {
+          suggestions.push({ id: e.id, name: e.name, entity_type: e.entity_type, reason: 'Also ruled same city' })
+          connectedIds.add(e.id)
+        }
+      }
+    }
+  }
+
+  // Strategy 2: entities with similar name fragments
+  const words = entity.name.split(/[\s,.']+/).filter(w => w.length >= 4)
+  if (words.length > 0 && suggestions.length < 8) {
+    const { data: nameMatches } = await supabase
+      .from('entities')
+      .select('id, name, entity_type')
+      .ilike('name', `%${words[0]}%`)
+      .neq('id', entity.id)
+      .limit(12)
+
+    for (const e of (nameMatches ?? [])) {
+      if (!connectedIds.has(e.id)) {
+        suggestions.push({ id: e.id, name: e.name, entity_type: e.entity_type, reason: 'Similar name' })
+        connectedIds.add(e.id)
+      }
+    }
+  }
+
+  return suggestions.slice(0, 8)
+}
+
+// ── Quick-connect inline form ─────────────────────────────────────────────────
+function QuickConnectForm({ fromEntity, toEntity, onSaved, onCancel }) {
+  const [relType, setRelType]     = useState('SUCCEEDED')
+  const [direction, setDirection] = useState('out')
+  const [validFrom, setFrom]      = useState('')
+  const [validTo, setTo]          = useState('')
+  const [saving, setSaving]       = useState(false)
+  const [err, setErr]             = useState(null)
+
+  const save = async () => {
+    setSaving(true); setErr(null)
+    const row = {
+      from_entity_id: direction === 'out' ? fromEntity.id : toEntity.id,
+      to_entity_id:   direction === 'out' ? toEntity.id   : fromEntity.id,
+      relation_type:  relType,
+      valid_from: validFrom ? parseInt(validFrom, 10) : null,
+      valid_to:   validTo   ? parseInt(validTo, 10)   : null,
+    }
+    const { error } = await supabase.from('relationships').insert(row)
+    setSaving(false)
+    if (error) { setErr(error.message); return }
+    onSaved?.()
+  }
+
+  return (
+    <div className="admin-quick-connect">
+      <div className="admin-quick-connect__row">
+        <span className="admin-quick-connect__entity">{fromEntity.name}</span>
+        <select className="admin-select admin-input--compact" value={direction} onChange={e => setDirection(e.target.value)}>
+          <option value="out">→</option>
+          <option value="in">←</option>
+        </select>
+        <select className="admin-select admin-input--compact admin-quick-connect__type" value={relType} onChange={e => setRelType(e.target.value)}>
+          {REL_TYPES.map(t => <option key={t}>{t}</option>)}
+        </select>
+        <span className="admin-quick-connect__entity">{toEntity.name}</span>
+      </div>
+      <div className="admin-quick-connect__dates">
+        <input className="admin-input admin-input--compact" type="number" placeholder="From year" value={validFrom} onChange={e => setFrom(e.target.value)} />
+        <input className="admin-input admin-input--compact" type="number" placeholder="To year" value={validTo} onChange={e => setTo(e.target.value)} />
+      </div>
+      {err && <div className="admin-error">{err}</div>}
+      <div className="admin-edit-actions">
+        <button className="admin-save-btn admin-save-btn--sm" onClick={save} disabled={saving}>
+          {saving ? 'Saving…' : 'Save connection'}
+        </button>
+        <button className="admin-cancel-btn" onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
+  )
+}
+
+// ── Suggestions section ───────────────────────────────────────────────────────
+function SuggestionsSection({ entity, rels, onRelAdded }) {
+  const [items, setItems]       = useState([])
+  const [loading, setLoading]   = useState(true)
+  const [dismissed, setDismissed] = useState(new Set())
+  const [connecting, setConnecting] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    buildSuggestions(entity, rels).then(s => {
+      if (!cancelled) { setItems(s); setLoading(false) }
+    })
+    return () => { cancelled = true }
+  }, [entity.id]) // intentionally not tracking rels to avoid re-running on every load
+
+  const dismiss = (id) => setDismissed(d => new Set([...d, id]))
+
+  const handleSaved = (id) => {
+    dismiss(id)
+    setConnecting(null)
+    onRelAdded?.()
+  }
+
+  const visible = items.filter(s => !dismissed.has(s.id))
+
+  if (loading || !visible.length) return null
+
+  return (
+    <Section title="Suggested Connections" count={visible.length}>
+      <div className="admin-suggestions-list">
+        {visible.map(s => (
+          <div key={s.id} className="admin-suggestion">
+            {connecting?.id === s.id ? (
+              <QuickConnectForm
+                fromEntity={entity}
+                toEntity={s}
+                onSaved={() => handleSaved(s.id)}
+                onCancel={() => setConnecting(null)}
+              />
+            ) : (
+              <div className="admin-suggestion__body">
+                <div className="admin-suggestion__info">
+                  <span className="admin-suggestion__name">{s.name}</span>
+                  <TypeBadge type={s.entity_type} />
+                  <span className="admin-suggestion__reason">{s.reason}</span>
+                </div>
+                <div className="admin-suggestion__actions">
+                  <button className="admin-suggestion__connect-btn" onClick={() => setConnecting(s)}>
+                    Connect
+                  </button>
+                  <button className="admin-suggestion__dismiss" onClick={() => dismiss(s.id)} title="Dismiss">✕</button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </Section>
   )
 }

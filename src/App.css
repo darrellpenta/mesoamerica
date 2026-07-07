@@ -2345,3 +2345,128 @@ html, body, #root {
   font-style: italic;
   margin-top: 2px;
 }
+
+/* =====================================================================
+   ADMIN — SUGGESTED CONNECTIONS (Phase 5)
+   ===================================================================== */
+
+.admin-suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-suggestion {
+  background: #141628;
+  border: 1px solid #222440;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.admin-suggestion__body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  flex-wrap: wrap;
+}
+
+.admin-suggestion__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.admin-suggestion__name {
+  font-size: 13px;
+  color: #8898c8;
+  font-weight: 500;
+}
+
+.admin-suggestion__reason {
+  font-size: 10px;
+  color: #303450;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.admin-suggestion__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.admin-suggestion__connect-btn {
+  background: rgba(80, 96, 160, 0.15);
+  border: 1px solid rgba(80, 96, 160, 0.3);
+  color: #8898c8;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.admin-suggestion__connect-btn:hover {
+  background: rgba(80, 96, 160, 0.3);
+  border-color: #6070a0;
+  color: #c0ccf0;
+}
+
+.admin-suggestion__dismiss {
+  background: none;
+  border: none;
+  color: #252840;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: inherit;
+  transition: color 0.1s;
+}
+
+.admin-suggestion__dismiss:hover { color: #606888; }
+
+/* Quick-connect inline form */
+.admin-quick-connect {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-quick-connect__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-quick-connect__entity {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8898c8;
+  flex-shrink: 0;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-quick-connect__type {
+  flex: 1;
+  min-width: 100px;
+}
+
+.admin-quick-connect__dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
