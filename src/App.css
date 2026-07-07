@@ -1330,13 +1330,21 @@ html, body, #root {
 .admin-main {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-placeholder {
-  color: #505870;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3a3f58;
   font-size: 13px;
-  margin-top: 40px;
+}
+
+.admin-placeholder__text {
   text-align: center;
 }
 
@@ -1618,4 +1626,365 @@ html, body, #root {
 .layer-item--drag-over {
   border-top: 2px solid #64b5f6;
   background: rgba(100, 181, 246, 0.06);
+}
+
+/* =====================================================================
+   ADMIN — ENTITY RECORD (Phase 1)
+   ===================================================================== */
+
+/* Type badge — color set via --type-color CSS var on the element */
+.admin-type-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 8px;
+  background: #1e2038;
+  color: var(--type-color, #8890b0);
+  border: 1px solid #2a2e44;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Record container */
+.admin-record {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-record__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.admin-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #2a2e44;
+  border-top-color: #6070c0;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* Record header */
+.admin-record__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #2a2e44;
+  flex-wrap: wrap;
+}
+
+.admin-record__name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #e8eaff;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Person sparkline */
+.admin-person-sparkline {
+  padding: 10px 24px 4px;
+  border-bottom: 1px solid #1a1c2e;
+}
+
+.admin-person-sparkline__labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #505878;
+  margin-top: 3px;
+}
+
+/* Record sections */
+.admin-record__section {
+  padding: 14px 24px;
+  border-bottom: 1px solid #1a1c2e;
+}
+
+.admin-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.admin-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #404868;
+}
+
+.admin-section-count {
+  font-size: 10px;
+  font-weight: 600;
+  background: #1e2038;
+  color: #505878;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+/* Extension fields grid */
+.admin-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px 20px;
+}
+
+.admin-field__label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #404868;
+  margin-bottom: 2px;
+}
+
+.admin-field__value {
+  font-size: 13px;
+  color: #b0b8d8;
+  word-break: break-word;
+}
+
+/* Relationship groups */
+.admin-rels-group {
+  margin-bottom: 14px;
+}
+
+.admin-rels-group__label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #303450;
+  margin-bottom: 6px;
+}
+
+/* Relationship cards */
+.admin-rel-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #141628;
+  border: 1px solid #222440;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+}
+
+.admin-rel-card__type {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #1e2038;
+  color: #5060a0;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.admin-rel-card__entity {
+  background: none;
+  border: none;
+  color: #8898c8;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+  flex: 1;
+  padding: 0;
+  min-width: 0;
+  font-family: inherit;
+  transition: color 0.1s;
+}
+
+.admin-rel-card__entity:hover:not(:disabled) { color: #c8d4f8; }
+.admin-rel-card__entity:disabled { cursor: default; }
+
+.admin-rel-card__dates {
+  font-size: 11px;
+  color: #383c58;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.admin-rel-card__notes {
+  width: 100%;
+  font-size: 11px;
+  color: #404868;
+  font-style: italic;
+  padding-top: 2px;
+}
+
+.admin-rel-card__del {
+  background: none;
+  border: none;
+  color: #2a2e44;
+  cursor: pointer;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 3px;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: color 0.1s, background 0.1s;
+}
+
+.admin-rel-card__del:hover {
+  color: #e05050;
+  background: rgba(224, 80, 80, 0.1);
+}
+
+/* Empty state */
+.admin-empty-state {
+  font-size: 12px;
+  color: #2a2e44;
+  font-style: italic;
+  padding: 4px 0 10px;
+}
+
+/* Add relationship toggle button */
+.admin-add-rel-btn {
+  margin-top: 8px;
+  background: none;
+  border: 1px dashed #252840;
+  color: #404868;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.admin-add-rel-btn:hover {
+  border-color: #404868;
+  color: #7080b0;
+}
+
+/* Add rel form header (title + close X) */
+.admin-add-form {
+  background: #141628;
+  border: 1px solid #222440;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+
+.admin-add-form__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.admin-add-form__title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #404868;
+}
+
+.admin-add-form__close {
+  background: none;
+  border: none;
+  color: #404868;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.1s;
+}
+
+.admin-add-form__close:hover { color: #8890b0; }
+
+/* Geo connections */
+.admin-geo-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.admin-geo-item {
+  padding: 10px 12px;
+  background: #141628;
+  border: 1px solid #222440;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.admin-geo-item:hover {
+  border-color: #383c60;
+  background: #1a1c30;
+}
+
+.admin-geo-item__name {
+  font-size: 13px;
+  color: #8898c8;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.admin-geo-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-geo-item__rel {
+  font-size: 10px;
+  color: #383c58;
+  letter-spacing: 0.04em;
+}
+
+/* Breadcrumb */
+.admin-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 24px;
+  border-bottom: 1px solid #1a1c2e;
+  background: #0e1020;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.admin-back-btn {
+  background: none;
+  border: none;
+  color: #5060a0;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.1s;
+}
+
+.admin-back-btn:hover { color: #8898c8; }
+
+.admin-breadcrumb__sep {
+  color: #252840;
+}
+
+.admin-breadcrumb__current {
+  color: #606888;
 }
