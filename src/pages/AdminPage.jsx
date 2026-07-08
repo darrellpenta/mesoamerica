@@ -1305,6 +1305,601 @@ function AdminDashboard({ onSelectEntity, onBrowseType }) {
   )
 }
 
+// ── Helper: browser download ──────────────────────────────────────────────────
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = filename; a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+// ── New story form ────────────────────────────────────────────────────────────
+function NewStoryForm({ onCreated, onCancel }) {
+  const [title, setTitle]   = useState('')
+  const [theme, setTheme]   = useState('')
+  const [saving, setSaving] = useState(false)
+  const [err, setErr]       = useState(null)
+
+  const save = async () => {
+    const t = title.trim()
+    if (!t || !supabase) return
+    setSaving(true); setErr(null)
+    const { data, error } = await supabase
+      .from('stories')
+      .insert({ title: t, theme: theme.trim() || null })
+      .select('id, title, theme, time_start, time_end, description, created_at')
+      .single()
+    setSaving(false)
+    if (error) { setErr(error.message); return }
+    onCreated(data)
+  }
+
+  return (
+    <div className="admin-new-entity">
+      <div className="admin-new-entity__title">New story</div>
+      <div className="admin-form-row">
+        <label className="admin-label">Title</label>
+        <input
+          className="admin-search-input"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          placeholder="e.g. Maya territorial decline"
+          autoFocus
+          onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') onCancel() }}
+        />
+      </div>
+      <div className="admin-form-row">
+        <label className="admin-label">Theme (optional)</label>
+        <input
+          className="admin-input admin-input--compact"
+          value={theme}
+          onChange={e => setTheme(e.target.value)}
+          placeholder="linguistics, land, conflict…"
+        />
+      </div>
+      {err && <div className="admin-error">{err}</div>}
+      <div className="admin-edit-actions">
+        <button className="admin-save-btn admin-save-btn--sm" onClick={save} disabled={saving || !title.trim()}>
+          {saving ? 'Creating…' : 'Create story'}
+        </button>
+        <button className="admin-cancel-btn" onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
+  )
+}
+
+// ── Stories list sidebar ──────────────────────────────────────────────────────
+function StoriesListPanel({ selectedId, onSelect, onExit, refreshKey }) {
+  const [stories, setStories] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showNew, setShowNew] = useState(false)
+
+  useEffect(() => {
+    if (!supabase) { setLoading(false); return }
+    setLoading(true)
+    supabase.from('stories')
+      .select('id, title, theme, time_start, time_end')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => { setStories(data ?? []); setLoading(false) })
+  }, [refreshKey])
+
+  return (
+    <>
+      <div className="admin-sidebar__header">
+        <div className="admin-sidebar__header-row">
+          <div className="admin-sidebar__title">Stories</div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button className="admin-new-btn" onClick={() => setShowNew(v => !v)}>
+              {showNew ? '✕' : '+ New'}
+            </button>
+          </div>
+        </div>
+        <button className="admin-stories-back-btn" onClick={onExit}>
+          ← Entity browser
+        </button>
+        {showNew && (
+          <NewStoryForm
+            onCreated={s => { setShowNew(false); setStories(prev => [s, ...prev]); onSelect(s) }}
+            onCancel={() => setShowNew(false)}
+          />
+        )}
+      </div>
+      <ul className="admin-entity-list">
+        {loading && <li className="admin-hint">Loading…</li>}
+        {!loading && !stories.length && !showNew && (
+          <li className="admin-hint">No stories yet. Click + New to create one.</li>
+        )}
+        {stories.map(s => (
+          <li
+            key={s.id}
+            className={`admin-entity-item${selectedId === s.id ? ' admin-entity-item--active' : ''}`}
+            onClick={() => onSelect(s)}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="admin-entity-name">{s.title}</div>
+              {s.theme && <div className="admin-story-meta-tag">{s.theme}</div>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
+// ── Stories landing ───────────────────────────────────────────────────────────
+function StoriesLanding() {
+  return (
+    <div className="admin-dashboard">
+      <div className="admin-dash-header">
+        <div className="admin-dash-title">Stories</div>
+        <div className="admin-dash-subtitle">
+          Select a story from the sidebar, or create a new one to get started.
+        </div>
+      </div>
+      <div className="admin-stories-landing-body">
+        <p>Stories let you curate entity selections, add narrative context, and export flat data files for use in maps, charts, and other visualization tools.</p>
+        <p>Each story can hold a collection of entities from across the database — persons, events, places, territories — along with the role each plays in the narrative and notes on why it matters.</p>
+        <p>Use <strong>Data Requests</strong> to ask Claude to source data you don't yet have. Submitted requests queue for processing and link automatically to the story when fulfilled.</p>
+      </div>
+    </div>
+  )
+}
+
+// ── Story meta editor ─────────────────────────────────────────────────────────
+function StoryMeta({ story, onSaved }) {
+  const [editing, setEditing] = useState(false)
+  const [form, setForm]       = useState({})
+  const [saving, setSaving]   = useState(false)
+  const [err, setErr]         = useState(null)
+
+  const startEdit = () => {
+    setForm({
+      title:       story.title ?? '',
+      description: story.description ?? '',
+      theme:       story.theme ?? '',
+      time_start:  story.time_start != null ? String(story.time_start) : '',
+      time_end:    story.time_end   != null ? String(story.time_end)   : '',
+    })
+    setEditing(true); setErr(null)
+  }
+
+  const save = async () => {
+    const trimmed = form.title.trim()
+    if (!trimmed) return
+    setSaving(true); setErr(null)
+    const updates = {
+      title:       trimmed,
+      description: form.description.trim() || null,
+      theme:       form.theme.trim() || null,
+      time_start:  form.time_start ? parseInt(form.time_start, 10) : null,
+      time_end:    form.time_end   ? parseInt(form.time_end,   10) : null,
+    }
+    const { error } = await supabase.from('stories').update(updates).eq('id', story.id)
+    setSaving(false)
+    if (error) { setErr(error.message); return }
+    setEditing(false)
+    onSaved?.({ ...story, ...updates })
+  }
+
+  if (!editing) {
+    return (
+      <div className="admin-record__header admin-record__header--story">
+        <div className="admin-story-header-row">
+          <div className="admin-record__name">{story.title}</div>
+          <button className="admin-section-edit-btn" onClick={startEdit}>Edit</button>
+        </div>
+        {story.theme && <span className="admin-story-theme-badge">{story.theme}</span>}
+        {(story.time_start != null || story.time_end != null) && (
+          <div className="admin-story-time-range">
+            {formatYear(story.time_start) || '?'} – {formatYear(story.time_end) || '?'}
+          </div>
+        )}
+        {story.description && (
+          <div className="admin-story-description">{story.description}</div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="admin-record__header">
+      <div className="admin-add-form" style={{ width: '100%' }}>
+        <div className="admin-add-form__header">
+          <span className="admin-add-form__title">Edit story</span>
+          <button className="admin-add-form__close" onClick={() => setEditing(false)}>✕</button>
+        </div>
+        <div className="admin-form-row">
+          <label className="admin-label">Title</label>
+          <input className="admin-input" value={form.title}
+            onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
+        </div>
+        <div className="admin-form-row">
+          <label className="admin-label">Description</label>
+          <textarea className="admin-input admin-annotation-input" rows={3}
+            value={form.description}
+            onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+            placeholder="What is this story about?" />
+        </div>
+        <div className="admin-form-row">
+          <label className="admin-label">Theme</label>
+          <input className="admin-input" value={form.theme}
+            onChange={e => setForm(p => ({ ...p, theme: e.target.value }))}
+            placeholder="linguistics, land, conflict…" />
+        </div>
+        <div className="admin-form-row admin-form-row--dates">
+          <div>
+            <label className="admin-label">Start year</label>
+            <input className="admin-input" type="number" value={form.time_start}
+              onChange={e => setForm(p => ({ ...p, time_start: e.target.value }))}
+              placeholder="-800" />
+          </div>
+          <div>
+            <label className="admin-label">End year</label>
+            <input className="admin-input" type="number" value={form.time_end}
+              onChange={e => setForm(p => ({ ...p, time_end: e.target.value }))}
+              placeholder="1521" />
+          </div>
+        </div>
+        {err && <div className="admin-error">{err}</div>}
+        <div className="admin-edit-actions">
+          <button className="admin-save-btn admin-save-btn--sm" onClick={save} disabled={saving}>
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+          <button className="admin-cancel-btn" onClick={() => setEditing(false)}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Add story entity form ─────────────────────────────────────────────────────
+function AddStoryEntityForm({ storyId, onAdded }) {
+  const [open, setOpen]           = useState(false)
+  const [pickedEntity, setPicked] = useState(null)
+  const [role, setRole]           = useState('')
+  const [notes, setNotes]         = useState('')
+  const [saving, setSaving]       = useState(false)
+  const [err, setErr]             = useState(null)
+
+  const save = async () => {
+    if (!pickedEntity || !supabase) return
+    setSaving(true); setErr(null)
+    const { error } = await supabase.from('story_entities').insert({
+      story_id:     storyId,
+      entity_id:    pickedEntity.id,
+      entity_type:  pickedEntity.entity_type,
+      role_in_story: role.trim() || null,
+      notes:         notes.trim() || null,
+    })
+    setSaving(false)
+    if (error) { setErr(error.message); return }
+    setPicked(null); setRole(''); setNotes(''); setOpen(false)
+    onAdded?.()
+  }
+
+  if (!open) {
+    return (
+      <button className="admin-add-rel-btn" onClick={() => setOpen(true)}>
+        + Add entity to story
+      </button>
+    )
+  }
+
+  return (
+    <div className="admin-add-form">
+      <div className="admin-add-form__header">
+        <span className="admin-add-form__title">Add entity</span>
+        <button className="admin-add-form__close" onClick={() => setOpen(false)}>✕</button>
+      </div>
+      <EntityPicker label="Entity" value={pickedEntity} onChange={setPicked} />
+      <div className="admin-form-row">
+        <label className="admin-label">Role in story (optional)</label>
+        <input className="admin-input" value={role}
+          onChange={e => setRole(e.target.value)}
+          placeholder="subject, context, reference…" />
+      </div>
+      <div className="admin-form-row">
+        <label className="admin-label">Notes (optional)</label>
+        <input className="admin-input" value={notes}
+          onChange={e => setNotes(e.target.value)}
+          placeholder="Why this entity matters to the story…" />
+      </div>
+      {err && <div className="admin-error">{err}</div>}
+      <button className="admin-save-btn" onClick={save} disabled={saving || !pickedEntity}>
+        {saving ? 'Adding…' : 'Add to story'}
+      </button>
+    </div>
+  )
+}
+
+// ── Story entity list ─────────────────────────────────────────────────────────
+function StoryEntityList({ storyId }) {
+  const [links, setLinks]   = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [addKey, setAddKey] = useState(0)
+
+  const load = useCallback(async () => {
+    if (!supabase) { setLoading(false); return }
+    setLoading(true)
+    const { data } = await supabase
+      .from('story_entities')
+      .select('id, entity_id, entity_type, role_in_story, notes, entity:entity_id(id, name, entity_type)')
+      .eq('story_id', storyId)
+      .order('created_at', { ascending: true })
+    setLinks(data ?? [])
+    setLoading(false)
+  }, [storyId])
+
+  useEffect(() => { load() }, [load])
+
+  const remove = async (linkId) => {
+    await supabase.from('story_entities').delete().eq('id', linkId)
+    setLinks(prev => prev.filter(l => l.id !== linkId))
+  }
+
+  return (
+    <Section title="Entities" count={links?.length ?? 0}>
+      {loading && <div className="admin-record__loading"><div className="admin-spinner" /></div>}
+      {!loading && !links?.length && (
+        <div className="admin-empty-state">No entities linked yet. Add some below.</div>
+      )}
+      {!loading && links?.length > 0 && (
+        <div className="admin-story-entity-list">
+          {links.map(link => (
+            <div key={link.id} className="admin-story-entity-row">
+              <div className="admin-story-entity-row__main">
+                <span className="admin-entity-name" style={{ fontSize: 13 }}>
+                  {link.entity?.name ?? link.entity_id}
+                </span>
+                <TypeBadge type={link.entity_type} />
+                {link.role_in_story && (
+                  <span className="admin-story-entity-row__role">{link.role_in_story}</span>
+                )}
+              </div>
+              {link.notes && (
+                <div className="admin-story-entity-row__notes">{link.notes}</div>
+              )}
+              <button className="admin-rel-card__del" onClick={() => remove(link.id)} title="Remove">✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+      <AddStoryEntityForm
+        key={addKey}
+        storyId={storyId}
+        onAdded={() => { load(); setAddKey(k => k + 1) }}
+      />
+    </Section>
+  )
+}
+
+// ── Export panel ──────────────────────────────────────────────────────────────
+function StoryExportPanel({ storyId, storyTitle }) {
+  const [format, setFormat]     = useState('csv')
+  const [exporting, setExporting] = useState(false)
+  const [err, setErr]           = useState(null)
+
+  const doExport = async () => {
+    if (!supabase) return
+    setExporting(true); setErr(null)
+    try {
+      const { data: links, error: linkErr } = await supabase
+        .from('story_entities')
+        .select('entity_id, entity_type, role_in_story, notes, entity:entity_id(name)')
+        .eq('story_id', storyId)
+
+      if (linkErr) throw new Error(linkErr.message)
+      if (!links?.length) { setErr('No entities in this story to export.'); setExporting(false); return }
+
+      const extData = await Promise.all(links.map(async (link) => {
+        const table = EXT_TABLES[link.entity_type]
+        if (!table) return {}
+        const { data } = await supabase.from(table).select('*').eq('entity_id', link.entity_id).maybeSingle()
+        return data ?? {}
+      }))
+
+      const rows = links.map((link, i) => {
+        const ext = extData[i]
+        return {
+          entity_id:    link.entity_id,
+          name:         link.entity?.name ?? '',
+          entity_type:  link.entity_type,
+          role_in_story: link.role_in_story ?? '',
+          notes:        link.notes ?? '',
+          date_start:   ext.date_start ?? ext.birth_year ?? ext.date_year_start ?? '',
+          date_end:     ext.date_end   ?? ext.death_year ?? ext.date_year_end   ?? '',
+          date_label:   ext.date_label ?? '',
+          subtype:      ext.event_type ?? ext.place_type ?? ext.territory_type ?? ext.feature_type ?? ext.person_type ?? '',
+        }
+      })
+
+      const slug = (storyTitle ?? 'story').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+
+      if (format === 'csv') {
+        const headers = ['entity_id', 'name', 'entity_type', 'role_in_story', 'notes', 'date_start', 'date_end', 'date_label', 'subtype']
+        const esc = v => { const s = String(v ?? ''); return (s.includes(',') || s.includes('"') || s.includes('\n')) ? `"${s.replace(/"/g, '""')}"` : s }
+        const csv = [headers.join(','), ...rows.map(r => headers.map(h => esc(r[h])).join(','))].join('\n')
+        downloadBlob(new Blob([csv], { type: 'text/csv' }), `${slug}.csv`)
+      } else {
+        const features = rows.map(r => ({ type: 'Feature', geometry: null, properties: r }))
+        const geojson = JSON.stringify({ type: 'FeatureCollection', features }, null, 2)
+        downloadBlob(new Blob([geojson], { type: 'application/geo+json' }), `${slug}.geojson`)
+      }
+    } catch (e) {
+      setErr(e.message)
+    }
+    setExporting(false)
+  }
+
+  return (
+    <Section title="Export">
+      <div className="admin-story-export">
+        <div className="admin-story-export__formats">
+          <label className="admin-story-export__fmt">
+            <input type="radio" name={`fmt-${storyId}`} value="csv"
+              checked={format === 'csv'} onChange={() => setFormat('csv')} />
+            CSV — all entity fields, one row per entity
+          </label>
+          <label className="admin-story-export__fmt">
+            <input type="radio" name={`fmt-${storyId}`} value="geojson"
+              checked={format === 'geojson'} onChange={() => setFormat('geojson')} />
+            GeoJSON — properties only, for visualization tools (Datawrapper, Flourish)
+          </label>
+        </div>
+        {err && <div className="admin-error">{err}</div>}
+        <button
+          className="admin-save-btn admin-save-btn--sm"
+          style={{ marginTop: 8 }}
+          onClick={doExport}
+          disabled={exporting}
+        >
+          {exporting ? 'Exporting…' : 'Download'}
+        </button>
+      </div>
+    </Section>
+  )
+}
+
+// ── Data request panel ────────────────────────────────────────────────────────
+function DataRequestPanel({ storyId }) {
+  const [requests, setRequests] = useState(null)
+  const [prompt, setPrompt]     = useState('')
+  const [urlHints, setUrlHints] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const [err, setErr]           = useState(null)
+
+  const load = useCallback(async () => {
+    if (!supabase) return
+    const { data } = await supabase
+      .from('data_requests')
+      .select('id, prompt, status, result_summary, created_at')
+      .eq('story_id', storyId)
+      .order('created_at', { ascending: false })
+    setRequests(data ?? [])
+  }, [storyId])
+
+  useEffect(() => { load() }, [load])
+
+  const submit = async () => {
+    const p = prompt.trim()
+    if (!p || !supabase) return
+    setSubmitting(true); setErr(null)
+    const hints = urlHints.split('\n').map(s => s.trim()).filter(Boolean)
+    const { error } = await supabase.from('data_requests').insert({
+      story_id:  storyId,
+      prompt:    p,
+      url_hints: hints.length ? hints : null,
+      status:    'pending',
+    })
+    setSubmitting(false)
+    if (error) { setErr(error.message); return }
+    setPrompt(''); setUrlHints(''); setShowForm(false)
+    load()
+  }
+
+  const STATUS_COLOR = { pending: '#d97706', processing: '#2563eb', review: '#7c3aed', done: '#059669' }
+  const pending = (requests ?? []).filter(r => r.status !== 'done').length
+
+  return (
+    <Section
+      title="Data Requests"
+      count={pending || undefined}
+      action={!showForm
+        ? <button className="admin-section-edit-btn" onClick={() => setShowForm(true)}>+ Request</button>
+        : null}
+    >
+      {showForm && (
+        <div className="admin-add-form">
+          <div className="admin-add-form__header">
+            <span className="admin-add-form__title">Request data from Claude</span>
+            <button className="admin-add-form__close" onClick={() => { setShowForm(false); setErr(null) }}>✕</button>
+          </div>
+          <div className="admin-form-row">
+            <label className="admin-label">What data do you need?</label>
+            <textarea
+              className="admin-input admin-annotation-input"
+              rows={4}
+              value={prompt}
+              onChange={e => setPrompt(e.target.value)}
+              placeholder="e.g. Government import/export data from Nicaragua 2000–2020, from INEC or World Bank"
+              autoFocus
+            />
+          </div>
+          <div className="admin-form-row">
+            <label className="admin-label">Source URLs (optional, one per line)</label>
+            <textarea
+              className="admin-input admin-annotation-input"
+              rows={2}
+              value={urlHints}
+              onChange={e => setUrlHints(e.target.value)}
+              placeholder="https://…"
+            />
+          </div>
+          {err && <div className="admin-error">{err}</div>}
+          <div className="admin-edit-actions">
+            <button className="admin-save-btn admin-save-btn--sm" onClick={submit}
+              disabled={submitting || !prompt.trim()}>
+              {submitting ? 'Submitting…' : 'Submit request'}
+            </button>
+            <button className="admin-cancel-btn" onClick={() => { setShowForm(false); setErr(null) }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {requests === null && <div className="admin-record__loading"><div className="admin-spinner" /></div>}
+      {requests?.length === 0 && !showForm && (
+        <div className="admin-empty-state">
+          No requests yet. Click + Request to ask Claude to source data for this story.
+        </div>
+      )}
+      {requests?.map(r => (
+        <div key={r.id} className="admin-data-request">
+          <div className="admin-data-request__header">
+            <span className="admin-data-request__status"
+              style={{ '--status-color': STATUS_COLOR[r.status] ?? '#9098b8' }}>
+              {r.status}
+            </span>
+          </div>
+          <div className="admin-data-request__prompt">{r.prompt}</div>
+          {r.result_summary && (
+            <div className="admin-data-request__result">{r.result_summary}</div>
+          )}
+        </div>
+      ))}
+    </Section>
+  )
+}
+
+// ── Story detail ──────────────────────────────────────────────────────────────
+function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
+  const [story, setStory] = useState(initialStory)
+
+  const handleDelete = async () => {
+    if (!supabase || !window.confirm(`Delete story "${story.title}"? This cannot be undone.`)) return
+    await supabase.from('stories').delete().eq('id', story.id)
+    onDelete?.()
+  }
+
+  return (
+    <div className="admin-record">
+      <StoryMeta story={story} onSaved={updated => { setStory(updated); onUpdated?.(updated) }} />
+      <StoryEntityList storyId={story.id} />
+      <StoryExportPanel storyId={story.id} storyTitle={story.title} />
+      <DataRequestPanel storyId={story.id} />
+      <div className="admin-record__section" style={{ background: '#fff8f8' }}>
+        <button
+          className="admin-section-edit-btn"
+          onClick={handleDelete}
+          style={{ color: '#dc2626', borderColor: 'rgba(220,38,38,0.3)' }}
+        >
+          Delete story
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   const [query, setQuery]         = useState('')
@@ -1314,10 +1909,12 @@ export default function AdminPage() {
   const [browseType, setBrowseType]       = useState(null)
   const [browseResults, setBrowseResults] = useState([])
   const [browseLoading, setBrowseLoading] = useState(false)
+  const [storiesMode, setStoriesMode]     = useState(false)
+  const [selectedStory, setSelectedStory] = useState(null)
+  const [storyListKey, setStoryListKey]   = useState(0)
 
   const { results, loading: searching } = useEntitySearch(query)
 
-  // Load entities when a type filter is selected
   useEffect(() => {
     if (!browseType || !supabase) { setBrowseResults([]); return }
     setBrowseLoading(true)
@@ -1326,10 +1923,7 @@ export default function AdminPage() {
       .eq('entity_type', browseType)
       .order('name')
       .limit(100)
-      .then(({ data }) => {
-        setBrowseResults(data ?? [])
-        setBrowseLoading(false)
-      })
+      .then(({ data }) => { setBrowseResults(data ?? []); setBrowseLoading(false) })
   }, [browseType])
 
   const navigate = (entity) => {
@@ -1344,24 +1938,27 @@ export default function AdminPage() {
   }
 
   const selectFromSidebar = (entity) => {
-    setSelected(entity)
-    setHistory([])
-    setShowNew(false)
+    setSelected(entity); setHistory([]); setShowNew(false)
   }
 
   const handleCreated = (entity) => {
-    setShowNew(false)
-    setQuery(entity.name)
-    selectFromSidebar(entity)
+    setShowNew(false); setQuery(entity.name); selectFromSidebar(entity)
   }
 
   const handleBrowseType = (type) => {
     setBrowseType(prev => prev === type ? null : type)
-    setQuery('')
-    setShowNew(false)
+    setQuery(''); setShowNew(false)
   }
 
-  // The displayed list: search takes priority, then browse type
+  const enterStoriesMode = () => {
+    setStoriesMode(true); setBrowseType(null); setQuery('')
+    setSelected(null); setHistory([]); setShowNew(false)
+  }
+
+  const exitStoriesMode = () => {
+    setStoriesMode(false); setSelectedStory(null)
+  }
+
   const displayList = query.length >= 2 ? results : browseResults
 
   return (
@@ -1369,101 +1966,113 @@ export default function AdminPage() {
 
       {/* Sidebar */}
       <div className="admin-sidebar">
-        <div className="admin-sidebar__header">
-          <div className="admin-sidebar__header-row">
-            <div className="admin-sidebar__title">Entity Browser</div>
-            <button
-              className="admin-new-btn"
-              onClick={() => setShowNew(v => !v)}
-              title="Create a new entity"
-            >
-              {showNew ? '✕' : '+ New'}
-            </button>
-          </div>
-
-          {/* Type filter pills */}
-          {!showNew && (
-            <div className="admin-type-pills">
-              {TYPE_INFO.map(t => (
-                <button
-                  key={t.type}
-                  className={`admin-type-pill${browseType === t.type ? ' admin-type-pill--active' : ''}`}
-                  style={{ '--type-color': TYPE_COLORS[t.type] }}
-                  onClick={() => handleBrowseType(t.type)}
-                  title={`Browse ${t.label}`}
-                >
-                  {t.icon} {t.label}
+        {storiesMode ? (
+          <StoriesListPanel
+            selectedId={selectedStory?.id}
+            onSelect={setSelectedStory}
+            onExit={exitStoriesMode}
+            refreshKey={storyListKey}
+          />
+        ) : (
+          <>
+            <div className="admin-sidebar__header">
+              <div className="admin-sidebar__header-row">
+                <div className="admin-sidebar__title">Entity Browser</div>
+                <button className="admin-new-btn" onClick={() => setShowNew(v => !v)} title="Create a new entity">
+                  {showNew ? '✕' : '+ New'}
                 </button>
-              ))}
+              </div>
+
+              {!showNew && (
+                <div className="admin-type-pills">
+                  {TYPE_INFO.map(t => (
+                    <button
+                      key={t.type}
+                      className={`admin-type-pill${browseType === t.type ? ' admin-type-pill--active' : ''}`}
+                      style={{ '--type-color': TYPE_COLORS[t.type] }}
+                      onClick={() => handleBrowseType(t.type)}
+                      title={`Browse ${t.label}`}
+                    >
+                      {t.icon} {t.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {showNew ? (
+                <NewEntityPanel onCreated={handleCreated} onCancel={() => setShowNew(false)} />
+              ) : (
+                <>
+                  <input
+                    className="admin-search-input"
+                    placeholder={browseType
+                      ? `Search in ${TYPE_INFO.find(t => t.type === browseType)?.label ?? browseType}…`
+                      : 'Search all entities…'}
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                  />
+                  <button className="admin-stories-toggle" onClick={enterStoriesMode}>
+                    Stories
+                  </button>
+                </>
+              )}
             </div>
-          )}
 
-          {showNew ? (
-            <NewEntityPanel
-              onCreated={handleCreated}
-              onCancel={() => setShowNew(false)}
-            />
-          ) : (
-            <input
-              className="admin-search-input"
-              placeholder={browseType ? `Search in ${TYPE_INFO.find(t => t.type === browseType)?.label ?? browseType}…` : 'Search all entities…'}
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-            />
-          )}
-        </div>
-
-        {!showNew && (
-          <ul className="admin-entity-list">
-            {browseLoading && query.length < 2 && (
-              <li className="admin-hint">Loading…</li>
+            {!showNew && (
+              <ul className="admin-entity-list">
+                {browseLoading && query.length < 2 && <li className="admin-hint">Loading…</li>}
+                {displayList.map(e => (
+                  <li
+                    key={e.id}
+                    className={`admin-entity-item${selected?.id === e.id ? ' admin-entity-item--active' : ''}`}
+                    onClick={() => selectFromSidebar(e)}
+                  >
+                    <span className="admin-entity-name">{e.name}</span>
+                    <TypeBadge type={e.entity_type} />
+                  </li>
+                ))}
+                {!searching && !browseLoading && !displayList.length && query.length >= 2 && (
+                  <li className="admin-empty">No entities found.</li>
+                )}
+                {query.length < 2 && !browseType && !showNew && (
+                  <li className="admin-hint">Select a type above or type to search</li>
+                )}
+              </ul>
             )}
-
-            {displayList.map(e => (
-              <li
-                key={e.id}
-                className={`admin-entity-item${selected?.id === e.id ? ' admin-entity-item--active' : ''}`}
-                onClick={() => selectFromSidebar(e)}
-              >
-                <span className="admin-entity-name">{e.name}</span>
-                <TypeBadge type={e.entity_type} />
-              </li>
-            ))}
-
-            {!searching && !browseLoading && !displayList.length && query.length >= 2 && (
-              <li className="admin-empty">No entities found.</li>
-            )}
-
-            {query.length < 2 && !browseType && !showNew && (
-              <li className="admin-hint">Select a type above or type to search</li>
-            )}
-          </ul>
+          </>
         )}
       </div>
 
       {/* Main area */}
       <div className="admin-main">
-        {history.length > 0 && (
-          <div className="admin-breadcrumb">
-            <button className="admin-back-btn" onClick={goBack}>
-              ← {history[history.length - 1]?.name}
-            </button>
-            <span className="admin-breadcrumb__sep">/</span>
-            <span className="admin-breadcrumb__current">{selected?.name}</span>
-          </div>
-        )}
-
-        {!selected ? (
-          <AdminDashboard
-            onSelectEntity={selectFromSidebar}
-            onBrowseType={handleBrowseType}
-          />
+        {storiesMode ? (
+          selectedStory ? (
+            <StoryDetail
+              key={selectedStory.id}
+              story={selectedStory}
+              onUpdated={updated => setSelectedStory(updated)}
+              onDelete={() => { setSelectedStory(null); setStoryListKey(k => k + 1) }}
+            />
+          ) : (
+            <StoriesLanding />
+          )
         ) : (
-          <EntityRecord
-            key={selected.id}
-            entity={selected}
-            onNavigate={navigate}
-          />
+          <>
+            {history.length > 0 && (
+              <div className="admin-breadcrumb">
+                <button className="admin-back-btn" onClick={goBack}>
+                  ← {history[history.length - 1]?.name}
+                </button>
+                <span className="admin-breadcrumb__sep">/</span>
+                <span className="admin-breadcrumb__current">{selected?.name}</span>
+              </div>
+            )}
+            {!selected ? (
+              <AdminDashboard onSelectEntity={selectFromSidebar} onBrowseType={handleBrowseType} />
+            ) : (
+              <EntityRecord key={selected.id} entity={selected} onNavigate={navigate} />
+            )}
+          </>
         )}
       </div>
     </div>
