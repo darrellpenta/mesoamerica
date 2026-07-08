@@ -2,23 +2,29 @@
 """
 Agentic data sourcing agent for the Mesoamerica project.
 
-Polls data_requests with status='pending', uses Claude + web search to find
-and normalize entities, then writes staged_imports rows for human review in
-the admin UI.
+Polls data_requests with status='pending', uses an LLM to find and normalize
+entities, then writes staged_imports rows for human review in the admin UI.
 
 Requirements:
-  pip install anthropic requests psycopg2-binary python-dotenv
+  pip install requests psycopg2-binary python-dotenv
+  pip install anthropic   # optional, enables Claude + web search
+  Ollama running locally  # free fallback, no API key needed
 
 Usage:
   python3 scripts/source_data.py              # process one pending request
   python3 scripts/source_data.py --all        # process all pending requests
   python3 scripts/source_data.py --id <uuid>  # process a specific request
-  python3 scripts/source_data.py --dry-run    # show what would be staged, no DB writes
+  python3 scripts/source_data.py --dry-run    # preview without writing to DB
 
-Fallback chain (in order):
-  1. Claude claude-sonnet-5 + web_search tool (requires ANTHROPIC_API_KEY)
-  2. Claude + manually fetched URL content (if url_hints provided)
-  3. Claude model knowledge only (confidence flagged as 'model_knowledge')
+Fallback chain (tried in order):
+  1. Claude claude-sonnet-5 + web_search tool  (requires ANTHROPIC_API_KEY)
+  2. Claude + fetched URL content              (requires ANTHROPIC_API_KEY + url_hints)
+  3. Claude model knowledge only              (requires ANTHROPIC_API_KEY)
+  4. Ollama (local) + fetched URL content     (requires Ollama running at localhost:11434)
+  5. Ollama model knowledge only             (requires Ollama running at localhost:11434)
+
+Set ANTHROPIC_API_KEY in .env to enable Claude steps.
+Ollama is always tried as a free fallback if it is running.
 """
 
 import os
@@ -36,6 +42,14 @@ load_dotenv(Path(__file__).parent.parent / '.env')
 
 SUPABASE_DB_URL   = os.environ.get('SUPABASE_DB_URL')
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
+OLLAMA_BASE       = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
+
+# Preferred Ollama models in order of quality for this task
+OLLAMA_PREFERRED = [
+    'llama3.2', 'llama3.1', 'llama3', 'llama2',
+    'mistral', 'mixtral', 'gemma2', 'gemma',
+    'phi3', 'phi', 'qwen2',
+]
 
 if not SUPABASE_DB_URL:
     raise SystemExit('SUPABASE_DB_URL not set in .env')
@@ -96,23 +110,19 @@ def fetch_story_context(cur, story_id):
         return ''
     title, desc, theme, ts, te = row
     parts = [f'Story: "{title}"']
-    if theme:
-        parts.append(f'Theme: {theme}')
-    if ts or te:
-        parts.append(f'Time range: {ts or "?"} to {te or "?"}')
-    if desc:
-        parts.append(f'Description: {desc}')
+    if theme:   parts.append(f'Theme: {theme}')
+    if ts or te: parts.append(f'Time range: {ts or "?"} to {te or "?"}')
+    if desc:    parts.append(f'Description: {desc}')
     return '\n'.join(parts)
 
 
-# ── URL fetching fallback ──────────────────────────────────────────────────────
+# ── URL fetching ───────────────────────────────────────────────────────────────
 
 def fetch_url_text(url, max_chars=10_000):
     try:
         r = http.get(url, timeout=20, headers={'User-Agent': 'Mozilla/5.0 (research bot)'})
         r.raise_for_status()
         text = r.text
-        # Strip scripts and styles first
         text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.DOTALL | re.IGNORECASE)
         text = re.sub(r'<style[^>]*>.*?</style>',  '', text, flags=re.DOTALL | re.IGNORECASE)
         text = re.sub(r'<[^>]+>', ' ', text)
@@ -122,22 +132,53 @@ def fetch_url_text(url, max_chars=10_000):
         return f'[Could not fetch {url}: {e}]'
 
 
-# ── Claude calls ──────────────────────────────────────────────────────────────
+# ── Ollama ─────────────────────────────────────────────────────────────────────
 
-def make_client():
+def detect_ollama_model():
+    """Return the best available local Ollama model, or None if Ollama is not running."""
+    try:
+        r = http.get(f'{OLLAMA_BASE}/api/tags', timeout=5)
+        r.raise_for_status()
+        models = [m['name'].split(':')[0] for m in r.json().get('models', [])]
+        if not models:
+            return None
+        for preferred in OLLAMA_PREFERRED:
+            if preferred in models:
+                return preferred
+        return models[0]  # use whatever is installed
+    except Exception:
+        return None
+
+
+def call_ollama(model, user_msg, system=SYSTEM_PROMPT):
+    r = http.post(
+        f'{OLLAMA_BASE}/api/chat',
+        json={
+            'model':    model,
+            'stream':   False,
+            'messages': [
+                {'role': 'system',  'content': system},
+                {'role': 'user',    'content': user_msg},
+            ],
+        },
+        timeout=180,
+    )
+    r.raise_for_status()
+    return r.json()['message']['content']
+
+
+# ── Claude ─────────────────────────────────────────────────────────────────────
+
+def make_anthropic_client():
     import anthropic
     return anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 
 def extract_text(response):
-    parts = []
-    for block in response.content:
-        if hasattr(block, 'text') and block.text:
-            parts.append(block.text)
-    return '\n'.join(parts)
+    return '\n'.join(b.text for b in response.content if hasattr(b, 'text') and b.text)
 
 
-def call_with_web_search(client, user_msg):
+def call_claude_web_search(client, user_msg):
     response = client.messages.create(
         model='claude-sonnet-5',
         max_tokens=4096,
@@ -148,32 +189,12 @@ def call_with_web_search(client, user_msg):
     return extract_text(response)
 
 
-def call_with_url_content(client, user_msg, urls):
-    chunks = '\n\n'.join(
-        f'=== {url} ===\n{fetch_url_text(url)}'
-        for url in urls[:3]
-    )
-    augmented = f'{user_msg}\n\nContent fetched from provided URLs:\n\n{chunks}'
+def call_claude_with_content(client, user_msg):
     response = client.messages.create(
         model='claude-sonnet-5',
         max_tokens=4096,
         system=SYSTEM_PROMPT,
-        messages=[{'role': 'user', 'content': augmented}],
-    )
-    return extract_text(response)
-
-
-def call_knowledge_only(client, user_msg):
-    msg = (
-        f'{user_msg}\n\n'
-        'Note: no live web search is available for this request. '
-        'Use your training knowledge and set confidence="model_knowledge" for all entities.'
-    )
-    response = client.messages.create(
-        model='claude-sonnet-5',
-        max_tokens=4096,
-        system=SYSTEM_PROMPT,
-        messages=[{'role': 'user', 'content': msg}],
+        messages=[{'role': 'user', 'content': user_msg}],
     )
     return extract_text(response)
 
@@ -181,44 +202,32 @@ def call_knowledge_only(client, user_msg):
 # ── Response parsing ──────────────────────────────────────────────────────────
 
 def parse_response(raw):
-    """
-    Extract JSON from Claude's response. Handles prose wrapping and markdown
-    code fences. Returns (entities_list, summary_str).
-    """
     if not raw:
-        raise ValueError('Empty response from Claude')
+        raise ValueError('Empty response')
 
-    # Strip markdown code fences if present
     raw = re.sub(r'^```(?:json)?\s*', '', raw.strip(), flags=re.MULTILINE)
-    raw = re.sub(r'\s*```$', '', raw.strip(), flags=re.MULTILINE)
+    raw = re.sub(r'\s*```$',          '', raw.strip(), flags=re.MULTILINE)
 
-    # Find outermost JSON object
     match = re.search(r'\{.*\}', raw, re.DOTALL)
     if not match:
         raise ValueError('No JSON object found in response')
 
-    data = json.loads(match.group(0))
-    entities_raw = data.get('entities', [])
-    summary = str(data.get('summary', ''))[:1000]
+    data     = json.loads(match.group(0))
+    summary  = str(data.get('summary', ''))[:1000]
+
+    def _year(val):
+        if val is None: return None
+        try: return int(val)
+        except (TypeError, ValueError): return None
 
     normalized = []
-    for e in entities_raw:
+    for e in data.get('entities', []):
         name = str(e.get('name', '')).strip()[:500]
         if not name:
             continue
-
         etype = str(e.get('entity_type', '')).lower().replace(' ', '_')
         if etype not in ENTITY_TYPES:
             etype = 'place'
-
-        def _year(val):
-            if val is None:
-                return None
-            try:
-                return int(val)
-            except (TypeError, ValueError):
-                return None
-
         normalized.append({
             'name':         name,
             'entity_type':  etype,
@@ -230,13 +239,12 @@ def parse_response(raw):
             'confidence':   str(e.get('confidence', 'medium'))[:50],
             'raw_data':     json.dumps(e),
         })
-
     return normalized, summary
 
 
 # ── Core processing ───────────────────────────────────────────────────────────
 
-def source_request(cur, client, req, dry_run=False):
+def source_request(cur, client, ollama_model, req, dry_run=False):
     req_id    = req['id']
     story_id  = req['story_id']
     prompt    = req['prompt']
@@ -247,41 +255,68 @@ def source_request(cur, client, req, dry_run=False):
         print(f'  URL hints: {url_hints}')
 
     story_ctx = fetch_story_context(cur, story_id)
-    user_msg  = f'{story_ctx}\n\n---\n\nSourcing request: {prompt}' if story_ctx else f'Sourcing request: {prompt}'
+    base_msg  = f'{story_ctx}\n\n---\n\nSourcing request: {prompt}' if story_ctx else f'Sourcing request: {prompt}'
 
     raw_text    = None
     method_used = None
 
-    # ── Fallback 1: web search ──
+    # ── 1. Claude + web search ──
     if client:
         try:
-            print('  [1/3] Trying Claude + web search…')
-            raw_text    = call_with_web_search(client, user_msg)
-            method_used = 'web_search'
+            print('  [1/5] Claude + web search…')
+            raw_text    = call_claude_web_search(client, base_msg)
+            method_used = 'claude_web_search'
         except Exception as e:
-            print(f'  Web search failed: {e}')
+            print(f'       failed: {e}')
 
-    # ── Fallback 2: url_hints ──
-    if not raw_text and url_hints and client:
+    # ── 2. Claude + fetched URL content ──
+    if not raw_text and client and url_hints:
         try:
-            print('  [2/3] Fetching URL hints and passing to Claude…')
-            raw_text    = call_with_url_content(client, user_msg, url_hints)
-            method_used = 'url_hints'
+            print('  [2/5] Claude + fetched URL content…')
+            chunks = '\n\n'.join(f'=== {u} ===\n{fetch_url_text(u)}' for u in url_hints[:3])
+            raw_text    = call_claude_with_content(client, f'{base_msg}\n\nURL content:\n\n{chunks}')
+            method_used = 'claude_url_content'
         except Exception as e:
-            print(f'  URL hint fallback failed: {e}')
+            print(f'       failed: {e}')
 
-    # ── Fallback 3: model knowledge ──
+    # ── 3. Claude knowledge only ──
     if not raw_text and client:
         try:
-            print('  [3/3] Falling back to model knowledge only…')
-            raw_text    = call_knowledge_only(client, user_msg)
-            method_used = 'model_knowledge'
+            print('  [3/5] Claude model knowledge only…')
+            msg = (f'{base_msg}\n\nNo live web search available. '
+                   'Use training knowledge and set confidence="model_knowledge".')
+            raw_text    = call_claude_with_content(client, msg)
+            method_used = 'claude_knowledge'
         except Exception as e:
-            print(f'  Model knowledge fallback failed: {e}')
+            print(f'       failed: {e}')
+
+    # ── 4. Ollama + fetched URL content ──
+    if not raw_text and ollama_model and url_hints:
+        try:
+            print(f'  [4/5] Ollama ({ollama_model}) + fetched URL content…')
+            chunks = '\n\n'.join(f'=== {u} ===\n{fetch_url_text(u)}' for u in url_hints[:3])
+            raw_text    = call_ollama(ollama_model, f'{base_msg}\n\nURL content:\n\n{chunks}')
+            method_used = 'ollama_url_content'
+        except Exception as e:
+            print(f'       failed: {e}')
+
+    # ── 5. Ollama knowledge only ──
+    if not raw_text and ollama_model:
+        try:
+            print(f'  [5/5] Ollama ({ollama_model}) model knowledge only…')
+            msg = (f'{base_msg}\n\nNo live web search available. '
+                   'Use training knowledge and set confidence="model_knowledge".')
+            raw_text    = call_ollama(ollama_model, msg)
+            method_used = 'ollama_knowledge'
+        except Exception as e:
+            print(f'       failed: {e}')
 
     # ── Hard failure ──
     if not raw_text:
-        msg = 'All sourcing attempts failed. Check ANTHROPIC_API_KEY and network.'
+        tips = []
+        if not client:       tips.append('add ANTHROPIC_API_KEY to .env for Claude')
+        if not ollama_model: tips.append('start Ollama (ollama serve) for a free local fallback')
+        msg = 'All sourcing attempts failed. ' + (' | '.join(tips) if tips else '')
         if not dry_run:
             cur.execute(
                 "UPDATE data_requests SET status='failed', result_summary=%s WHERE id=%s",
@@ -294,7 +329,7 @@ def source_request(cur, client, req, dry_run=False):
     try:
         entities, summary = parse_response(raw_text)
     except Exception as e:
-        msg = f'Could not parse Claude response: {e}\n\nRaw (first 500 chars):\n{raw_text[:500]}'
+        msg = f'Could not parse LLM response: {e}\n\nRaw (first 500 chars):\n{raw_text[:500]}'
         if not dry_run:
             cur.execute(
                 "UPDATE data_requests SET status='failed', result_summary=%s WHERE id=%s",
@@ -304,7 +339,7 @@ def source_request(cur, client, req, dry_run=False):
         return 0
 
     if not entities:
-        msg = 'Claude returned 0 valid entities. Try rephrasing the request or adding URL hints.'
+        msg = 'LLM returned 0 valid entities. Try rephrasing or adding URL hints.'
         if not dry_run:
             cur.execute(
                 "UPDATE data_requests SET status='failed', result_summary=%s WHERE id=%s",
@@ -313,15 +348,17 @@ def source_request(cur, client, req, dry_run=False):
         print(f'  EMPTY: {msg}')
         return 0
 
-    # If model knowledge was the method, override confidence on all rows
-    if method_used == 'model_knowledge':
+    # Mark all rows as model_knowledge if no live source was used
+    if method_used in ('claude_knowledge', 'ollama_knowledge', 'ollama_url_content'):
         for e in entities:
-            e['confidence'] = 'model_knowledge'
+            if e['confidence'] not in ('high', 'medium', 'low'):
+                e['confidence'] = 'model_knowledge'
 
     if dry_run:
-        print(f'\n  DRY RUN — would stage {len(entities)} entities (method: {method_used}):')
+        print(f'\n  DRY RUN — {len(entities)} entities (method: {method_used}):')
         for e in entities:
-            yr = f'{e["date_start"] or ""}–{e["date_end"] or ""}' if (e['date_start'] or e['date_end']) else ''
+            yr = (f'{e["date_start"] or ""}–{e["date_end"] or ""}'
+                  if (e['date_start'] or e['date_end']) else '')
             print(f'    [{e["confidence"][:4]}] {e["name"]} ({e["entity_type"]}) {yr}')
             if e['description']:
                 print(f'          {e["description"][:80]}')
@@ -354,40 +391,58 @@ def source_request(cur, client, req, dry_run=False):
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     ap.add_argument('--all',     action='store_true', help='Process all pending requests')
     ap.add_argument('--id',      metavar='UUID',      help='Process one specific request')
-    ap.add_argument('--dry-run', action='store_true', help='Preview output without writing to DB')
+    ap.add_argument('--dry-run', action='store_true', help='Preview without writing to DB')
     args = ap.parse_args()
 
-    if not ANTHROPIC_API_KEY:
-        print('WARNING: ANTHROPIC_API_KEY not set — Claude calls will fail and requests will be marked failed.')
-        client = None
-    else:
+    # ── Set up clients ──
+    client = None
+    if ANTHROPIC_API_KEY:
         try:
-            client = make_client()
+            client = make_anthropic_client()
+            print('Claude API: available')
         except ImportError:
-            print('ERROR: anthropic package not installed. Run: pip install anthropic')
-            sys.exit(1)
+            print('WARNING: anthropic package not installed (pip install anthropic) — Claude disabled')
+    else:
+        print('Claude API: not configured (ANTHROPIC_API_KEY not set)')
 
+    ollama_model = detect_ollama_model()
+    if ollama_model:
+        print(f'Ollama: available ({ollama_model})')
+    else:
+        print('Ollama: not running (start with: ollama serve)')
+
+    if not client and not ollama_model:
+        print('\nERROR: No LLM available. Set ANTHROPIC_API_KEY or start Ollama.')
+        sys.exit(1)
+
+    # ── Fetch pending requests ──
     conn = get_conn()
     cur  = conn.cursor()
 
     if args.id:
         cur.execute(
-            "SELECT id, story_id, prompt, url_hints FROM data_requests WHERE id=%s AND status='pending'",
+            "SELECT id, story_id, prompt, url_hints FROM data_requests "
+            "WHERE id=%s AND status='pending'",
             (args.id,)
         )
     elif args.all:
         cur.execute(
-            "SELECT id, story_id, prompt, url_hints FROM data_requests WHERE status='pending' ORDER BY created_at"
+            "SELECT id, story_id, prompt, url_hints FROM data_requests "
+            "WHERE status='pending' ORDER BY created_at"
         )
     else:
         cur.execute(
-            "SELECT id, story_id, prompt, url_hints FROM data_requests WHERE status='pending' ORDER BY created_at LIMIT 1"
+            "SELECT id, story_id, prompt, url_hints FROM data_requests "
+            "WHERE status='pending' ORDER BY created_at LIMIT 1"
         )
 
-    cols = ['id', 'story_id', 'prompt', 'url_hints']
+    cols    = ['id', 'story_id', 'prompt', 'url_hints']
     pending = [dict(zip(cols, r)) for r in cur.fetchall()]
 
     if not pending:
@@ -395,14 +450,14 @@ def main():
         cur.close(); conn.close()
         return
 
-    print(f'Processing {len(pending)} request(s)…')
+    print(f'\nProcessing {len(pending)} request(s)…')
     total = 0
 
     for req in pending:
         if not args.dry_run:
             cur.execute("UPDATE data_requests SET status='processing' WHERE id=%s", (req['id'],))
         try:
-            count = source_request(cur, client, req, dry_run=args.dry_run)
+            count = source_request(cur, client, ollama_model, req, dry_run=args.dry_run)
             total += count
         except Exception as e:
             print(f'  Unexpected error: {e}')
