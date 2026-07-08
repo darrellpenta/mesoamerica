@@ -97,6 +97,24 @@ layer_definitions  — map layer config (mirrors src/layers/index.js)
 annotations        — key-value freeform notes on any entity
 ```
 
+### Stories tables (narrative platform)
+
+```
+stories            — named narrative container (title, description, theme, time_start, time_end)
+story_entities     — junction: story_id → entity_id; carries role_in_story and notes
+data_requests      — sourcing queue: natural-language prompts submitted by the admin,
+                     processed by scripts/source_data.py; status: pending → processing → review → done | failed
+staged_imports     — rows staged by source_data.py for human review before committing to entities;
+                     carries name, entity_type, dates, description, source_url, confidence,
+                     review_status (pending | approved | rejected)
+```
+
+Migration scripts (run once, in order):
+```bash
+python3 scripts/create_stories_schema.py   # stories, story_entities, data_requests
+python3 scripts/add_staged_imports.py      # staged_imports
+```
+
 ### relationships table
 
 ```sql
@@ -174,13 +192,45 @@ const ERAS = [
 
 ## Admin Page (`src/pages/AdminPage.jsx`)
 
-Full knowledge-graph editor behind password gate. Features:
+Full knowledge-graph editor behind password gate. Two modes: **Entity browser** and **Stories**.
+
+### Entity browser features
 - **Dashboard** — entity counts by type, mini sparkline graphs, type-filter pills, browse-by-type without search
 - **Entity record** — master/detail; inline name editing; extension field editing (persons dates, place type, etc.)
 - **Relationship management** — add/delete typed, time-bounded relationships with entity search
 - **Annotations** — freeform key-value notes (text/number/date/url/markdown types)
 - **Create entity** — "New" button with live duplicate detection
 - **Suggested connections** — surfaces co-rulers and name-similar entities not yet linked
+
+### Stories mode features
+
+Accessed via the "Stories" toggle at the bottom of the entity sidebar. Each story is a named narrative container binding a theme, time range, and a curated set of entities.
+
+- **Story list** — sidebar of all stories; click to open; "New story" button
+- **StoryMeta** — editable title, description, theme, time range
+- **StoryEntityList** — entities linked to this story via `story_entities`; add with role + notes
+- **CSV Import** — upload any CSV, map columns to entity fields (name, type, dates, notes), bulk-create entities and auto-link to story; progress bar + result summary
+- **StoryExportPanel** — export story entities as CSV or GeoJSON (properties only, geometry null)
+- **DataRequestPanel** — submit natural-language sourcing prompts to the `data_requests` queue; run `source_data.py` offline to process; status badges: pending / processing / review / done / failed
+- **StagingReviewPanel** — appears when a request reaches `review` status; shows each staged row with confidence badge (high/medium/low/model_knowledge), approve or reject per row; approve creates entity + extension record + annotation + story link in one shot; "Mark request done" closes the loop
+
+### Key Admin patterns
+
+```js
+// EXT_TABLES mapping (entity_type → extension table name)
+const EXT_TABLES = {
+  person: 'persons', place: 'places', geo_feature: 'geo_features',
+  territory: 'territories', admin_boundary: 'admin_boundaries', event: 'events',
+}
+
+// Story entity query (child → parent FK join)
+supabase.from('story_entities')
+  .select('id, entity_id, entity_type, role_in_story, notes, entity:entity_id(id, name, entity_type)')
+  .eq('story_id', storyId)
+
+// Staged imports for a request
+supabase.from('staged_imports').select('*').eq('request_id', requestId)
+```
 
 ---
 
@@ -345,10 +395,36 @@ On every push to `main`:
 |--------|---------|--------|
 | `scripts/generate_geojson.py` | Regenerate all `public/data/*.geojson` from Supabase | Runs in CI; run locally with `SUPABASE_DB_URL` in `.env` |
 | `scripts/add_feature_colors.py` | Add `color`, `family`, `biome`, `site` properties to 9 GeoJSON layers for auto-coloring | Re-run if palette changes; commit output |
+| `scripts/create_stories_schema.py` | One-time migration: create `stories`, `story_entities`, `data_requests` | Already run |
+| `scripts/add_staged_imports.py` | One-time migration: create `staged_imports` | Already run |
+| `scripts/source_data.py` | Agentic sourcing agent: polls `data_requests` where `status='pending'`, calls LLM to find entities, writes `staged_imports` for review | See below |
 | `scripts/seed_from_wikidata.py` | Seed rulers from `scripts/wp_rulers_enriched.json` | `python3 scripts/seed_from_wikidata.py [--dry-run]` |
 | `scripts/seed_long_shadow.py` | Seed 20 persons, 16 events, 5 places from *The Long Shadow* | Already run |
 | `scripts/migrate_point_layers.py` | One-time: point GeoJSON → Supabase | Already run |
 | `scripts/migrate_poly_layers.py` | One-time: polygon/line GeoJSON → Supabase | Already run |
+
+### `source_data.py` — agentic sourcing agent
+
+Processes `data_requests` rows and stages results for human review in the admin UI.
+
+```bash
+pip install requests psycopg2-binary python-dotenv
+pip install anthropic   # optional — enables Claude + web search
+
+python3 scripts/source_data.py              # one pending request
+python3 scripts/source_data.py --all        # all pending
+python3 scripts/source_data.py --id <uuid>  # specific request
+python3 scripts/source_data.py --dry-run    # preview, no DB writes
+```
+
+**Fallback chain (tried in order):**
+1. Claude `claude-sonnet-5` + web search — best quality, live sources (needs `ANTHROPIC_API_KEY`)
+2. Claude + fetched URL content — uses `url_hints` from the request (needs `ANTHROPIC_API_KEY`)
+3. Claude model knowledge only — training data, all rows flagged `confidence='model_knowledge'` (needs `ANTHROPIC_API_KEY`)
+4. Ollama (local) + fetched URL content — free, no key, needs Ollama running (`ollama serve`)
+5. Ollama model knowledge only — free fallback, all rows flagged `model_knowledge`
+
+The script auto-detects Ollama model availability via `http://localhost:11434/api/tags` and prints which LLMs are active at startup. Set `ANTHROPIC_API_KEY` in `.env` to enable Claude.
 
 ---
 
@@ -381,9 +457,12 @@ python3 scripts/generate_geojson.py
 - **Timeline** — multi-entity SVG timeline: persons, events, places, territories, admin boundaries across 6 historical eras with era zoom and reference strip
 - **Admin (password-protected)** — entity browser, full record editing, relationship management, annotations, entity creation, suggested connections
 - **Knowledge graph** — 112 persons seeded with RULED relationships; *The Long Shadow* events and places
+- **Stories (narrative platform)** — named story containers with theme + time bounds; entity curation with roles; CSV bulk import; CSV/GeoJSON export; data request queue
+- **Agentic data sourcing** — `source_data.py` polls the request queue, uses Claude + web search (or Ollama as a free local fallback), stages results; admin reviews rows one-by-one before anything commits
 
 ### Not Yet Implemented
 
+- Public story viewer (`/#/stories/:id`) — read-only map/chart view for a curated story
 - Admin point placement on map (drop new point from admin interface)
 - Wikipedia / external content in the detail sidebar
 - Polity, culture, time_period entity types (schema supports them; no data)
@@ -407,3 +486,7 @@ Paste this file at the start of a new session. Key reminders:
 - **Admin password:** `mesoamerica2026` (in `src/main.jsx` as `ADMIN_PW`)
 - **PostgREST FK joins** go from child → parent only (e.g., `from('persons').select('*, entity:entity_id(name)')`, not from `entities`)
 - **`base: './'`** in `vite.config.js` — required for GitHub Pages; do not change
+- **Stories mode** — toggled via the "Stories" button at the bottom of the Admin sidebar; `storiesMode` + `selectedStory` state in `AdminPage`; story operations use `stories`, `story_entities`, `staged_imports`, `data_requests` tables
+- **Agentic sourcing flow:** user submits prompt in DataRequestPanel → run `python3 scripts/source_data.py` → status becomes `review` → admin clicks "Review staged data" → StagingReviewPanel appears → approve/reject rows → "Mark request done"
+- **`staged_imports` confidence values:** `high`, `medium`, `low`, `model_knowledge` — displayed as colored badges in the review panel
+- **Ollama fallback:** `source_data.py` auto-detects Ollama at `http://localhost:11434`; prefers llama3 family. Override with `OLLAMA_BASE_URL` in `.env`.
