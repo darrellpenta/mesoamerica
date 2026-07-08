@@ -1761,13 +1761,190 @@ function StoryExportPanel({ storyId, storyTitle }) {
 }
 
 // ── Data request panel ────────────────────────────────────────────────────────
+// ── Staging review panel ──────────────────────────────────────────────────────
+const CONF_COLOR = {
+  high:            '#059669',
+  medium:          '#2563eb',
+  low:             '#d97706',
+  model_knowledge: '#7c3aed',
+}
+
+function StagingReviewPanel({ requestId, storyId, onClose, onDone }) {
+  const [rows, setRows]             = useState(null)
+  const [processing, setProcessing] = useState({})
+
+  const load = useCallback(async () => {
+    if (!supabase) return
+    const { data } = await supabase
+      .from('staged_imports')
+      .select('*')
+      .eq('request_id', requestId)
+      .order('created_at', { ascending: true })
+    setRows(data ?? [])
+  }, [requestId])
+
+  useEffect(() => { load() }, [load])
+
+  const approve = async (row) => {
+    if (!supabase) return
+    setProcessing(p => ({ ...p, [row.id]: 'approving' }))
+
+    // Create entity
+    const { data: ent, error: entErr } = await supabase
+      .from('entities')
+      .insert({ name: row.name, entity_type: row.entity_type })
+      .select('id, entity_type')
+      .single()
+
+    if (entErr) {
+      setProcessing(p => ({ ...p, [row.id]: null }))
+      alert(`Could not create entity: ${entErr.message}`)
+      return
+    }
+
+    // Extension record (dates)
+    const extTable = EXT_TABLES[ent.entity_type]
+    if (extTable && (row.date_start || row.date_end)) {
+      const ext = { entity_id: ent.id }
+      if (row.date_start) ext.date_start = row.date_start
+      if (row.date_end)   ext.date_end   = row.date_end
+      await supabase.from(extTable).insert(ext)
+    }
+
+    // Description + source as annotation
+    if (row.description) {
+      let md = row.description
+      if (row.source_url) {
+        md += `\n\nSource: [${row.source_label || row.source_url}](${row.source_url})`
+      }
+      await supabase.from('annotations').insert({ entity_id: ent.id, content_md: md })
+    }
+
+    // Link to story
+    if (storyId) {
+      await supabase.from('story_entities').insert({
+        story_id:    storyId,
+        entity_id:   ent.id,
+        entity_type: ent.entity_type,
+        notes:       `Sourced via data request. Confidence: ${row.confidence}`,
+      })
+    }
+
+    await supabase.from('staged_imports').update({ review_status: 'approved' }).eq('id', row.id)
+    setRows(r => r.map(x => x.id === row.id ? { ...x, review_status: 'approved' } : x))
+    setProcessing(p => ({ ...p, [row.id]: null }))
+  }
+
+  const reject = async (row) => {
+    if (!supabase) return
+    setProcessing(p => ({ ...p, [row.id]: 'rejecting' }))
+    await supabase.from('staged_imports').update({ review_status: 'rejected' }).eq('id', row.id)
+    setRows(r => r.map(x => x.id === row.id ? { ...x, review_status: 'rejected' } : x))
+    setProcessing(p => ({ ...p, [row.id]: null }))
+  }
+
+  const markDone = async () => {
+    await supabase.from('data_requests').update({ status: 'done' }).eq('id', requestId)
+    onDone?.()
+    onClose()
+  }
+
+  const pendingRows   = (rows ?? []).filter(r => r.review_status === 'pending')
+  const approvedCount = (rows ?? []).filter(r => r.review_status === 'approved').length
+  const rejectedCount = (rows ?? []).filter(r => r.review_status === 'rejected').length
+  const allReviewed   = rows?.length > 0 && pendingRows.length === 0
+
+  return (
+    <div className="admin-staging-panel">
+      <div className="admin-staging-panel__header">
+        <span className="admin-staging-panel__title">
+          Review staged data — {rows?.length ?? '…'} rows
+        </span>
+        <button className="admin-add-form__close" onClick={onClose}>✕</button>
+      </div>
+
+      <div className="admin-staging-panel__tally">
+        <span>{pendingRows.length} pending</span>
+        {approvedCount > 0 && <span className="admin-staging-tally--good">{approvedCount} approved</span>}
+        {rejectedCount > 0 && <span className="admin-staging-tally--bad">{rejectedCount} rejected</span>}
+      </div>
+
+      {rows === null && <div className="admin-record__loading"><div className="admin-spinner" /></div>}
+
+      {rows?.map(row => (
+        <div key={row.id} className={`admin-staging-row admin-staging-row--${row.review_status}`}>
+          <div className="admin-staging-row__meta">
+            <span
+              className="admin-staging-row__conf"
+              style={{ '--conf-color': CONF_COLOR[row.confidence] ?? '#6b7494' }}
+            >
+              {row.confidence}
+            </span>
+            <TypeBadge type={row.entity_type} />
+            {(row.date_start || row.date_end) && (
+              <span className="admin-story-time-range">
+                {row.date_start ?? '?'}
+                {row.date_end && row.date_end !== row.date_start ? `–${row.date_end}` : ''}
+              </span>
+            )}
+          </div>
+          <div className="admin-staging-row__name">{row.name}</div>
+          {row.description && (
+            <div className="admin-staging-row__desc">{row.description}</div>
+          )}
+          {row.source_url && (
+            <div className="admin-staging-row__source">
+              Source: <span>{row.source_label || row.source_url}</span>
+            </div>
+          )}
+
+          {row.review_status === 'pending' && (
+            <div className="admin-staging-row__actions">
+              <button
+                className="admin-staging-btn admin-staging-btn--approve"
+                onClick={() => approve(row)}
+                disabled={!!processing[row.id]}
+              >
+                {processing[row.id] === 'approving' ? '…' : 'Approve'}
+              </button>
+              <button
+                className="admin-staging-btn admin-staging-btn--reject"
+                onClick={() => reject(row)}
+                disabled={!!processing[row.id]}
+              >
+                {processing[row.id] === 'rejecting' ? '…' : 'Reject'}
+              </button>
+            </div>
+          )}
+          {row.review_status !== 'pending' && (
+            <div className={`admin-staging-row__verdict admin-staging-row__verdict--${row.review_status}`}>
+              {row.review_status === 'approved' ? '✓ Approved — entity created' : '✗ Rejected'}
+            </div>
+          )}
+        </div>
+      ))}
+
+      {allReviewed && (
+        <div className="admin-staging-panel__done-bar">
+          <span>{approvedCount} {approvedCount === 1 ? 'entity' : 'entities'} added to story.</span>
+          <button className="admin-save-btn admin-save-btn--sm" onClick={markDone}>
+            Mark request done
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Data request panel ────────────────────────────────────────────────────────
 function DataRequestPanel({ storyId }) {
-  const [requests, setRequests] = useState(null)
-  const [prompt, setPrompt]     = useState('')
-  const [urlHints, setUrlHints] = useState('')
+  const [requests, setRequests]     = useState(null)
+  const [prompt, setPrompt]         = useState('')
+  const [urlHints, setUrlHints]     = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [showForm, setShowForm] = useState(false)
-  const [err, setErr]           = useState(null)
+  const [showForm, setShowForm]     = useState(false)
+  const [reviewingId, setReviewingId] = useState(null)
+  const [err, setErr]               = useState(null)
 
   const load = useCallback(async () => {
     if (!supabase) return
@@ -1798,13 +1975,20 @@ function DataRequestPanel({ storyId }) {
     load()
   }
 
-  const STATUS_COLOR = { pending: '#d97706', processing: '#2563eb', review: '#7c3aed', done: '#059669' }
-  const pending = (requests ?? []).filter(r => r.status !== 'done').length
+  const STATUS_COLOR = {
+    pending:    '#d97706',
+    processing: '#2563eb',
+    review:     '#7c3aed',
+    done:       '#059669',
+    failed:     '#dc2626',
+  }
+
+  const activeCount = (requests ?? []).filter(r => !['done', 'failed'].includes(r.status)).length
 
   return (
     <Section
       title="Data Requests"
-      count={pending || undefined}
+      count={activeCount || undefined}
       action={!showForm
         ? <button className="admin-section-edit-btn" onClick={() => setShowForm(true)}>+ Request</button>
         : null}
@@ -1815,6 +1999,10 @@ function DataRequestPanel({ storyId }) {
             <span className="admin-add-form__title">Request data from Claude</span>
             <button className="admin-add-form__close" onClick={() => { setShowForm(false); setErr(null) }}>✕</button>
           </div>
+          <p className="admin-import-hint">
+            Describe the data you need. Run <code>python3 scripts/source_data.py</code> to have
+            Claude search for it, then come back here to review the staged results.
+          </p>
           <div className="admin-form-row">
             <label className="admin-label">What data do you need?</label>
             <textarea
@@ -1860,10 +2048,31 @@ function DataRequestPanel({ storyId }) {
               style={{ '--status-color': STATUS_COLOR[r.status] ?? '#9098b8' }}>
               {r.status}
             </span>
+            {r.status === 'review' && reviewingId !== r.id && (
+              <button
+                className="admin-staging-trigger"
+                onClick={() => setReviewingId(r.id)}
+              >
+                Review staged data
+              </button>
+            )}
+            {r.status === 'pending' && (
+              <span className="admin-data-request__hint">
+                Run <code>python3 scripts/source_data.py</code> to process
+              </span>
+            )}
           </div>
           <div className="admin-data-request__prompt">{r.prompt}</div>
           {r.result_summary && (
             <div className="admin-data-request__result">{r.result_summary}</div>
+          )}
+          {reviewingId === r.id && (
+            <StagingReviewPanel
+              requestId={r.id}
+              storyId={storyId}
+              onClose={() => setReviewingId(null)}
+              onDone={() => { setReviewingId(null); load() }}
+            />
           )}
         </div>
       ))}
