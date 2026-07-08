@@ -83,12 +83,18 @@ const FreehandPolygonMode = {
 // Static GeoJSON layer
 // ---------------------------------------------------------------------------
 function buildColorExpr(layer) {
-  // Prefer explicit match expressions keyed on a categorical property
-  if (layer.colorBy && layer.colorLegend?.length) {
-    const pairs = layer.colorLegend.flatMap(e => [e.value, e.color])
-    return ['match', ['get', layer.colorBy], ...pairs, layer.color]
+  if (layer.colorBy) {
+    // colorDetails: fine-grained { value: color } map (e.g. per-dialect) — takes priority
+    if (layer.colorDetails) {
+      const pairs = Object.entries(layer.colorDetails).flat()
+      return ['match', ['get', layer.colorBy], ...pairs, layer.color]
+    }
+    // colorLegend: group-level [{ value, color }] list
+    if (layer.colorLegend?.length) {
+      const pairs = layer.colorLegend.flatMap(e => [e.value, e.color])
+      return ['match', ['get', layer.colorBy], ...pairs, layer.color]
+    }
   }
-  // Fallback: read a 'color' property stored directly on each GeoJSON feature
   if (layer.featureColor) return ['coalesce', ['get', 'color'], layer.color]
   return layer.color
 }
