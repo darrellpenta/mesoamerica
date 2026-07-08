@@ -1871,9 +1871,285 @@ function DataRequestPanel({ storyId }) {
   )
 }
 
+// ── CSV parser (browser-side, no deps) ───────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim())
+  if (lines.length < 2) return { headers: [], rows: [] }
+
+  function parseRow(line) {
+    const fields = []
+    let cur = '', inQ = false
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i]
+      if (ch === '"') {
+        if (inQ && line[i + 1] === '"') { cur += '"'; i++ }
+        else inQ = !inQ
+      } else if (ch === ',' && !inQ) { fields.push(cur); cur = '' }
+      else cur += ch
+    }
+    fields.push(cur)
+    return fields
+  }
+
+  const headers = parseRow(lines[0]).map(h => h.replace(/^"|"$/g, '').trim())
+  const rows = lines.slice(1).map(l => {
+    const vals = parseRow(l)
+    const obj = {}
+    headers.forEach((h, i) => { obj[h] = (vals[i] ?? '').replace(/^"|"$/g, '').trim() })
+    return obj
+  }).filter(r => Object.values(r).some(v => v))
+
+  return { headers, rows }
+}
+
+const FIELD_OPTIONS = [
+  { value: '_skip',        label: '— skip —' },
+  { value: 'name',         label: 'Name' },
+  { value: 'entity_type',  label: 'Entity type' },
+  { value: 'date_start',   label: 'Date / year start' },
+  { value: 'date_end',     label: 'Date / year end' },
+  { value: 'description',  label: 'Description / notes' },
+]
+
+// ── CSV importer ──────────────────────────────────────────────────────────────
+function CSVImporter({ storyId, onDone, onCancel }) {
+  const [step, setStep]             = useState('upload')  // upload|map|preview|importing|done
+  const [parsed, setParsed]         = useState(null)      // { headers, rows }
+  const [mapping, setMapping]       = useState({})        // { colHeader: fieldKey }
+  const [defaultType, setDefaultType] = useState('place')
+  const [progress, setProgress]     = useState(null)      // { done, total }
+  const [results, setResults]       = useState(null)      // { created, linked, failed, errors }
+  const [err, setErr]               = useState(null)
+  const fileRef = useRef(null)
+
+  // ── Step 1: read file ──────────────────────────────────────────────────────
+  const onFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const { headers, rows } = parseCSV(ev.target.result)
+      if (!headers.length) { setErr('Could not parse CSV — check the file format.'); return }
+      setParsed({ headers, rows })
+      // Auto-detect obvious columns
+      const auto = {}
+      headers.forEach(h => {
+        const lc = h.toLowerCase()
+        if (/^name$/i.test(lc) || lc === 'title')            auto[h] = 'name'
+        else if (/type/i.test(lc))                            auto[h] = 'entity_type'
+        else if (/start|begin|from|year_start|date_start/i.test(lc)) auto[h] = 'date_start'
+        else if (/end|to|year_end|date_end/i.test(lc))        auto[h] = 'date_end'
+        else if (/desc|note|summary/i.test(lc))               auto[h] = 'description'
+        else                                                   auto[h] = '_skip'
+      })
+      setMapping(auto)
+      setStep('map')
+      setErr(null)
+    }
+    reader.readAsText(file)
+  }
+
+  // ── Step 3: import ─────────────────────────────────────────────────────────
+  const runImport = async () => {
+    if (!supabase || !parsed) return
+    const nameCol = Object.entries(mapping).find(([, v]) => v === 'name')?.[0]
+    if (!nameCol) { setErr('You must map a column to Name.'); return }
+
+    const typeCol  = Object.entries(mapping).find(([, v]) => v === 'entity_type')?.[0]
+    const ds_col   = Object.entries(mapping).find(([, v]) => v === 'date_start')?.[0]
+    const de_col   = Object.entries(mapping).find(([, v]) => v === 'date_end')?.[0]
+    const desc_col = Object.entries(mapping).find(([, v]) => v === 'description')?.[0]
+
+    setStep('importing')
+    setProgress({ done: 0, total: parsed.rows.length })
+    const res = { created: 0, linked: 0, failed: 0, errors: [] }
+
+    for (let i = 0; i < parsed.rows.length; i++) {
+      const row = parsed.rows[i]
+      const name = row[nameCol]?.trim()
+      if (!name) { res.failed++; setProgress({ done: i + 1, total: parsed.rows.length }); continue }
+
+      const etype = (typeCol && row[typeCol]?.trim()) || defaultType
+      const notes = desc_col ? row[desc_col]?.trim() || null : null
+
+      // Create entity
+      const { data: ent, error: entErr } = await supabase
+        .from('entities')
+        .insert({ name, entity_type: etype })
+        .select('id, entity_type')
+        .single()
+
+      if (entErr) { res.failed++; res.errors.push(`${name}: ${entErr.message}`); setProgress({ done: i + 1, total: parsed.rows.length }); continue }
+      res.created++
+
+      // Extension record (dates)
+      const extTable = EXT_TABLES[ent.entity_type]
+      if (extTable && (ds_col || de_col)) {
+        const extRow = { entity_id: ent.id }
+        if (ds_col && row[ds_col]) { const n = parseInt(row[ds_col], 10); if (!isNaN(n)) extRow.date_start = n }
+        if (de_col && row[de_col]) { const n = parseInt(row[de_col], 10); if (!isNaN(n)) extRow.date_end   = n }
+        await supabase.from(extTable).insert(extRow)
+      }
+
+      // Annotation for notes/description
+      if (notes) {
+        await supabase.from('annotations').insert({ entity_id: ent.id, content_md: notes })
+      }
+
+      // Link to story
+      if (storyId) {
+        const { error: linkErr } = await supabase.from('story_entities').insert({
+          story_id: storyId, entity_id: ent.id, entity_type: ent.entity_type,
+        })
+        if (!linkErr) res.linked++
+      }
+
+      setProgress({ done: i + 1, total: parsed.rows.length })
+    }
+
+    setResults(res)
+    setStep('done')
+  }
+
+  const nameIsMapped = Object.values(mapping).includes('name')
+
+  if (step === 'upload') {
+    return (
+      <div className="admin-add-form">
+        <div className="admin-add-form__header">
+          <span className="admin-add-form__title">Import CSV</span>
+          <button className="admin-add-form__close" onClick={onCancel}>✕</button>
+        </div>
+        <p className="admin-import-hint">
+          Upload a CSV file. You'll map columns to entity fields on the next step.
+          Entities are created and linked to this story automatically.
+        </p>
+        {err && <div className="admin-error">{err}</div>}
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".csv,text/csv"
+          style={{ display: 'none' }}
+          onChange={onFile}
+        />
+        <button className="admin-import-upload-btn" onClick={() => fileRef.current?.click()}>
+          Choose CSV file
+        </button>
+      </div>
+    )
+  }
+
+  if (step === 'map') {
+    const preview = parsed.rows.slice(0, 3)
+    return (
+      <div className="admin-add-form admin-import-form">
+        <div className="admin-add-form__header">
+          <span className="admin-add-form__title">Map columns — {parsed.rows.length} rows detected</span>
+          <button className="admin-add-form__close" onClick={onCancel}>✕</button>
+        </div>
+
+        <div className="admin-import-mapper">
+          <div className="admin-import-mapper__head">
+            <span>Column</span><span>Maps to</span><span>Sample values</span>
+          </div>
+          {parsed.headers.map(h => (
+            <div key={h} className="admin-import-mapper__row">
+              <span className="admin-import-mapper__col">{h}</span>
+              <select
+                className="admin-select admin-input--compact"
+                value={mapping[h] ?? '_skip'}
+                onChange={e => setMapping(p => ({ ...p, [h]: e.target.value }))}
+              >
+                {FIELD_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <span className="admin-import-mapper__sample">
+                {preview.map(r => r[h]).filter(Boolean).slice(0, 2).join(', ') || '—'}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="admin-import-type-row">
+          <label className="admin-label">Default entity type (when not in CSV):</label>
+          <select className="admin-select" value={defaultType} onChange={e => setDefaultType(e.target.value)}>
+            {Object.keys(EXT_TABLES).map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
+          </select>
+        </div>
+
+        {!nameIsMapped && (
+          <div className="admin-error" style={{ marginTop: 8 }}>Map at least one column to "Name" to continue.</div>
+        )}
+
+        <div className="admin-edit-actions" style={{ marginTop: 12 }}>
+          <button className="admin-save-btn admin-save-btn--sm" onClick={runImport} disabled={!nameIsMapped}>
+            Import {parsed.rows.length} rows
+          </button>
+          <button className="admin-cancel-btn" onClick={() => setStep('upload')}>Back</button>
+        </div>
+      </div>
+    )
+  }
+
+  if (step === 'importing') {
+    const pct = progress ? Math.round((progress.done / progress.total) * 100) : 0
+    return (
+      <div className="admin-add-form">
+        <div className="admin-add-form__title" style={{ marginBottom: 14 }}>Importing…</div>
+        <div className="admin-import-progress-track">
+          <div className="admin-import-progress-fill" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="admin-import-progress-label">
+          {progress?.done ?? 0} / {progress?.total ?? 0} rows
+        </div>
+      </div>
+    )
+  }
+
+  if (step === 'done') {
+    return (
+      <div className="admin-add-form">
+        <div className="admin-add-form__title" style={{ marginBottom: 14 }}>Import complete</div>
+        <div className="admin-import-results">
+          <div className="admin-import-result admin-import-result--good">
+            <span className="admin-import-result__n">{results.created}</span>
+            <span>entities created</span>
+          </div>
+          <div className="admin-import-result admin-import-result--good">
+            <span className="admin-import-result__n">{results.linked}</span>
+            <span>linked to story</span>
+          </div>
+          {results.failed > 0 && (
+            <div className="admin-import-result admin-import-result--warn">
+              <span className="admin-import-result__n">{results.failed}</span>
+              <span>rows skipped</span>
+            </div>
+          )}
+        </div>
+        {results.errors.length > 0 && (
+          <div className="admin-import-errors">
+            {results.errors.slice(0, 5).map((e, i) => (
+              <div key={i} className="admin-error" style={{ marginBottom: 2 }}>{e}</div>
+            ))}
+            {results.errors.length > 5 && (
+              <div className="admin-error">…and {results.errors.length - 5} more</div>
+            )}
+          </div>
+        )}
+        <button className="admin-save-btn admin-save-btn--sm" style={{ marginTop: 14 }} onClick={onDone}>
+          Done
+        </button>
+      </div>
+    )
+  }
+
+  return null
+}
+
 // ── Story detail ──────────────────────────────────────────────────────────────
 function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
-  const [story, setStory] = useState(initialStory)
+  const [story, setStory]           = useState(initialStory)
+  const [showImporter, setShowImporter] = useState(false)
+  const [entityListKey, setEntityListKey] = useState(0)
 
   const handleDelete = async () => {
     if (!supabase || !window.confirm(`Delete story "${story.title}"? This cannot be undone.`)) return
@@ -1884,7 +2160,35 @@ function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
   return (
     <div className="admin-record">
       <StoryMeta story={story} onSaved={updated => { setStory(updated); onUpdated?.(updated) }} />
-      <StoryEntityList storyId={story.id} />
+      <StoryEntityList key={entityListKey} storyId={story.id} />
+
+      {/* CSV import */}
+      <div className="admin-record__section">
+        <div className="admin-section-header">
+          <span className="admin-section-title">Import CSV</span>
+          {!showImporter && (
+            <button
+              className="admin-section-edit-btn"
+              onClick={() => setShowImporter(true)}
+            >
+              Import CSV
+            </button>
+          )}
+        </div>
+        {showImporter && (
+          <CSVImporter
+            storyId={story.id}
+            onDone={() => { setShowImporter(false); setEntityListKey(k => k + 1) }}
+            onCancel={() => setShowImporter(false)}
+          />
+        )}
+        {!showImporter && (
+          <p className="admin-story-description" style={{ marginTop: 4 }}>
+            Upload a CSV to bulk-create entities and link them to this story.
+          </p>
+        )}
+      </div>
+
       <StoryExportPanel storyId={story.id} storyTitle={story.title} />
       <DataRequestPanel storyId={story.id} />
       <div className="admin-record__section" style={{ background: '#fff8f8' }}>
