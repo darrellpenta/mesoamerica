@@ -1,10 +1,12 @@
 # Mesoamerica Interactive Map
 
-An interactive map of Mesoamerica built with React, Mapbox GL JS, and Supabase. Covers archaeology, ecology, history, and modern data across 39 thematic layers with a relational knowledge graph of historical entities and relationships.
+An interactive historical/geographic map of Mesoamerica built with React, Mapbox GL JS, and Supabase. Covers archaeology, ecology, linguistics, conflict, and modern administrative data across 39 thematic layers, plus a multi-entity timeline and a full-featured entity knowledge-graph editor.
 
-**Live site:** https://darrellpenta.github.io/mesoamerica/  
-**Repo:** https://github.com/darrellpenta/mesoamerica-fresh  
-**Working directory:** `~/mesoamerica-fresh`
+**Live site:** https://darrellpenta.github.io/mesoamerica/
+**Repo:** https://github.com/darrellpenta/mesoamerica
+**Working directory (local):** `~/mesoamerica-fresh`
+
+> **For Claude Code:** start every session from `~/mesoamerica-fresh`. For git commands, use `git -C /Users/darrell.penta/mesoamerica-fresh` because the shell's working directory may be the home folder.
 
 ---
 
@@ -15,111 +17,94 @@ An interactive map of Mesoamerica built with React, Mapbox GL JS, and Supabase. 
 | Frontend | React 18 + Vite 5 + Mapbox GL JS v3 |
 | Database | Supabase (Postgres + PostGIS) |
 | Hosting | GitHub Pages via GitHub Actions |
-| Draw tools | `@mapbox/mapbox-gl-draw` |
-| Routing | React Router v7 (HashRouter) |
+| Draw tools | `@mapbox/mapbox-gl-draw` v1.5 |
+| Routing | React Router v7 — `HashRouter` (required for GitHub Pages) |
 | Supabase client | `@supabase/supabase-js` v2 |
 
 ---
 
-## Three-Tier Architecture
+## Data Architecture
 
 ```
-Supabase (Postgres + PostGIS)
-  ↓  [build time]
-GitHub Actions: scripts/generate_geojson.py
-  → public/data/*.geojson  (39 files, one per layer)
+Supabase (Postgres + PostGIS)          ← runtime queries (Admin, Timeline, Detail panel)
+  ↓  [CI: scripts/generate_geojson.py]
+public/data/*.geojson                  ← 39 files, build artifacts, regenerated on deploy
   ↓  [vite build]
-React + Mapbox GL JS
-  → dist/  →  GitHub Pages
+dist/  →  GitHub Pages
 ```
 
-**Supabase is the single source of truth.** The GeoJSON files in `public/data/` are build artifacts — regenerated fresh on every deploy from the database. The app also queries Supabase directly at runtime for entity relationships and the Admin/Timeline pages.
+**Supabase is the single source of truth for entity data.** GeoJSON files in `public/data/` are build artifacts — do not edit them directly for entity data. However, some GeoJSON files also carry **computed color properties** added by `scripts/add_feature_colors.py` (see Auto-Color System below); those are committed and treated as stable preprocessing outputs.
+
+**Supabase project URL:** `https://vqovdkjdawqdpzxomsiw.supabase.co`
 
 ---
 
 ## Frontend Routes
 
-The app uses `HashRouter` (required for GitHub Pages):
+All routes use `HashRouter` — paths are `/#/path`.
 
 | Route | Component | Description |
 |-------|-----------|-------------|
 | `/#/` | `src/App.jsx` | Interactive map with 39 layers |
-| `/#/timeline` | `src/pages/TimelinePage.jsx` | SVG timeline of 92 historical rulers |
-| `/#/admin` | `src/pages/AdminPage.jsx` | Entity browser + relationship editor |
+| `/#/timeline` | `src/pages/TimelinePage.jsx` | Multi-entity historical timeline |
+| `/#/admin` | `src/pages/AdminPage.jsx` | Entity browser + knowledge-graph editor |
 
 ---
 
-## Data Layers (39 total)
+## UI Theme — Light Mode
 
-Layers are defined in `src/layers/index.js` (frontend registry) and mirrored in the `layer_definitions` table in Supabase. Each GeoJSON file in `public/data/` corresponds to one layer.
+The entire app uses a light CSS palette (set in `src/App.css`):
 
-### Point layers (14)
+| Token | Value | Used for |
+|-------|-------|---------|
+| `--bg-page` | `#f5f7fb` | Page background |
+| `--bg-panel` | `#ffffff` | Panels, cards |
+| `--text` | `#1a1d2e` | Body text |
+| `--accent` | `#2563eb` | Primary CTAs, active nav |
+| `--warm` | `#e85d04` | Secondary accent |
+| `--border` | `#e0e4f0` | Dividers |
 
-| Layer ID | Description |
-|----------|-------------|
-| `sites` | Major archaeological sites |
-| `mayan-sites` | Maya-specific sites |
-| `maya-inscriptions` | Inscription locations |
-| `inah-archaeological-zones` | INAH-registered zones (Mexico) |
-| `volcanoes` | Active/historic volcanoes |
-| `earthquakes` | Seismic events |
-| `conflict-events` | ACLED armed conflict data |
-| `unesco-world-heritage` | UNESCO WH sites |
-| `aztec-villages` | Aztec settlement locations |
-| `ramsar-wetlands` | Ramsar-designated wetlands |
-| `lidar-surveys-opentopography` | LiDAR survey points |
-| `pulltrouser-swamp-points` | Pulltrouser Swamp survey points |
-| `becan-points` | Becan site survey points |
-| `culturally-significant-species` | Species occurrence records |
+---
 
-### Polygon / line layers (25)
+## Admin Password Protection
 
-`classical-empires`, `postclassical-empires`, `maya-culture-areas`, `language-families`, `language-dialects`, `ecoregions`, `protected-areas`, `lidar-coverage`, `lidar-coverage-2022`, `pacunam-survey-units`, `maya-settlement-groups`, `becan`, `pulltrouser-swamp`, `urban-areas`, `admin2-boundaries`, `coral-reefs`, `major-lakes`, `major-rivers`, `major-roads`, `faults-central-america`, `faults-mexico`, `hurricane-tracks`, `mangroves-2020`, `la-milpa`, `artifacts`
+`/#/admin` is gated by `AdminAuthGate` in `src/main.jsx`:
+
+```js
+const ADMIN_PW = 'mesoamerica2026'
+// Stores 'yes' in localStorage['admin-authed-v1'] on success
+```
+
+To change the password, edit the `ADMIN_PW` constant in `src/main.jsx`.
 
 ---
 
 ## Database Schema
 
-Project URL: `https://vqovdkjdawqdpzxomsiw.supabase.co`
-
 ### Core tables
 
 ```
-sources            — citation provenance for entities and relationships
-entities           — base registry (every entity has a row here)
+sources            — citation provenance
+entities           — base registry (id, entity_type, name, source_id, layer_id)
   ├── places       — point geometry, archaeological/historic sites
-  ├── geo_features — natural features (rivers, lakes, volcanoes, coral reefs…)
+  ├── geo_features — natural features
   ├── territories  — time-bounded political/cultural polygons
-  ├── admin_boundaries — modern country/state/municipality polygons
+  ├── admin_boundaries — modern administrative polygons
   ├── events       — discrete occurrences (battles, eruptions, conflicts)
   └── persons      — historical figures (rulers, explorers, leaders)
-relationships      — typed, time-bounded edges between any two entities
-layer_definitions  — map layer configuration (mirrors src/layers/index.js)
-```
-
-### entities table
-
-```sql
-id          uuid PRIMARY KEY
-entity_type text  -- 'place' | 'geo_feature' | 'territory' | 'admin_boundary'
-                  -- | 'person' | 'event'
-name        text NOT NULL
-source_id   uuid REFERENCES sources(id)
-layer_id    text REFERENCES layer_definitions(id)  -- added for build-time GeoJSON generation
+relationships      — typed, time-bounded edges between entities
+layer_definitions  — map layer config (mirrors src/layers/index.js)
+annotations        — key-value freeform notes on any entity
 ```
 
 ### relationships table
 
 ```sql
-id             uuid PRIMARY KEY
-from_entity_id uuid REFERENCES entities(id)
-to_entity_id   uuid REFERENCES entities(id)
-relation_type  text  -- 'RULED' | 'FOUNDED' | 'TRADED_WITH' | 'ALLIED_WITH'
-                     -- | 'DEFEATED' | 'SUCCEEDED' | 'LOCATED_IN'
-valid_from     int   -- year (negative = BCE)
-valid_to       int
-source_id      uuid REFERENCES sources(id)
-notes          text
+id, from_entity_id, to_entity_id,
+relation_type  -- 'RULED' | 'FOUNDED' | 'TRADED_WITH' | 'ALLIED_WITH'
+               -- | 'DEFEATED' | 'SUCCEEDED' | 'LOCATED_IN'
+valid_from int, valid_to int,   -- year (negative = BCE)
+source_id, notes
 ```
 
 ### Current data inventory
@@ -131,131 +116,239 @@ notes          text
 | territories | 7,157 |
 | admin_boundaries | 3,636 |
 | geo_features | 35,314 |
-| persons | 92 |
-| **Total entities** | **~61,650** |
+| persons | 112 (92 Maya/Aztec rulers + 20 modern figures) |
+| **Total** | **~61,650** |
 | **Relationships** | **~195** |
 
 **Person cohorts:**
-- 92 Maya/Aztec rulers seeded from Wikidata — Palenque (19), Copán (19), Tenochtitlan (21), Calakmul (15), Piedras Negras (12), Yaxchilan (6)
-- 20 modern Central American historical figures from *The Long Shadow* (Walker, Zemurray, Sandino, Árbenz, Ríos Montt, Romero, D'Aubuisson, Noriega, et al.)
+- 92 Maya/Aztec rulers from Wikidata — Palenque (19), Copán (19), Tenochtitlan (21), Calakmul (15), Piedras Negras (12), Yaxchilan (6)
+- 20 modern Central American figures from *The Long Shadow* (Walker, Zemurray, Sandino, Árbenz, Ríos Montt, Romero, D'Aubuisson, Noriega, et al.)
 
-**Events cohort (The Long Shadow):** La Matanza, Operation PBSUCCESS, El Mozote, Río Negro Massacres, Gerardi Assassination, Iran-Contra, Panama Invasion, Honduras Coup, and 8 others
+**Events from *The Long Shadow*:** La Matanza (1932), Operation PBSUCCESS (1954), El Mozote Massacre (1981), Río Negro Massacres (1980–82), Gerardi Assassination (1998), Iran-Contra, Panama Invasion, Honduras Coup, and others (date range 1932–2013)
 
-**Places cohort (The Long Shadow):** El Mozote, Pantzós, Ixil Triangle, Río Negro, El Aguacate (massacre sites and strategic locations)
+### PostgREST FK join direction
 
-### RLS policies
+FK joins from the child side only:
+```js
+// Works — querying from the child table
+supabase.from('persons').select('*, entity:entity_id(name)').eq('entity_id', id)
 
-All tables have permissive RLS (personal project — anon key is the only auth layer):
-```sql
-CREATE POLICY "public_all" ON <table> FOR ALL USING (true) WITH CHECK (true);
+// Does NOT work — PostgREST can't infer the join this direction
+supabase.from('entities').select('*, persons(*)').eq('id', id)
 ```
+
+---
+
+## Timeline Page (`src/pages/TimelinePage.jsx`)
+
+A pure-SVG multi-entity historical timeline. Queries Supabase for 6 entity types and renders them as horizontal bars on a shared year axis.
+
+### Entity types
+
+| Type | Supabase table | Date fields | Color |
+|------|---------------|-------------|-------|
+| `person` | `persons` | `birth_year`, `death_year`, `floruit_start`, `floruit_end` | `#7c3aed` |
+| `event` | `events` | `date_year_start`, `date_year_end` | `#dc2626` |
+| `place` | `places` | `date_start`, `date_end` | `#059669` |
+| `territory` | `territories` | `date_start`, `date_end` | `#d97706` |
+| `admin_boundary` | `admin_boundaries` | `date_start`, `date_end` | `#9333ea` |
+
+Relationships (`relation_type = 'RULED'`) are loaded as a 6th query and shown as thin lines connecting persons to territories.
+
+### Eras
+
+```js
+const ERAS = [
+  { key: 'all',         label: 'All Eras',    dMin: -800, dMax: 2030 },
+  { key: 'preclassic',  label: 'Preclassic',  dMin: -900, dMax:  350, eStart: -800, eEnd:  250 },
+  { key: 'classic',     label: 'Classic',     dMin:  150, dMax: 1000, eStart:  250, eEnd:  900 },
+  { key: 'postclassic', label: 'Postclassic', dMin:  800, dMax: 1600, eStart:  900, eEnd: 1521 },
+  { key: 'colonial',    label: 'Colonial',    dMin: 1450, dMax: 1850, eStart: 1521, eEnd: 1821 },
+  { key: 'modern',      label: 'Modern',      dMin: 1800, dMax: 2030, eStart: 1821, eEnd: 2030 },
+]
+```
+
+`dMin`/`dMax` = display range (with buffer); `eStart`/`eEnd` = historical period boundaries shown as colored bands. Year → pixel x: `yearToX(year, width, dMin, dMax)`. Era boundary lines at 250, 900, 1521, 1821.
+
+---
+
+## Admin Page (`src/pages/AdminPage.jsx`)
+
+Full knowledge-graph editor behind password gate. Features:
+- **Dashboard** — entity counts by type, mini sparkline graphs, type-filter pills, browse-by-type without search
+- **Entity record** — master/detail; inline name editing; extension field editing (persons dates, place type, etc.)
+- **Relationship management** — add/delete typed, time-bounded relationships with entity search
+- **Annotations** — freeform key-value notes (text/number/date/url/markdown types)
+- **Create entity** — "New" button with live duplicate detection
+- **Suggested connections** — surfaces co-rulers and name-similar entities not yet linked
+
+---
+
+## Map: Layer Registry (`src/layers/index.js`)
+
+All 39 layers are defined in `LAYER_REGISTRY`. Each entry:
+
+```js
+{
+  id: 'layer-id',          // Mapbox source/layer ID — must be unique
+  group: 'Group Name',     // Section header in LayerPanel
+  label: 'Display Name',
+  color: '#hex',           // fallback/solid color
+  mapboxType: 'fill',      // 'circle' | 'fill' | 'line'
+  dataUrl: './data/layer-id.geojson',
+  visible: false,
+  description: '...',
+  sourceUrl: '...',
+
+  // Auto-color fields (see Auto-Color System below):
+  featureColor: true,      // enables per-feature coloring
+  colorBy: 'family',       // GeoJSON property to match on
+  colorDetails: { 'Name': '#hex', ... },  // fine-grained name→color map (takes priority)
+  colorLegend: [{ label, value, color, count }],  // group-level chips for panel legend
+}
+```
+
+### Layer groups
+
+| Group | Layer IDs |
+|-------|-----------|
+| Archaeology & Sites | `sites`, `maya-inscriptions`, `inah-archaeological-zones`, `unesco-world-heritage`, `lidar-surveys-opentopography` |
+| Empires & Culture | `classical-empires`, `postclassical-empires`, `maya-culture-areas`, `mayan-sites`, `aztec-villages` |
+| Languages | `language-families`, `language-dialects` |
+| LiDAR & Settlement | `lidar-coverage`, `lidar-coverage-2022`, `maya-settlement-groups`, `pacunam-survey-units`, `la-milpa`, `pulltrouser-swamp`, `pulltrouser-swamp-points`, `becan`, `becan-points` |
+| Physical Geography | `volcanoes`, `faults-central-america`, `faults-mexico`, `earthquakes`, `major-rivers`, `major-lakes`, `hurricane-tracks`, `coral-reefs`, `ramsar-wetlands` |
+| Ecology & Environment | `ecoregions`, `mangroves-2020`, `protected-areas`, `culturally-significant-species` |
+| Conflict & History | `modern-conflict-sites`, `conflict-events` |
+| Modern Administrative | `admin2-boundaries`, `urban-areas`, `major-roads` |
+
+---
+
+## Auto-Color System
+
+9 polygon/circle layers are auto-colored by categorical property. The system lives in `MapView.jsx` (`buildColorExpr`) and the layer config (`colorBy`, `colorDetails`, `colorLegend`).
+
+### `buildColorExpr(layer)` — priority order
+
+```js
+function buildColorExpr(layer) {
+  if (layer.colorBy) {
+    // 1. colorDetails: { value: '#hex' } — fine-grained, e.g. per-dialect (99 entries)
+    if (layer.colorDetails) {
+      const pairs = Object.entries(layer.colorDetails).flat()
+      return ['match', ['get', layer.colorBy], ...pairs, layer.color]
+    }
+    // 2. colorLegend: [{ value, color }] — group-level, e.g. per-empire
+    if (layer.colorLegend?.length) {
+      const pairs = layer.colorLegend.flatMap(e => [e.value, e.color])
+      return ['match', ['get', layer.colorBy], ...pairs, layer.color]
+    }
+  }
+  // 3. featureColor: reads GeoJSON 'color' property (legacy fallback)
+  if (layer.featureColor) return ['coalesce', ['get', 'color'], layer.color]
+  return layer.color
+}
+```
+
+This expression is applied to `fill-color`, `line-color` (outlines), and `circle-color`.
+
+### Auto-colored layers
+
+| Layer | `colorBy` | Match source | Groups |
+|-------|-----------|-------------|--------|
+| `language-dialects` | `name` | `colorDetails` (99 entries) | 18 family hues, shades within family |
+| `language-families` | `name` | `colorLegend` (26 entries) | 26 distinct colors |
+| `classical-empires` | `name` | `colorLegend` | Mayan=blue, Teotihuacan=amber, Zapotec=green |
+| `postclassical-empires` | `name` | `colorLegend` | Aztec=orange, Tarascan=green, Tlaxcalan=cyan, Zapotec=violet |
+| `maya-culture-areas` | `name` | `colorLegend` | 9 distinct zone colors |
+| `maya-settlement-groups` | `site` | `colorLegend` | 6 site hues (Python-added `site` property) |
+| `ecoregions` | `biome` | `colorLegend` | 7 biome types (Python-added `biome` property) |
+| `conflict-events` | `event_subtype` | `colorLegend` | Battles=red, Protests=blue, Riots=purple… |
+| `culturally-significant-species` | `subtype` | `colorLegend` | Jaguar=amber, Quetzal=green |
+
+**Important:** `colorBy` should reference a GeoJSON property that already exists in the original file, OR one that was added by `scripts/add_feature_colors.py` and committed. Properties added only by the script but not in the original GeoJSON will fail silently if the browser caches the old file. Language dialects uses `name` (original), which is safe. Ecoregions uses `biome` and settlements use `site` (both script-added and committed).
+
+**Do not use `['get', 'color']` directly as a fill-color expression** — Mapbox GL JS doesn't reliably coerce a string feature property to its internal color type. Always use a `match` expression instead.
+
+### Preprocessing script
+
+`scripts/add_feature_colors.py` adds `color`, `family`, `biome`, and `site` properties to the target GeoJSON files. Re-run if you add new features or change the palette:
+
+```bash
+cd ~/mesoamerica-fresh
+python3 scripts/add_feature_colors.py
+```
+
+### Color legend chips
+
+When a layer is toggled on and has a `colorLegend`, `LayerPanel.jsx` renders compact colored chips below the layer description. Each chip shows a dot (CSS `--chip-color: entry.color`) + label + optional count. Styled in `App.css` under `.layer-legend` / `.layer-legend__chip`.
 
 ---
 
 ## Key Frontend Patterns
 
-### `callbacksRef` in MapView
+### `buildColorExpr` in `MapView.jsx`
 
-Mapbox event handlers are closures set up once on map load. To keep them current without recreating the map, all callbacks are stored in a ref and read at call time:
+Defined above `addLayerToMap`. Called once per layer when it's added to the Mapbox map. Returns a Mapbox expression string or array.
+
+### `callbacksRef` — stale closure fix
+
+Mapbox event handlers are closures set up once on `map.on('load')`. To access current props:
 
 ```js
-// In MapView.jsx — sync on every render
-callbacksRef.current = { onMapClick, onFeatureClick, onFeatureDrawn, ... }
-
-// In Mapbox event handler (closure from map load)
-map.on('click', e => callbacksRef.current.onMapClick(features, e.lngLat))
+callbacksRef.current = { onMapClick, onFeatureClick, onFeatureDrawn, regionBuildMode, onCellToggle, ... }
+// All Mapbox handlers read from callbacksRef.current at call time, not capture time
 ```
 
-Any new prop passed to `MapView` that's used inside a Mapbox event handler must be added to `callbacksRef.current`.
+Any new prop used inside a Mapbox event handler must be added here.
 
 ### `useImperativeHandle` + `forwardRef` in MapView
 
-Imperative map operations are exposed to `App.jsx` via ref:
-
 ```js
 useImperativeHandle(ref, () => ({
-  syncLayerOrder,   // called after layer reorder
-  getReEditFeature, // returns edited feature geometry
-  fitToFeature,     // flies to a feature's bbox
+  syncLayerOrder,      // called after layer reorder in LayerPanel
+  getReEditFeature,    // returns edited feature geometry from MapboxDraw
+  fitToFeature,        // map.fitBounds to feature bbox (80px padding, maxZoom 12, 700ms)
 }))
 ```
 
-### Detail panel entity lookup
-
-When a clicked feature has `_entity_id` in its properties, `DetailPanel.jsx` queries Supabase for the entity's extension data and relationships. The FK `persons.entity_id → entities.id` is only recognized by PostgREST from the child side — queries must go `FROM persons` not `FROM entities JOIN persons`:
+### `vite.config.js` — relative base path
 
 ```js
-// Works
-supabase.from('persons').select('*, entity:entity_id(name)').eq('entity_id', id)
-
-// Doesn't work (FK not inferred this direction)
-supabase.from('entities').select('*, persons(*)').eq('id', id)
+base: './'   // DO NOT change — required for GitHub Pages subdirectory hosting
 ```
 
-### `base: './'` in vite.config.js
+### `.env.production` — committed Supabase vars
 
-All asset paths are relative (`./assets/...`). This is required for GitHub Pages subdirectory hosting. **Do not change this to an absolute path** — it will break the deployed site.
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are committed in `.env.production` (the anon key is a public browser credential). `VITE_MAPBOX_TOKEN` is in GitHub Secrets only.
 
-### `.env.production` for Supabase vars
+### Map type overlays
 
-`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are committed in `.env.production` (safe — the anon key is a public browser credential). They are **not** in GitHub Secrets because GitHub Actions would inject empty strings that override the file. `VITE_MAPBOX_TOKEN` is in GitHub Secrets only and is not committed.
+Selectable from LayerPanel: Default, Topographic, 3D Terrain, Population (choropleth). Implemented as Mapbox layers/sources with stable `mt-*` IDs. `removeMapTypeOverlays(map)` clears them before each switch.
 
 ---
 
-## Environment Variables
-
-### `.env` (local only, gitignored)
-
-```
-VITE_MAPBOX_TOKEN=pk.eyJ...          # Mapbox GL public token
-VITE_SUPABASE_URL=https://...        # Supabase project URL
-VITE_SUPABASE_ANON_KEY=eyJ...        # Supabase anon key
-SUPABASE_DB_URL=postgres://...       # Direct DB connection (scripts only)
-```
-
-### `.env.production` (committed)
-
-```
-VITE_SUPABASE_URL=https://vqovdkjdawqdpzxomsiw.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJ...
-```
-
-### GitHub Secrets (repo → Settings → Secrets → Actions)
-
-| Secret | Used by |
-|--------|---------|
-| `VITE_MAPBOX_TOKEN` | `npm run build` |
-| `SUPABASE_DB_URL` | `scripts/generate_geojson.py` |
-
----
-
-## CI/CD — GitHub Actions
+## CI/CD
 
 File: `.github/workflows/deploy.yml`
 
 On every push to `main`:
-
-1. **Python setup** — installs `psycopg2-binary`, `python-dotenv`
-2. **`scripts/generate_geojson.py`** — queries Supabase via `SUPABASE_DB_URL`, regenerates all 39 GeoJSON files in `public/data/`
-3. **`npm run build`** — Vite build with `VITE_MAPBOX_TOKEN` injected; Supabase vars come from `.env.production`
-4. **Deploy** — uploads `dist/` to GitHub Pages
+1. `pip install psycopg2-binary python-dotenv`
+2. `python3 scripts/generate_geojson.py` — regenerates all 39 GeoJSON files from Supabase
+3. `npm run build` — Vite build with `VITE_MAPBOX_TOKEN` from GitHub Secrets
+4. Deploy `dist/` to GitHub Pages
 
 ---
 
 ## Scripts Reference
 
-| Script | Purpose | Run how |
-|--------|---------|---------|
-| `scripts/generate_geojson.py` | Regenerate all `public/data/*.geojson` from Supabase | Automatically in CI; locally with `SUPABASE_DB_URL` in `.env` |
-| `scripts/migrate_point_layers.py` | One-time: migrated 14 point layer GeoJSON files into Supabase | Already run |
-| `scripts/migrate_poly_layers.py` | One-time: migrated 25 polygon/line layer GeoJSON files into Supabase | Already run |
-| `scripts/backfill_layer_id.py` | One-time: set `entities.layer_id` from GeoJSON `_entity_id` values | Already run |
-| `scripts/seed_from_wikidata.py` | Seed rulers from `scripts/wp_rulers_enriched.json` into Supabase | `python3 scripts/seed_from_wikidata.py [--dry-run] [--fix-rels]` |
-| `scripts/add_layer_id.sql` | Added `layer_id` column to entities table | Already run in Supabase SQL Editor |
-| `scripts/phase1_schema.sql` | Initial schema creation | Already run |
-| `scripts/phase1_seed.sql` | Seed `layer_definitions` table | Already run |
-| `scripts/create_annotations_table.sql` | Create `annotations` table (key/value schema) | **Pending** — existing annotations table uses `content_md` blob schema; see note below |
-| `scripts/seed_long_shadow.py` | Seed 20 persons, 16 events, 5 places, ~50 relationships and annotations from *The Long Shadow* | `python3 scripts/seed_long_shadow.py [--dry-run]` |
+| Script | Purpose | Status |
+|--------|---------|--------|
+| `scripts/generate_geojson.py` | Regenerate all `public/data/*.geojson` from Supabase | Runs in CI; run locally with `SUPABASE_DB_URL` in `.env` |
+| `scripts/add_feature_colors.py` | Add `color`, `family`, `biome`, `site` properties to 9 GeoJSON layers for auto-coloring | Re-run if palette changes; commit output |
+| `scripts/seed_from_wikidata.py` | Seed rulers from `scripts/wp_rulers_enriched.json` | `python3 scripts/seed_from_wikidata.py [--dry-run]` |
+| `scripts/seed_long_shadow.py` | Seed 20 persons, 16 events, 5 places from *The Long Shadow* | Already run |
+| `scripts/migrate_point_layers.py` | One-time: point GeoJSON → Supabase | Already run |
+| `scripts/migrate_poly_layers.py` | One-time: polygon/line GeoJSON → Supabase | Already run |
 
 ---
 
@@ -264,10 +357,10 @@ On every push to `main`:
 ```bash
 cd ~/mesoamerica-fresh
 npm install
-npm run dev       # starts at http://localhost:5173
+npm run dev       # http://localhost:5173
 ```
 
-Requires `.env` with `VITE_MAPBOX_TOKEN` (minimum). Without Supabase vars, the app runs with `supabase = null` — the map and draw tools work, but the entity sidebar, Timeline, and Admin pages show no data.
+Minimum: `VITE_MAPBOX_TOKEN` in `.env`. Without Supabase vars, the map and draw tools work; Admin/Timeline show no data.
 
 To regenerate GeoJSON locally (requires `SUPABASE_DB_URL` in `.env`):
 ```bash
@@ -280,38 +373,37 @@ python3 scripts/generate_geojson.py
 
 ### Implemented
 
-- **39-layer map** — toggle visibility, drag to reorder, citation panel on activation
-- **Click → What's Here** — cross-layer feature summary on map click
-- **Entity detail panel** — shows feature properties + Supabase relationship data (rulers, connections) when feature has `_entity_id`
-- **Draw tools** — polygon/point drawing, freehand mode, undo/redo, snap-to-boundary, region-build mode, image overlay, vertex re-edit
-- **User layers** — persistent to localStorage, export/import GeoJSON
-- **Timeline** (`/#/timeline`) — SVG timeline of 92 rulers grouped by city, with birth/reign date bars
-- **Admin — Entity Record** — master/detail layout; clicking an entity shows full record with extension fields, relationships (in/out), geo connections, and a reign-period sparkline for persons
-- **Admin — Inline editing** — edit entity name in-place; edit all extension fields (persons dates, place type, etc.) via section edit mode; upserts extension table row
-- **Admin — Relationship management** — collapsible add-relationship form with entity search, direction, type, date range, and notes; delete relationships
-- **Admin — Annotations** — freeform key-value notes on any entity (text/number/date/url/markdown types); click-to-edit values; requires `annotations` table migration (see below)
-- **Admin — Create entity** — "+ New" button with live duplicate detection; opens entity record after creation
-- **Admin — Suggested connections** — surfaces co-rulers and name-similar entities not yet linked; inline quick-connect form per suggestion
-- **Knowledge graph** — 92 rulers seeded from Wikidata with RULED relationships to cities
+- **39-layer map** — toggle, drag to reorder, citation panel, click → feature detail
+- **Auto-color by category** — 9 layers colored by categorical property (family, biome, empire name, event subtype, etc.) via Mapbox match expressions; color legend chips in LayerPanel
+- **Light mode UI** — full CSS rewrite; all panels, nav, admin, timeline in light palette
+- **Draw tools** — polygon/point/freehand, undo/redo, snap-to-boundary, region-build, image overlay, vertex re-edit
+- **User layers** — persist to localStorage; export/import GeoJSON
+- **Timeline** — multi-entity SVG timeline: persons, events, places, territories, admin boundaries across 6 historical eras with era zoom and reference strip
+- **Admin (password-protected)** — entity browser, full record editing, relationship management, annotations, entity creation, suggested connections
+- **Knowledge graph** — 112 persons seeded with RULED relationships; *The Long Shadow* events and places
 
 ### Not Yet Implemented
 
-- Admin point placement (drop a new point on the map from the admin interface)
-- Timeline filtering by time period / entity type beyond city grouping
-- Polity, culture, time_period entity types (schema supports them; no data seeded)
-- Wikipedia/external content integration in the sidebar panel
+- Admin point placement on map (drop new point from admin interface)
+- Wikipedia / external content in the detail sidebar
+- Polity, culture, time_period entity types (schema supports them; no data)
+- MultiPolygon vertex right-click deletion in re-edit mode
+- INEGI indigenous language speakers (tabular join to municipalities)
+- Raster datasets (ESA WorldCover, Night Lights, Hansen GFC) — require Mapbox tileset upload
 
 ---
 
 ## Resuming with Claude Code
 
-To re-engage on this project, paste this file into a new Claude Code session. Key things Claude needs to know:
+Paste this file at the start of a new session. Key reminders:
 
-- The working directory is `~/mesoamerica-fresh`
-- Supabase project: `https://vqovdkjdawqdpzxomsiw.supabase.co`
-- The anon key is in `.env` and `.env.production`; the direct DB URL is in `.env` only
-- GeoJSON files in `public/data/` are build artifacts — edit data in Supabase, not the files
-- `entities.layer_id` is how `generate_geojson.py` knows which entities belong to which layer
-- PostgREST FK joins only work from the child table side (see Key Frontend Patterns above)
-- `HashRouter` is used — all routes are `/#/path`
-- The `callbacksRef` pattern is used in `MapView.jsx` — read the section above before adding new props
+- **Working dir:** `~/mesoamerica-fresh`; for git, always use `git -C /Users/darrell.penta/mesoamerica-fresh <command>`
+- **Supabase:** `https://vqovdkjdawqdpzxomsiw.supabase.co` — anon key in `.env` and `.env.production`; direct DB URL in `.env` only
+- **GeoJSON files** in `public/data/` are CI build artifacts for entity data — edit data in Supabase. The exception: color/family/biome/site properties added by `add_feature_colors.py` are committed and stable.
+- **Auto-color:** Never use `['get', 'color']` as a fill-color expression — use a `['match', ...]` expression via `buildColorExpr()` in `MapView.jsx`
+- **`colorBy` must reference an existing GeoJSON property** (or a script-added one that's committed) — browser caching will silently break match expressions that depend on freshly-added properties that haven't propagated
+- **`HashRouter`** — all routes are `/#/path`; never use `BrowserRouter`
+- **`callbacksRef`** — any new prop used inside a Mapbox event handler must be added to `callbacksRef.current` in `MapView.jsx`
+- **Admin password:** `mesoamerica2026` (in `src/main.jsx` as `ADMIN_PW`)
+- **PostgREST FK joins** go from child → parent only (e.g., `from('persons').select('*, entity:entity_id(name)')`, not from `entities`)
+- **`base: './'`** in `vite.config.js` — required for GitHub Pages; do not change
