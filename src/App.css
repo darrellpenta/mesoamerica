@@ -3433,6 +3433,30 @@ html, body, #root {
 .admin-staging-row__verdict--approved { color: #15803d; }
 .admin-staging-row__verdict--rejected { color: #9f1239; }
 
+.admin-staging-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  .admin-staging-edit-form { background: #1e2433; border-color: #334155; }
+}
+:root[data-theme="light"] .admin-staging-edit-form { background: #f8fafc; border-color: #e2e8f0; }
+:root[data-theme="dark"]  .admin-staging-edit-form { background: #1e2433; border-color: #334155; }
+
+.admin-staging-btn:not(.admin-staging-btn--approve):not(.admin-staging-btn--reject) {
+  background: #f1f5f9;
+  color: #475569;
+}
+.admin-staging-btn:not(.admin-staging-btn--approve):not(.admin-staging-btn--reject):hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
 .admin-staging-panel__done-bar {
   display: flex;
   align-items: center;
@@ -3637,3 +3661,70 @@ html, body, #root {
   color: #485072;
   flex-shrink: 0;
 }
+
+/* ── Story Timeline ───────────────────────────────────────────────────────── */
+
+.admin-timeline {
+  padding: 4px 0 8px;
+}
+.admin-timeline__axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #7a82a8;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.admin-timeline__track {
+  position: relative;
+  height: 28px;
+  margin-bottom: 12px;
+}
+.admin-timeline__rail {
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  height: 2px;
+  background: #e2e8f0;
+  transform: translateY(-50%);
+}
+.admin-timeline__bar {
+  position: absolute;
+  top: 4px;
+  height: 20px;
+  min-width: 4px;
+  background: var(--bar-color, #7a82a8);
+  border-radius: 3px;
+  opacity: 0.8;
+  transition: opacity 0.1s;
+  cursor: default;
+}
+.admin-timeline__bar:hover { opacity: 1; }
+.admin-timeline__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.admin-timeline__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 2px 0;
+}
+.admin-timeline__item-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (prefers-color-scheme: dark) {
+  .admin-timeline__rail { background: #334155; }
+  .admin-timeline__axis { color: #94a3b8; }
+}
+:root[data-theme="dark"]  .admin-timeline__rail { background: #334155; }
+:root[data-theme="dark"]  .admin-timeline__axis { color: #94a3b8; }
+:root[data-theme="light"] .admin-timeline__rail { background: #e2e8f0; }
+:root[data-theme="light"] .admin-timeline__axis { color: #7a82a8; }

@@ -1,15 +1,48 @@
-import { useState } from 'react'
+import { useState, Component, Suspense, lazy } from 'react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import NavBar from './components/NavBar.jsx'
-import App from './App.jsx'
-import AdminPage from './pages/AdminPage.jsx'
-import TimelinePage from './pages/TimelinePage.jsx'
 
-// Change this string to update the admin password
-const ADMIN_PW = 'mesoamerica2026'
+const App              = lazy(() => import('./App.jsx'))
+const AdminPage        = lazy(() => import('./pages/AdminPage.jsx'))
+const TimelinePage     = lazy(() => import('./pages/TimelinePage.jsx'))
+const StoryViewerPage  = lazy(() => import('./pages/StoryViewerPage.jsx'))
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { error: null }
+  }
+  static getDerivedStateFromError(error) {
+    return { error }
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 32, textAlign: 'center', color: '#dc2626' }}>
+          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
+            {this.props.label ?? 'Something went wrong'}
+          </div>
+          <div style={{ fontSize: 13, opacity: 0.75, marginBottom: 16 }}>
+            {this.state.error.message}
+          </div>
+          <button
+            onClick={() => this.setState({ error: null })}
+            style={{ fontSize: 13, padding: '6px 16px', cursor: 'pointer' }}
+          >
+            Try again
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
+// Set VITE_ADMIN_PASSWORD in .env (never commit the password)
+const ADMIN_PW = import.meta.env.VITE_ADMIN_PASSWORD ?? ''
 
 function AdminAuthGate() {
   const [authed, setAuthed] = useState(() => {
@@ -62,11 +95,14 @@ createRoot(document.getElementById('root')).render(
       <div className="app-shell">
         <NavBar />
         <div className="app-shell__body">
-          <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/timeline" element={<TimelinePage />} />
-            <Route path="/admin" element={<AdminAuthGate />} />
-          </Routes>
+          <Suspense fallback={<div style={{ padding: 48, textAlign: 'center', opacity: 0.5 }}>Loading…</div>}>
+            <Routes>
+              <Route path="/" element={<ErrorBoundary label="Map failed to load"><App /></ErrorBoundary>} />
+              <Route path="/timeline" element={<ErrorBoundary label="Timeline failed to load"><TimelinePage /></ErrorBoundary>} />
+              <Route path="/admin" element={<ErrorBoundary label="Admin panel error"><AdminAuthGate /></ErrorBoundary>} />
+              <Route path="/stories/:id" element={<ErrorBoundary label="Story failed to load"><StoryViewerPage /></ErrorBoundary>} />
+            </Routes>
+          </Suspense>
         </div>
       </div>
     </HashRouter>

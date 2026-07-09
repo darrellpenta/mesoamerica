@@ -106,6 +106,8 @@ function TypeBadge({ type }) {
 }
 
 // ── Entity search hook ────────────────────────────────────────────────────────
+// Tries entity_search RPC (FTS across name + annotations) first;
+// falls back to ilike when FTS returns nothing (e.g. partial prefix).
 function useEntitySearch(query) {
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -115,14 +117,21 @@ function useEntitySearch(query) {
     let cancelled = false
     setLoading(true)
     const timer = setTimeout(async () => {
-      const { data } = await supabase
-        .from('entities')
-        .select('id, name, entity_type')
-        .ilike('name', `%${query}%`)
-        .order('name')
-        .limit(30)
+      const { data: fts } = await supabase
+        .rpc('entity_search', { p_query: query, p_limit: 30 })
+
+      let data = fts
+      if (!data?.length) {
+        const { data: like } = await supabase
+          .from('entities')
+          .select('id, name, entity_type')
+          .ilike('name', `%${query}%`)
+          .order('name')
+          .limit(30)
+        data = like
+      }
       if (!cancelled) { setResults(data ?? []); setLoading(false) }
-    }, 250)
+    }, 300)
     return () => { cancelled = true; clearTimeout(timer) }
   }, [query])
 
@@ -962,6 +971,7 @@ function NewEntityPanel({ onCreated, onCancel }) {
       .single()
     setCreating(false)
     if (error) { setErr(error.message); return }
+    await supabase.from('entity_sources').insert({ entity_id: data.id, source_type: 'manual', confidence: 'medium' })
     onCreated(data)
   }
 
@@ -1772,6 +1782,8 @@ const CONF_COLOR = {
 function StagingReviewPanel({ requestId, storyId, onClose, onDone }) {
   const [rows, setRows]             = useState(null)
   const [processing, setProcessing] = useState({})
+  const [editingId, setEditingId]   = useState(null)
+  const [draft, setDraft]           = useState({})
 
   const load = useCallback(async () => {
     if (!supabase) return
@@ -1820,6 +1832,16 @@ function StagingReviewPanel({ requestId, storyId, onClose, onDone }) {
       await supabase.from('annotations').insert({ entity_id: ent.id, content_md: md })
     }
 
+    // Provenance
+    await supabase.from('entity_sources').insert({
+      entity_id:       ent.id,
+      source_type:     'data_request',
+      data_request_id: requestId,
+      source_url:      row.source_url || null,
+      source_label:    row.source_label || null,
+      confidence:      row.confidence,
+    })
+
     // Link to story
     if (storyId) {
       await supabase.from('story_entities').insert({
@@ -1841,6 +1863,26 @@ function StagingReviewPanel({ requestId, storyId, onClose, onDone }) {
     await supabase.from('staged_imports').update({ review_status: 'rejected' }).eq('id', row.id)
     setRows(r => r.map(x => x.id === row.id ? { ...x, review_status: 'rejected' } : x))
     setProcessing(p => ({ ...p, [row.id]: null }))
+  }
+
+  const startEdit = (row) => {
+    setEditingId(row.id)
+    setDraft({ name: row.name, entity_type: row.entity_type, date_start: row.date_start ?? '', date_end: row.date_end ?? '', description: row.description ?? '' })
+  }
+
+  const saveEdit = async () => {
+    if (!supabase || !editingId) return
+    const patch = {
+      name:        draft.name.trim() || undefined,
+      entity_type: draft.entity_type || undefined,
+      date_start:  draft.date_start !== '' ? parseInt(draft.date_start, 10) || null : null,
+      date_end:    draft.date_end   !== '' ? parseInt(draft.date_end,   10) || null : null,
+      description: draft.description.trim() || null,
+    }
+    await supabase.from('staged_imports').update(patch).eq('id', editingId)
+    setRows(r => r.map(x => x.id === editingId ? { ...x, ...patch } : x))
+    setEditingId(null)
+    setDraft({})
   }
 
   const markDone = async () => {
@@ -1898,22 +1940,77 @@ function StagingReviewPanel({ requestId, storyId, onClose, onDone }) {
             </div>
           )}
 
+          {row.review_status === 'pending' && editingId === row.id && (
+            <div className="admin-staging-edit-form">
+              <input
+                className="admin-input admin-input--compact"
+                value={draft.name}
+                onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
+                placeholder="Name"
+              />
+              <select
+                className="admin-select admin-input--compact"
+                value={draft.entity_type}
+                onChange={e => setDraft(d => ({ ...d, entity_type: e.target.value }))}
+              >
+                {Object.keys(EXT_TABLES).map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
+              </select>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input
+                  className="admin-input admin-input--compact"
+                  type="number"
+                  placeholder="Start year"
+                  value={draft.date_start}
+                  onChange={e => setDraft(d => ({ ...d, date_start: e.target.value }))}
+                  style={{ width: 100 }}
+                />
+                <input
+                  className="admin-input admin-input--compact"
+                  type="number"
+                  placeholder="End year"
+                  value={draft.date_end}
+                  onChange={e => setDraft(d => ({ ...d, date_end: e.target.value }))}
+                  style={{ width: 100 }}
+                />
+              </div>
+              <textarea
+                className="admin-input admin-input--compact"
+                rows={3}
+                placeholder="Description"
+                value={draft.description}
+                onChange={e => setDraft(d => ({ ...d, description: e.target.value }))}
+              />
+              <div className="admin-edit-actions" style={{ marginTop: 4 }}>
+                <button className="admin-save-btn admin-save-btn--sm" onClick={saveEdit}>Save</button>
+                <button className="admin-cancel-btn" onClick={() => setEditingId(null)}>Cancel</button>
+              </div>
+            </div>
+          )}
           {row.review_status === 'pending' && (
             <div className="admin-staging-row__actions">
               <button
                 className="admin-staging-btn admin-staging-btn--approve"
                 onClick={() => approve(row)}
-                disabled={!!processing[row.id]}
+                disabled={!!processing[row.id] || editingId === row.id}
               >
                 {processing[row.id] === 'approving' ? '…' : 'Approve'}
               </button>
               <button
                 className="admin-staging-btn admin-staging-btn--reject"
                 onClick={() => reject(row)}
-                disabled={!!processing[row.id]}
+                disabled={!!processing[row.id] || editingId === row.id}
               >
                 {processing[row.id] === 'rejecting' ? '…' : 'Reject'}
               </button>
+              {editingId !== row.id && (
+                <button
+                  className="admin-staging-btn"
+                  onClick={() => startEdit(row)}
+                  disabled={!!processing[row.id]}
+                >
+                  Edit
+                </button>
+              )}
             </div>
           )}
           {row.review_status !== 'pending' && (
@@ -2171,14 +2268,17 @@ function CSVImporter({ storyId, onDone, onCancel }) {
 
     setStep('importing')
     setProgress({ done: 0, total: parsed.rows.length })
-    const res = { created: 0, linked: 0, failed: 0, errors: [] }
+    const res = { created: 0, linked: 0, failed: 0, coerced: 0, errors: [] }
+    const validTypes = Object.keys(EXT_TABLES)
 
     for (let i = 0; i < parsed.rows.length; i++) {
       const row = parsed.rows[i]
       const name = row[nameCol]?.trim()
       if (!name) { res.failed++; setProgress({ done: i + 1, total: parsed.rows.length }); continue }
 
-      const etype = (typeCol && row[typeCol]?.trim()) || defaultType
+      const rawType = typeCol ? (row[typeCol]?.trim() || '').toLowerCase().replace(/\s+/g, '_') : ''
+      const etype = validTypes.includes(rawType) ? rawType : defaultType
+      if (rawType && !validTypes.includes(rawType)) res.coerced++
       const notes = desc_col ? row[desc_col]?.trim() || null : null
 
       // Create entity
@@ -2190,6 +2290,9 @@ function CSVImporter({ storyId, onDone, onCancel }) {
 
       if (entErr) { res.failed++; res.errors.push(`${name}: ${entErr.message}`); setProgress({ done: i + 1, total: parsed.rows.length }); continue }
       res.created++
+
+      // Provenance
+      await supabase.from('entity_sources').insert({ entity_id: ent.id, source_type: 'csv_import', confidence: 'medium' })
 
       // Extension record (dates)
       const extTable = EXT_TABLES[ent.entity_type]
@@ -2279,10 +2382,15 @@ function CSVImporter({ storyId, onDone, onCancel }) {
         </div>
 
         <div className="admin-import-type-row">
-          <label className="admin-label">Default entity type (when not in CSV):</label>
+          <label className="admin-label">Default entity type (when not in CSV or unrecognized):</label>
           <select className="admin-select" value={defaultType} onChange={e => setDefaultType(e.target.value)}>
             {Object.keys(EXT_TABLES).map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
           </select>
+          {Object.values(mapping).includes('entity_type') && (
+            <p className="admin-import-hint" style={{ marginTop: 4, marginBottom: 0 }}>
+              Valid values: {Object.keys(EXT_TABLES).join(', ')}. Others fall back to the default above.
+            </p>
+          )}
         </div>
 
         {!nameIsMapped && (
@@ -2333,6 +2441,12 @@ function CSVImporter({ storyId, onDone, onCancel }) {
               <span>rows skipped</span>
             </div>
           )}
+          {results.coerced > 0 && (
+            <div className="admin-import-result admin-import-result--warn">
+              <span className="admin-import-result__n">{results.coerced}</span>
+              <span>types set to default (unrecognized value)</span>
+            </div>
+          )}
         </div>
         {results.errors.length > 0 && (
           <div className="admin-import-errors">
@@ -2354,11 +2468,103 @@ function CSVImporter({ storyId, onDone, onCancel }) {
   return null
 }
 
+// ── Story timeline ────────────────────────────────────────────────────────────
+function StoryTimeline({ storyId, timeStart, timeEnd }) {
+  const [items, setItems] = useState(null)
+
+  useEffect(() => {
+    if (!supabase) return
+    let active = true
+    ;(async () => {
+      const { data: links } = await supabase
+        .from('story_entities')
+        .select('entity_id, entity_type, entity:entity_id(name)')
+        .eq('story_id', storyId)
+      if (!active || !links?.length) { setItems([]); return }
+
+      const extData = await Promise.all(links.map(async (link) => {
+        const table = EXT_TABLES[link.entity_type]
+        if (!table) return {}
+        const { data } = await supabase.from(table).select('*').eq('entity_id', link.entity_id).maybeSingle()
+        return data ?? {}
+      }))
+
+      const dated = links
+        .map((link, i) => {
+          const ext = extData[i]
+          const ds = ext.date_start ?? ext.birth_year ?? ext.date_year_start ?? null
+          const de = ext.date_end   ?? ext.death_year ?? ext.date_year_end   ?? null
+          return ds != null || de != null
+            ? { id: link.entity_id, name: link.entity?.name ?? '(unnamed)', type: link.entity_type, ds, de }
+            : null
+        })
+        .filter(Boolean)
+        .sort((a, b) => (a.ds ?? a.de) - (b.ds ?? b.de))
+
+      if (active) setItems(dated)
+    })()
+    return () => { active = false }
+  }, [storyId])
+
+  if (items === null) return <div className="admin-record__loading"><div className="admin-spinner" /></div>
+  if (!items.length) return <p className="admin-import-hint">No entities with date information in this story.</p>
+
+  const minY = Math.min(...items.map(x => x.ds ?? x.de))
+  const maxY = Math.max(...items.map(x => x.de ?? x.ds))
+  const span = maxY - minY || 1
+
+  const toPct = (y) => Math.max(0, Math.min(100, ((y - minY) / span) * 100))
+
+  return (
+    <div className="admin-timeline">
+      {/* Axis labels */}
+      <div className="admin-timeline__axis">
+        <span>{minY < 0 ? `${Math.abs(minY)} BCE` : minY}</span>
+        <span>{maxY < 0 ? `${Math.abs(maxY)} BCE` : maxY}</span>
+      </div>
+      {/* Axis track */}
+      <div className="admin-timeline__track">
+        <div className="admin-timeline__rail" />
+        {items.map(item => {
+          const left = toPct(item.ds ?? item.de)
+          const right = item.de != null && item.ds != null ? toPct(item.de) : left
+          const width = Math.max(right - left, 0.5)
+          const color = TYPE_COLORS[item.type] ?? '#7a82a8'
+          return (
+            <div
+              key={item.id}
+              className="admin-timeline__bar"
+              style={{ left: `${left}%`, width: `${width}%`, '--bar-color': color }}
+              title={`${item.name} (${item.ds ?? '?'}–${item.de ?? '?'})`}
+            />
+          )
+        })}
+      </div>
+      {/* Item list */}
+      <div className="admin-timeline__list">
+        {items.map(item => (
+          <div key={item.id} className="admin-timeline__item">
+            <TypeBadge type={item.type} />
+            <span className="admin-timeline__item-name">{item.name}</span>
+            <span className="admin-story-time-range">
+              {item.ds != null ? (item.ds < 0 ? `${Math.abs(item.ds)} BCE` : item.ds) : '?'}
+              {item.de != null && item.de !== item.ds
+                ? ` – ${item.de < 0 ? `${Math.abs(item.de)} BCE` : item.de}`
+                : ''}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Story detail ──────────────────────────────────────────────────────────────
 function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
   const [story, setStory]           = useState(initialStory)
   const [showImporter, setShowImporter] = useState(false)
   const [entityListKey, setEntityListKey] = useState(0)
+  const [showTimeline, setShowTimeline] = useState(false)
 
   const handleDelete = async () => {
     if (!supabase || !window.confirm(`Delete story "${story.title}"? This cannot be undone.`)) return
@@ -2369,6 +2575,16 @@ function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
   return (
     <div className="admin-record">
       <StoryMeta story={story} onSaved={updated => { setStory(updated); onUpdated?.(updated) }} />
+      <div className="admin-record__section" style={{ paddingTop: 4, paddingBottom: 4 }}>
+        <a
+          href={`#/stories/${story.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: 12, color: '#7a82a8', textDecoration: 'none' }}
+        >
+          ↗ View public story page
+        </a>
+      </div>
       <StoryEntityList key={entityListKey} storyId={story.id} />
 
       {/* CSV import */}
@@ -2395,6 +2611,19 @@ function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
           <p className="admin-story-description" style={{ marginTop: 4 }}>
             Upload a CSV to bulk-create entities and link them to this story.
           </p>
+        )}
+      </div>
+
+      {/* Timeline */}
+      <div className="admin-record__section">
+        <div className="admin-section-header">
+          <span className="admin-section-title">Timeline</span>
+          <button className="admin-section-edit-btn" onClick={() => setShowTimeline(v => !v)}>
+            {showTimeline ? 'Hide' : 'Show'}
+          </button>
+        </div>
+        {showTimeline && (
+          <StoryTimeline storyId={story.id} timeStart={story.time_start} timeEnd={story.time_end} />
         )}
       </div>
 
@@ -2481,6 +2710,19 @@ const FIELD_DEFS = {
     { key: 'lon',         label: 'Centroid lon',  type: 'number', geom: true },
     { key: 'lat',         label: 'Centroid lat',  type: 'number', geom: true },
   ],
+  relationships: [
+    { key: 'relation_id',      label: 'Relation ID',       type: 'id' },
+    { key: 'from_entity_id',   label: 'From ID',            type: 'id' },
+    { key: 'from_entity_name', label: 'From name',          type: 'text' },
+    { key: 'from_entity_type', label: 'From type',          type: 'text', groupable: true },
+    { key: 'relation_type',    label: 'Relation type',      type: 'text', groupable: true },
+    { key: 'to_entity_id',     label: 'To ID',              type: 'id' },
+    { key: 'to_entity_name',   label: 'To name',            type: 'text' },
+    { key: 'to_entity_type',   label: 'To type',            type: 'text', groupable: true },
+    { key: 'valid_from',       label: 'Valid from (year)',  type: 'number' },
+    { key: 'valid_to',         label: 'Valid to (year)',    type: 'number' },
+    { key: 'notes',            label: 'Notes',              type: 'text' },
+  ],
 }
 
 const EXPLORER_DEFAULTS = {
@@ -2490,6 +2732,7 @@ const EXPLORER_DEFAULTS = {
   geo_feature:    ['name', 'feature_type', 'subtype', 'lon', 'lat'],
   territory:      ['name', 'territory_type', 'date_start', 'date_end'],
   admin_boundary: ['name', 'admin_level', 'iso_code'],
+  relationships:  ['from_entity_name', 'from_entity_type', 'relation_type', 'to_entity_name', 'to_entity_type', 'valid_from', 'valid_to'],
 }
 
 function DataExplorer() {
@@ -2499,6 +2742,7 @@ function DataExplorer() {
   const [previewData, setPreviewData] = useState(null)
   const [loading, setLoading]         = useState(false)
   const [exporting, setExporting]     = useState(false)
+  const [exportResult, setExportResult] = useState(null)  // { count, capped }
   const [err, setErr]                 = useState(null)
   const [typeCounts, setTypeCounts]   = useState(null)
   const [summaryField, setSummaryField] = useState('')
@@ -2544,12 +2788,20 @@ function DataExplorer() {
     return out
   }
 
+  const fetchRows = async (limit) => {
+    if (entityType === 'relationships') {
+      const { data, error } = await supabase.rpc('export_relationships', { p_limit: limit })
+      return { rows: unwrap(data), error }
+    }
+    const { data, error } = await supabase.rpc('export_entity_type', { p_type: entityType, p_limit: limit })
+    return { rows: unwrap(data), error }
+  }
+
   const runPreview = async () => {
     if (!supabase) return
     setLoading(true); setPreviewData(null); setErr(null)
-    const { data, error } = await supabase.rpc('export_entity_type', { p_type: entityType, p_limit: 100 })
+    const { rows, error } = await fetchRows(100)
     if (error) { setErr(error.message); setLoading(false); return }
-    const rows = unwrap(data)
     const fields = [...selectedFields]
     setPreviewData({
       rows: rows.slice(0, 50),
@@ -2561,12 +2813,12 @@ function DataExplorer() {
 
   const runExport = async () => {
     if (!supabase) return
-    setExporting(true); setErr(null)
-    const { data, error } = await supabase.rpc('export_entity_type', { p_type: entityType, p_limit: 5000 })
+    setExporting(true); setErr(null); setExportResult(null)
+    const { rows, error } = await fetchRows(5000)
     if (error) { setErr(error.message); setExporting(false); return }
-    const rows = unwrap(data)
     const fields = [...selectedFields]
     downloadBlob(new Blob([buildCSV(rows, fields)], { type: 'text/csv' }), `${entityType}_export.csv`)
+    setExportResult({ count: rows.length, capped: rows.length >= 5000 })
     setExporting(false)
   }
 
@@ -2662,6 +2914,13 @@ function DataExplorer() {
             {!previewData && !loading && (
               <p className="admin-import-hint" style={{ marginTop: 8 }}>
                 Preview loads 100 rows to check completeness. Export downloads the full dataset.
+              </p>
+            )}
+            {exportResult && (
+              <p className="admin-import-hint" style={{ marginTop: 8, color: exportResult.capped ? '#d97706' : '#059669' }}>
+                {exportResult.capped
+                  ? `Exported 5,000 rows (cap reached — your dataset has more rows; filter by story to get a subset).`
+                  : `Exported ${exportResult.count.toLocaleString()} row${exportResult.count !== 1 ? 's' : ''}.`}
               </p>
             )}
           </div>

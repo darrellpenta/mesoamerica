@@ -11,10 +11,13 @@ Requirements:
   Ollama running locally  # free fallback, no API key needed
 
 Usage:
-  python3 scripts/source_data.py              # process one pending request
-  python3 scripts/source_data.py --all        # process all pending requests
-  python3 scripts/source_data.py --id <uuid>  # process a specific request
-  python3 scripts/source_data.py --dry-run    # preview without writing to DB
+  python3 scripts/source_data.py               # process one pending request
+  python3 scripts/source_data.py --all         # process all pending requests
+  python3 scripts/source_data.py --id <uuid>   # process a specific request
+  python3 scripts/source_data.py --retry-failed # reset failed→pending, then process all
+  python3 scripts/source_data.py --watch        # poll every 30s for new pending requests
+  python3 scripts/source_data.py --watch --interval 60  # custom poll interval
+  python3 scripts/source_data.py --dry-run     # preview without writing to DB
 
 Fallback chain (tried in order):
   1. Claude claude-sonnet-5 + web_search tool  (requires ANTHROPIC_API_KEY)
@@ -390,14 +393,45 @@ def source_request(cur, client, ollama_model, req, dry_run=False):
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
+def process_batch(cur, client, ollama_model, fetch_sql, fetch_params=(), dry_run=False):
+    """Fetch and process a batch of requests. Returns total entities staged."""
+    cur.execute(fetch_sql, fetch_params)
+    cols    = ['id', 'story_id', 'prompt', 'url_hints']
+    pending = [dict(zip(cols, r)) for r in cur.fetchall()]
+
+    if not pending:
+        return 0
+
+    print(f'\nProcessing {len(pending)} request(s)…')
+    total = 0
+    for req in pending:
+        if not dry_run:
+            cur.execute("UPDATE data_requests SET status='processing' WHERE id=%s", (req['id'],))
+        try:
+            count = source_request(cur, client, ollama_model, req, dry_run=dry_run)
+            total += count
+        except Exception as e:
+            print(f'  Unexpected error: {e}')
+            if not dry_run:
+                cur.execute(
+                    "UPDATE data_requests SET status='failed', result_summary=%s WHERE id=%s",
+                    (f'Unexpected error: {e}', req['id'])
+                )
+    return total
+
+
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    ap.add_argument('--all',     action='store_true', help='Process all pending requests')
-    ap.add_argument('--id',      metavar='UUID',      help='Process one specific request')
-    ap.add_argument('--dry-run', action='store_true', help='Preview without writing to DB')
+    ap.add_argument('--all',          action='store_true', help='Process all pending requests')
+    ap.add_argument('--id',           metavar='UUID',      help='Process one specific request')
+    ap.add_argument('--retry-failed', action='store_true', help='Reset failed→pending, then process all')
+    ap.add_argument('--watch',        action='store_true', help='Poll for new pending requests on a loop')
+    ap.add_argument('--interval',     type=int, default=30, metavar='SECS',
+                    help='Poll interval in seconds for --watch (default: 30)')
+    ap.add_argument('--dry-run',      action='store_true', help='Preview without writing to DB')
     args = ap.parse_args()
 
     # ── Set up clients ──
@@ -421,53 +455,54 @@ def main():
         print('\nERROR: No LLM available. Set ANTHROPIC_API_KEY or start Ollama.')
         sys.exit(1)
 
-    # ── Fetch pending requests ──
     conn = get_conn()
     cur  = conn.cursor()
 
+    # ── --retry-failed: reset failed requests back to pending ──
+    if args.retry_failed and not args.dry_run:
+        cur.execute(
+            "UPDATE data_requests SET status='pending', result_summary=NULL "
+            "WHERE status='failed' RETURNING id"
+        )
+        reset_ids = cur.fetchall()
+        print(f'Reset {len(reset_ids)} failed request(s) to pending.')
+
+    # ── Build query for this run ──
     if args.id:
-        cur.execute(
-            "SELECT id, story_id, prompt, url_hints FROM data_requests "
-            "WHERE id=%s AND status='pending'",
-            (args.id,)
-        )
-    elif args.all:
-        cur.execute(
-            "SELECT id, story_id, prompt, url_hints FROM data_requests "
-            "WHERE status='pending' ORDER BY created_at"
-        )
+        fetch_sql    = ("SELECT id, story_id, prompt, url_hints FROM data_requests "
+                        "WHERE id=%s AND status='pending'")
+        fetch_params = (args.id,)
+    elif args.all or args.retry_failed:
+        fetch_sql    = ("SELECT id, story_id, prompt, url_hints FROM data_requests "
+                        "WHERE status='pending' ORDER BY created_at")
+        fetch_params = ()
     else:
-        cur.execute(
-            "SELECT id, story_id, prompt, url_hints FROM data_requests "
-            "WHERE status='pending' ORDER BY created_at LIMIT 1"
-        )
+        fetch_sql    = ("SELECT id, story_id, prompt, url_hints FROM data_requests "
+                        "WHERE status='pending' ORDER BY created_at LIMIT 1")
+        fetch_params = ()
 
-    cols    = ['id', 'story_id', 'prompt', 'url_hints']
-    pending = [dict(zip(cols, r)) for r in cur.fetchall()]
-
-    if not pending:
-        print('No pending data requests.')
-        cur.close(); conn.close()
-        return
-
-    print(f'\nProcessing {len(pending)} request(s)…')
-    total = 0
-
-    for req in pending:
-        if not args.dry_run:
-            cur.execute("UPDATE data_requests SET status='processing' WHERE id=%s", (req['id'],))
+    if args.watch:
+        import time
+        print(f'\nWatch mode — polling every {args.interval}s. Press Ctrl+C to stop.\n')
+        grand_total = 0
         try:
-            count = source_request(cur, client, ollama_model, req, dry_run=args.dry_run)
-            total += count
-        except Exception as e:
-            print(f'  Unexpected error: {e}')
-            if not args.dry_run:
-                cur.execute(
-                    "UPDATE data_requests SET status='failed', result_summary=%s WHERE id=%s",
-                    (f'Unexpected error: {e}', req['id'])
-                )
+            while True:
+                count = process_batch(cur, client, ollama_model, fetch_sql, fetch_params, args.dry_run)
+                grand_total += count
+                if count == 0:
+                    print(f'  No pending requests — sleeping {args.interval}s…')
+                else:
+                    print(f'  Staged {count} entities this pass. Total so far: {grand_total}')
+                time.sleep(args.interval)
+        except KeyboardInterrupt:
+            print(f'\nWatch mode stopped. Grand total: {grand_total} entities staged.')
+    else:
+        total = process_batch(cur, client, ollama_model, fetch_sql, fetch_params, args.dry_run)
+        if total == 0 and not (args.id or args.retry_failed):
+            print('No pending data requests.')
+        else:
+            print(f'\nTotal: {total} entities staged.')
 
-    print(f'\nTotal: {total} entities staged across {len(pending)} request(s).')
     cur.close()
     conn.close()
 

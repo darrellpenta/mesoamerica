@@ -204,9 +204,47 @@ $func$;
 GRANT EXECUTE ON FUNCTION export_entity_type  TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION entity_type_counts  TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION entity_field_counts TO anon, authenticated;
+
+
+-- ── export_relationships ──────────────────────────────────────────────────────
+-- Returns all entity_relationships with denormalized from/to entity fields.
+CREATE OR REPLACE FUNCTION export_relationships(
+  p_story_id uuid    DEFAULT NULL,
+  p_limit    integer DEFAULT 5000
+)
+RETURNS TABLE(row_data jsonb)
+LANGUAGE sql
+SECURITY DEFINER AS $func$
+  SELECT to_jsonb(t) FROM (
+    SELECT
+      r.id              AS relation_id,
+      r.from_entity_id,
+      fe.name           AS from_entity_name,
+      fe.entity_type    AS from_entity_type,
+      r.relation_type,
+      r.to_entity_id,
+      te.name           AS to_entity_name,
+      te.entity_type    AS to_entity_type,
+      r.valid_from,
+      r.valid_to,
+      r.notes
+    FROM entity_relationships r
+    JOIN entities fe ON fe.id = r.from_entity_id
+    JOIN entities te ON te.id = r.to_entity_id
+    WHERE (
+      p_story_id IS NULL
+      OR r.from_entity_id IN (SELECT entity_id FROM story_entities WHERE story_id = p_story_id)
+      OR r.to_entity_id   IN (SELECT entity_id FROM story_entities WHERE story_id = p_story_id)
+    )
+    ORDER BY r.relation_type, fe.name
+    LIMIT p_limit
+  ) t;
+$func$;
+
+GRANT EXECUTE ON FUNCTION export_relationships TO anon, authenticated;
 """
 
 cur.execute(sql)
-print('Created RPCs: export_entity_type, entity_type_counts, entity_field_counts')
+print('Created RPCs: export_entity_type, entity_type_counts, entity_field_counts, export_relationships')
 cur.close()
 conn.close()
