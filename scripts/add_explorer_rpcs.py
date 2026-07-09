@@ -228,7 +228,7 @@ SECURITY DEFINER AS $func$
       r.valid_from,
       r.valid_to,
       r.notes
-    FROM entity_relationships r
+    FROM relationships r
     JOIN entities fe ON fe.id = r.from_entity_id
     JOIN entities te ON te.id = r.to_entity_id
     WHERE (
