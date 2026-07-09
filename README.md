@@ -214,6 +214,34 @@ Accessed via the "Stories" toggle at the bottom of the entity sidebar. Each stor
 - **DataRequestPanel** — submit natural-language sourcing prompts to the `data_requests` queue; run `source_data.py` offline to process; status badges: pending / processing / review / done / failed
 - **StagingReviewPanel** — appears when a request reaches `review` status; shows each staged row with confidence badge (high/medium/low/model_knowledge), approve or reject per row; approve creates entity + extension record + annotation + story link in one shot; "Mark request done" closes the loop
 
+### Data Explorer mode
+
+Accessed via "Data Explorer" in the entity browser sidebar. A self-service query builder for exporting data to R / Python / tidyverse / ggplot.
+
+- **Export tab** — pick entity type, check fields, hit Preview (100 rows via RPC), inspect per-field completeness bars (green ≥90%, amber 50–90%, red <50%), download full CSV (up to 5,000 rows, selected fields only). Geometry fields (`lon`/`lat`) are extracted server-side via `ST_X`/`ST_Y` for points or `ST_Centroid` for polygons.
+- **Summarize tab** — database-wide bar chart of entity counts per type; group-by picker for categorical fields (`event_type`, `place_type`, etc.) → grouped count table, exportable as CSV.
+
+Three Supabase RPCs power the explorer (see `scripts/add_explorer_rpcs.py`):
+
+```js
+// Export full field set for one entity type (lon/lat extracted from geometry)
+supabase.rpc('export_entity_type', { p_type: 'event', p_story_id: null, p_limit: 5000 })
+// Returns: [{ row_data: { entity_id, name, event_type, date_year_start, lon, lat, ... } }, ...]
+
+// Count per entity type
+supabase.rpc('entity_type_counts')
+// Returns: [{ entity_type: 'event', entity_count: 12781 }, ...]
+
+// Grouped count for a categorical field (allowlisted fields only — no SQL injection)
+supabase.rpc('entity_field_counts', { p_type: 'event', p_field: 'event_type' })
+// Returns: [{ field_value: 'Battles', entity_count: 4201 }, ...]
+```
+
+**Geometry extraction rules:**
+- `place`, `event` → `ST_X(geom)` / `ST_Y(geom)` (point)
+- `geo_feature`, `territory`, `admin_boundary` → `ST_X(ST_Centroid(geom))` / `ST_Y(ST_Centroid(geom))` (polygon centroid)
+- Null geom rows get null lon/lat (shown in completeness bars)
+
 ### Key Admin patterns
 
 ```js
@@ -222,6 +250,11 @@ const EXT_TABLES = {
   person: 'persons', place: 'places', geo_feature: 'geo_features',
   territory: 'territories', admin_boundary: 'admin_boundaries', event: 'events',
 }
+
+// FIELD_DEFS — static field definitions per entity type (in DataExplorer)
+// Keys: entity_id, name, <type-specific fields>, lon, lat
+// Properties: type ('text'|'number'|'id'), geom (bool), groupable (bool)
+// See EXPLORER_DEFAULTS for per-type default field selections
 
 // Story entity query (child → parent FK join)
 supabase.from('story_entities')
@@ -398,6 +431,7 @@ On every push to `main`:
 | `scripts/create_stories_schema.py` | One-time migration: create `stories`, `story_entities`, `data_requests` | Already run |
 | `scripts/add_staged_imports.py` | One-time migration: create `staged_imports` | Already run |
 | `scripts/source_data.py` | Agentic sourcing agent: polls `data_requests` where `status='pending'`, calls LLM to find entities, writes `staged_imports` for review | See below |
+| `scripts/add_explorer_rpcs.py` | One-time migration: create `export_entity_type`, `entity_type_counts`, `entity_field_counts` Postgres functions; grant to anon + authenticated | Already run |
 | `scripts/seed_from_wikidata.py` | Seed rulers from `scripts/wp_rulers_enriched.json` | `python3 scripts/seed_from_wikidata.py [--dry-run]` |
 | `scripts/seed_long_shadow.py` | Seed 20 persons, 16 events, 5 places from *The Long Shadow* | Already run |
 | `scripts/migrate_point_layers.py` | One-time: point GeoJSON → Supabase | Already run |
@@ -459,6 +493,7 @@ python3 scripts/generate_geojson.py
 - **Knowledge graph** — 112 persons seeded with RULED relationships; *The Long Shadow* events and places
 - **Stories (narrative platform)** — named story containers with theme + time bounds; entity curation with roles; CSV bulk import; CSV/GeoJSON export; data request queue
 - **Agentic data sourcing** — `source_data.py` polls the request queue, uses Claude + web search (or Ollama as a free local fallback), stages results; admin reviews rows one-by-one before anything commits
+- **Data Explorer** — self-service query builder in Admin; field picker with completeness bars; geometry extracted as lon/lat; CSV export (up to 5k rows); grouped count summaries; three Supabase RPCs
 
 ### Not Yet Implemented
 
@@ -490,3 +525,4 @@ Paste this file at the start of a new session. Key reminders:
 - **Agentic sourcing flow:** user submits prompt in DataRequestPanel → run `python3 scripts/source_data.py` → status becomes `review` → admin clicks "Review staged data" → StagingReviewPanel appears → approve/reject rows → "Mark request done"
 - **`staged_imports` confidence values:** `high`, `medium`, `low`, `model_knowledge` — displayed as colored badges in the review panel
 - **Ollama fallback:** `source_data.py` auto-detects Ollama at `http://localhost:11434`; prefers llama3 family. Override with `OLLAMA_BASE_URL` in `.env`.
+- **Data Explorer mode** — toggled via "Data Explorer" button in entity sidebar; `explorerMode` state in `AdminPage`; powered by three RPCs: `export_entity_type` (geometry-aware export), `entity_type_counts` (totals), `entity_field_counts` (group-by). RPC results return `[{ row_data: {...} }]` — unwrap with `data.map(r => r.row_data)`. `FIELD_DEFS` and `EXPLORER_DEFAULTS` constants define available fields and default selections per type.
