@@ -3443,3 +3443,197 @@ html, body, #root {
   font-size: 13px;
   color: #15803d;
 }
+
+/* ── Data Explorer ────────────────────────────────────────────────────────── */
+
+.admin-mode-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.admin-explorer-tabs {
+  display: flex;
+  border-bottom: 2px solid #e8ecf4;
+  margin-bottom: 0;
+}
+.admin-explorer-tab {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7494;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+}
+.admin-explorer-tab:hover { color: #2a2e44; }
+.admin-explorer-tab--active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.admin-explorer-type-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+.admin-explorer-type-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid #dde3f0;
+  background: #f5f7fb;
+  font-size: 12px;
+  font-weight: 500;
+  color: #485072;
+  cursor: pointer;
+}
+.admin-explorer-type-pill:hover { background: #e8ecf4; }
+.admin-explorer-type-pill--active {
+  background: #2d6ee0;
+  border-color: #2d6ee0;
+  color: #fff;
+}
+
+.admin-explorer-field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 4px 12px;
+  margin-top: 6px;
+}
+.admin-explorer-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #2a2e44;
+  cursor: pointer;
+  padding: 3px 0;
+}
+.admin-explorer-field--geom { color: #059669; }
+.admin-explorer-field input[type="checkbox"] { flex-shrink: 0; }
+
+.admin-explorer-field-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: #9098b8;
+  background: #f0f3fa;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: auto;
+}
+.admin-explorer-field-tag--geom { color: #059669; background: #f0faf4; }
+
+.admin-save-btn--export { background: #059669 !important; }
+.admin-save-btn--export:hover:not(:disabled) { background: #047857 !important; }
+
+/* Completeness bars */
+.admin-explorer-completeness {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.admin-explorer-comp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.admin-explorer-comp-label {
+  width: 130px;
+  flex-shrink: 0;
+  color: #485072;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-explorer-comp-track {
+  flex: 1;
+  height: 6px;
+  background: #e8ecf4;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.admin-explorer-comp-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.2s;
+}
+.admin-explorer-comp-stat {
+  width: 160px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+}
+.admin-explorer-comp-missing { color: #9098b8; }
+
+/* Preview table */
+.admin-explorer-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #dde3f0;
+  border-radius: 6px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.admin-explorer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.admin-explorer-table th {
+  position: sticky;
+  top: 0;
+  background: #f0f3fa;
+  padding: 7px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #485072;
+  border-bottom: 1px solid #dde3f0;
+  white-space: nowrap;
+}
+.admin-explorer-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #f0f3fa;
+  color: #2a2e44;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-explorer-table tr:last-child td { border-bottom: none; }
+.admin-explorer-table tr:hover td { background: #f8f9fd; }
+.admin-explorer-td--null { color: #b8bdd4 !important; font-style: italic; }
+
+/* Summarize counts */
+.admin-explorer-counts {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.admin-explorer-count-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.admin-explorer-count-label {
+  width: 160px;
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #2a2e44;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-explorer-count-n {
+  width: 70px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #485072;
+  flex-shrink: 0;
+}

@@ -2414,6 +2414,416 @@ function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
+// ── Data Explorer ─────────────────────────────────────────────────────────────
+
+const FIELD_DEFS = {
+  person: [
+    { key: 'entity_id',    label: 'Entity ID',      type: 'id' },
+    { key: 'name',         label: 'Name',            type: 'text' },
+    { key: 'person_type',  label: 'Person type',     type: 'text', groupable: true },
+    { key: 'birth_year',   label: 'Birth year',      type: 'number' },
+    { key: 'death_year',   label: 'Death year',      type: 'number' },
+    { key: 'floruit_start',label: 'Floruit start',   type: 'number' },
+    { key: 'floruit_end',  label: 'Floruit end',     type: 'number' },
+    { key: 'date_label',   label: 'Date label',      type: 'text' },
+    { key: 'date_precision',label:'Date precision',  type: 'text', groupable: true },
+  ],
+  event: [
+    { key: 'entity_id',      label: 'Entity ID',     type: 'id' },
+    { key: 'name',           label: 'Name',          type: 'text' },
+    { key: 'event_type',     label: 'Event type',    type: 'text', groupable: true },
+    { key: 'event_subtype',  label: 'Event subtype', type: 'text', groupable: true },
+    { key: 'date_year_start',label: 'Year start',    type: 'number' },
+    { key: 'date_year_end',  label: 'Year end',      type: 'number' },
+    { key: 'date_label',     label: 'Date label',    type: 'text' },
+    { key: 'fatalities',     label: 'Fatalities',    type: 'number' },
+    { key: 'actor_name',     label: 'Actor',         type: 'text', groupable: true },
+    { key: 'notes',          label: 'Notes',         type: 'text' },
+    { key: 'lon',            label: 'Longitude',     type: 'number', geom: true },
+    { key: 'lat',            label: 'Latitude',      type: 'number', geom: true },
+  ],
+  place: [
+    { key: 'entity_id',   label: 'Entity ID',     type: 'id' },
+    { key: 'name',        label: 'Name',           type: 'text' },
+    { key: 'place_type',  label: 'Place type',     type: 'text', groupable: true },
+    { key: 'date_start',  label: 'Date start',     type: 'number' },
+    { key: 'date_end',    label: 'Date end',       type: 'number' },
+    { key: 'date_label',  label: 'Date label',     type: 'text' },
+    { key: 'elevation_m', label: 'Elevation (m)',  type: 'number' },
+    { key: 'lon',         label: 'Longitude',      type: 'number', geom: true },
+    { key: 'lat',         label: 'Latitude',       type: 'number', geom: true },
+  ],
+  geo_feature: [
+    { key: 'entity_id',    label: 'Entity ID',     type: 'id' },
+    { key: 'name',         label: 'Name',           type: 'text' },
+    { key: 'feature_type', label: 'Feature type',   type: 'text', groupable: true },
+    { key: 'subtype',      label: 'Subtype',        type: 'text', groupable: true },
+    { key: 'date_start',   label: 'Date start',     type: 'number' },
+    { key: 'date_end',     label: 'Date end',       type: 'number' },
+    { key: 'lon',          label: 'Centroid lon',   type: 'number', geom: true },
+    { key: 'lat',          label: 'Centroid lat',   type: 'number', geom: true },
+  ],
+  territory: [
+    { key: 'entity_id',      label: 'Entity ID',      type: 'id' },
+    { key: 'name',           label: 'Name',            type: 'text' },
+    { key: 'territory_type', label: 'Territory type',  type: 'text', groupable: true },
+    { key: 'date_start',     label: 'Date start',      type: 'number' },
+    { key: 'date_end',       label: 'Date end',        type: 'number' },
+    { key: 'date_label',     label: 'Date label',      type: 'text' },
+    { key: 'lon',            label: 'Centroid lon',    type: 'number', geom: true },
+    { key: 'lat',            label: 'Centroid lat',    type: 'number', geom: true },
+  ],
+  admin_boundary: [
+    { key: 'entity_id',   label: 'Entity ID',    type: 'id' },
+    { key: 'name',        label: 'Name',          type: 'text' },
+    { key: 'admin_level', label: 'Admin level',   type: 'number', groupable: true },
+    { key: 'iso_code',    label: 'ISO code',      type: 'text',   groupable: true },
+    { key: 'lon',         label: 'Centroid lon',  type: 'number', geom: true },
+    { key: 'lat',         label: 'Centroid lat',  type: 'number', geom: true },
+  ],
+}
+
+const EXPLORER_DEFAULTS = {
+  person:         ['name', 'person_type', 'birth_year', 'death_year'],
+  event:          ['name', 'event_type', 'event_subtype', 'date_year_start', 'date_year_end', 'fatalities'],
+  place:          ['name', 'place_type', 'date_start', 'date_end', 'lon', 'lat'],
+  geo_feature:    ['name', 'feature_type', 'subtype', 'lon', 'lat'],
+  territory:      ['name', 'territory_type', 'date_start', 'date_end'],
+  admin_boundary: ['name', 'admin_level', 'iso_code'],
+}
+
+function DataExplorer() {
+  const [mode, setMode]               = useState('export')
+  const [entityType, setEntityType]   = useState('event')
+  const [selectedFields, setSelectedFields] = useState(new Set(EXPLORER_DEFAULTS.event))
+  const [previewData, setPreviewData] = useState(null)
+  const [loading, setLoading]         = useState(false)
+  const [exporting, setExporting]     = useState(false)
+  const [err, setErr]                 = useState(null)
+  const [typeCounts, setTypeCounts]   = useState(null)
+  const [summaryField, setSummaryField] = useState('')
+  const [summaryData, setSummaryData] = useState(null)
+  const [summaryLoading, setSummaryLoading] = useState(false)
+
+  // Reset fields when entity type changes
+  useEffect(() => {
+    setSelectedFields(new Set(EXPLORER_DEFAULTS[entityType] ?? ['name']))
+    setPreviewData(null); setErr(null)
+    setSummaryField(''); setSummaryData(null)
+  }, [entityType])
+
+  // Load type counts when switching to summarize
+  useEffect(() => {
+    if (mode !== 'summarize' || typeCounts || !supabase) return
+    supabase.rpc('entity_type_counts').then(({ data, error }) => {
+      if (!error) setTypeCounts(data ?? [])
+    })
+  }, [mode, typeCounts])
+
+  const toggleField = (key) =>
+    setSelectedFields(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n })
+
+  const defs = FIELD_DEFS[entityType] ?? []
+
+  const unwrap = (data) => (data ?? []).map(r => r.row_data ?? r)
+
+  const buildCSV = (rows, fields) => {
+    const esc = v => {
+      const s = String(v ?? '')
+      return (s.includes(',') || s.includes('"') || s.includes('\n')) ? `"${s.replace(/"/g, '""')}"` : s
+    }
+    return [fields.join(','), ...rows.map(r => fields.map(f => esc(r[f])).join(','))].join('\n')
+  }
+
+  const computeCompleteness = (rows, fields) => {
+    const out = {}
+    fields.forEach(key => {
+      const nonNull = rows.filter(r => r[key] != null && r[key] !== '').length
+      out[key] = { nonNull, total: rows.length, pct: rows.length ? Math.round(nonNull / rows.length * 100) : 0 }
+    })
+    return out
+  }
+
+  const runPreview = async () => {
+    if (!supabase) return
+    setLoading(true); setPreviewData(null); setErr(null)
+    const { data, error } = await supabase.rpc('export_entity_type', { p_type: entityType, p_limit: 100 })
+    if (error) { setErr(error.message); setLoading(false); return }
+    const rows = unwrap(data)
+    const fields = [...selectedFields]
+    setPreviewData({
+      rows: rows.slice(0, 50),
+      completeness: computeCompleteness(rows, fields),
+      total: rows.length,
+    })
+    setLoading(false)
+  }
+
+  const runExport = async () => {
+    if (!supabase) return
+    setExporting(true); setErr(null)
+    const { data, error } = await supabase.rpc('export_entity_type', { p_type: entityType, p_limit: 5000 })
+    if (error) { setErr(error.message); setExporting(false); return }
+    const rows = unwrap(data)
+    const fields = [...selectedFields]
+    downloadBlob(new Blob([buildCSV(rows, fields)], { type: 'text/csv' }), `${entityType}_export.csv`)
+    setExporting(false)
+  }
+
+  const runSummary = async () => {
+    if (!supabase || !summaryField) return
+    setSummaryLoading(true); setSummaryData(null)
+    const { data, error } = await supabase.rpc('entity_field_counts', { p_type: entityType, p_field: summaryField })
+    if (!error) setSummaryData(data ?? [])
+    else setErr(error.message)
+    setSummaryLoading(false)
+  }
+
+  const groupableFields = defs.filter(f => f.groupable)
+  const fieldList = [...selectedFields]
+
+  return (
+    <div className="admin-record">
+
+      {/* Mode tabs */}
+      <div className="admin-explorer-tabs">
+        {['export', 'summarize'].map(m => (
+          <button
+            key={m}
+            className={`admin-explorer-tab${mode === m ? ' admin-explorer-tab--active' : ''}`}
+            onClick={() => setMode(m)}
+          >
+            {m === 'export' ? 'Export' : 'Summarize'}
+          </button>
+        ))}
+      </div>
+
+      {/* Entity type selector */}
+      <div className="admin-record__section">
+        <div className="admin-section-header">
+          <span className="admin-section-title">Entity type</span>
+        </div>
+        <div className="admin-explorer-type-pills">
+          {Object.keys(FIELD_DEFS).map(t => (
+            <button
+              key={t}
+              className={`admin-explorer-type-pill${entityType === t ? ' admin-explorer-type-pill--active' : ''}`}
+              onClick={() => setEntityType(t)}
+            >
+              {t.replace(/_/g, ' ')}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Export mode ─────────────────────────────────────────────────────── */}
+      {mode === 'export' && (
+        <>
+          <div className="admin-record__section">
+            <div className="admin-section-header">
+              <span className="admin-section-title">Fields</span>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button className="admin-section-edit-btn" onClick={() => setSelectedFields(new Set(defs.map(f => f.key)))}>All</button>
+                <button className="admin-section-edit-btn" onClick={() => setSelectedFields(new Set(['name']))}>None</button>
+              </div>
+            </div>
+            <div className="admin-explorer-field-grid">
+              {defs.map(f => (
+                <label key={f.key} className={`admin-explorer-field${f.geom ? ' admin-explorer-field--geom' : ''}`}>
+                  <input type="checkbox" checked={selectedFields.has(f.key)} onChange={() => toggleField(f.key)} />
+                  <span>{f.label}</span>
+                  {f.type === 'number' && !f.geom && <span className="admin-explorer-field-tag">num</span>}
+                  {f.geom && <span className="admin-explorer-field-tag admin-explorer-field-tag--geom">geom</span>}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {err && <div className="admin-error" style={{ margin: '0 16px 8px' }}>{err}</div>}
+
+          <div className="admin-record__section">
+            <div className="admin-edit-actions">
+              <button
+                className="admin-save-btn admin-save-btn--sm"
+                onClick={runPreview}
+                disabled={loading || fieldList.length === 0}
+              >
+                {loading ? 'Loading…' : `Preview (${fieldList.length} field${fieldList.length !== 1 ? 's' : ''})`}
+              </button>
+              <button
+                className="admin-save-btn admin-save-btn--sm admin-save-btn--export"
+                onClick={runExport}
+                disabled={exporting || fieldList.length === 0 || !previewData}
+                title={!previewData ? 'Preview first to enable export' : ''}
+              >
+                {exporting ? 'Exporting…' : 'Export CSV (up to 5,000 rows)'}
+              </button>
+            </div>
+            {!previewData && !loading && (
+              <p className="admin-import-hint" style={{ marginTop: 8 }}>
+                Preview loads 100 rows to check completeness. Export downloads the full dataset.
+              </p>
+            )}
+          </div>
+
+          {previewData && (
+            <div className="admin-record__section">
+              {/* Completeness */}
+              <div className="admin-section-header" style={{ marginBottom: 10 }}>
+                <span className="admin-section-title">
+                  Completeness — {previewData.rows.length} of {previewData.total} rows previewed
+                </span>
+              </div>
+              <div className="admin-explorer-completeness">
+                {fieldList.map(key => {
+                  const c = previewData.completeness[key]
+                  const def = defs.find(f => f.key === key)
+                  if (!c) return null
+                  const color = c.pct >= 90 ? '#059669' : c.pct >= 50 ? '#d97706' : '#dc2626'
+                  return (
+                    <div key={key} className="admin-explorer-comp-row">
+                      <span className="admin-explorer-comp-label">{def?.label ?? key}</span>
+                      <div className="admin-explorer-comp-track">
+                        <div className="admin-explorer-comp-fill" style={{ width: `${c.pct}%`, background: color }} />
+                      </div>
+                      <span className="admin-explorer-comp-stat" style={{ color }}>
+                        {c.nonNull}/{c.total}
+                        {c.pct < 100 && (
+                          <span className="admin-explorer-comp-missing"> ({c.total - c.nonNull} missing)</span>
+                        )}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Preview table */}
+              <div className="admin-explorer-table-wrap">
+                <table className="admin-explorer-table">
+                  <thead>
+                    <tr>
+                      {fieldList.map(k => {
+                        const def = defs.find(f => f.key === k)
+                        return <th key={k}>{def?.label ?? k}</th>
+                      })}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {previewData.rows.map((row, i) => (
+                      <tr key={i}>
+                        {fieldList.map(k => (
+                          <td key={k} className={row[k] == null ? 'admin-explorer-td--null' : ''}>
+                            {row[k] != null ? String(row[k]).slice(0, 100) : '—'}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Summarize mode ───────────────────────────────────────────────────── */}
+      {mode === 'summarize' && (
+        <>
+          {/* Database-wide counts */}
+          <div className="admin-record__section">
+            <div className="admin-section-header">
+              <span className="admin-section-title">Database totals</span>
+            </div>
+            {!typeCounts && <div className="admin-record__loading"><div className="admin-spinner" /></div>}
+            {typeCounts && (() => {
+              const maxN = Math.max(...typeCounts.map(r => Number(r.entity_count)))
+              return (
+                <div className="admin-explorer-counts">
+                  {typeCounts.map(r => (
+                    <div key={r.entity_type} className="admin-explorer-count-row">
+                      <span className="admin-explorer-count-label">{r.entity_type.replace(/_/g, ' ')}</span>
+                      <div className="admin-explorer-comp-track" style={{ flex: 1 }}>
+                        <div
+                          className="admin-explorer-comp-fill"
+                          style={{ width: `${Math.round(Number(r.entity_count) / maxN * 100)}%`, background: '#2d6ee0' }}
+                        />
+                      </div>
+                      <span className="admin-explorer-count-n">{Number(r.entity_count).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            })()}
+          </div>
+
+          {/* Field group-by */}
+          {groupableFields.length > 0 && (
+            <div className="admin-record__section">
+              <div className="admin-section-header">
+                <span className="admin-section-title">
+                  Count {entityType.replace(/_/g, ' ')} by field
+                </span>
+              </div>
+              <div className="admin-import-type-row" style={{ flexWrap: 'wrap', gap: 8 }}>
+                <select
+                  className="admin-select"
+                  value={summaryField}
+                  onChange={e => { setSummaryField(e.target.value); setSummaryData(null) }}
+                >
+                  <option value="">— choose a field —</option>
+                  {groupableFields.map(f => (
+                    <option key={f.key} value={f.key}>{f.label}</option>
+                  ))}
+                </select>
+                <button
+                  className="admin-save-btn admin-save-btn--sm"
+                  onClick={runSummary}
+                  disabled={!summaryField || summaryLoading}
+                >
+                  {summaryLoading ? 'Loading…' : 'Count'}
+                </button>
+                {summaryData && (
+                  <button
+                    className="admin-section-edit-btn"
+                    onClick={() => {
+                      const csv = 'value,count\n' + summaryData.map(r => `${r.field_value},${r.entity_count}`).join('\n')
+                      downloadBlob(new Blob([csv], { type: 'text/csv' }), `${entityType}_by_${summaryField}.csv`)
+                    }}
+                  >
+                    Export CSV
+                  </button>
+                )}
+              </div>
+
+              {err && <div className="admin-error" style={{ marginTop: 8 }}>{err}</div>}
+
+              {summaryData && (() => {
+                const maxN = Math.max(...summaryData.map(r => Number(r.entity_count)))
+                return (
+                  <div className="admin-explorer-counts" style={{ marginTop: 12 }}>
+                    {summaryData.map((r, i) => (
+                      <div key={i} className="admin-explorer-count-row">
+                        <span className="admin-explorer-count-label">{r.field_value}</span>
+                        <div className="admin-explorer-comp-track" style={{ flex: 1 }}>
+                          <div
+                            className="admin-explorer-comp-fill"
+                            style={{ width: `${Math.round(Number(r.entity_count) / maxN * 100)}%`, background: '#7c3aed' }}
+                          />
+                        </div>
+                        <span className="admin-explorer-count-n">{Number(r.entity_count).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const [query, setQuery]         = useState('')
   const [selected, setSelected]   = useState(null)
@@ -2425,6 +2835,7 @@ export default function AdminPage() {
   const [storiesMode, setStoriesMode]     = useState(false)
   const [selectedStory, setSelectedStory] = useState(null)
   const [storyListKey, setStoryListKey]   = useState(0)
+  const [explorerMode, setExplorerMode]   = useState(false)
 
   const { results, loading: searching } = useEntitySearch(query)
 
@@ -2464,13 +2875,22 @@ export default function AdminPage() {
   }
 
   const enterStoriesMode = () => {
-    setStoriesMode(true); setBrowseType(null); setQuery('')
+    setStoriesMode(true); setExplorerMode(false)
+    setBrowseType(null); setQuery('')
     setSelected(null); setHistory([]); setShowNew(false)
   }
 
   const exitStoriesMode = () => {
     setStoriesMode(false); setSelectedStory(null)
   }
+
+  const enterExplorerMode = () => {
+    setExplorerMode(true); setStoriesMode(false)
+    setBrowseType(null); setQuery('')
+    setSelected(null); setHistory([]); setShowNew(false)
+  }
+
+  const exitExplorerMode = () => setExplorerMode(false)
 
   const displayList = query.length >= 2 ? results : browseResults
 
@@ -2479,7 +2899,15 @@ export default function AdminPage() {
 
       {/* Sidebar */}
       <div className="admin-sidebar">
-        {storiesMode ? (
+        {explorerMode ? (
+          <div className="admin-sidebar__header">
+            <button className="admin-stories-back-btn" onClick={exitExplorerMode}>← Entity browser</button>
+            <div className="admin-sidebar__title" style={{ marginTop: 12 }}>Data Explorer</div>
+            <p className="admin-import-hint" style={{ marginTop: 8 }}>
+              Build a dataset from any entity type, check field completeness, and export to CSV for R or Python.
+            </p>
+          </div>
+        ) : storiesMode ? (
           <StoriesListPanel
             selectedId={selectedStory?.id}
             onSelect={setSelectedStory}
@@ -2524,9 +2952,10 @@ export default function AdminPage() {
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                   />
-                  <button className="admin-stories-toggle" onClick={enterStoriesMode}>
-                    Stories
-                  </button>
+                  <div className="admin-mode-toggles">
+                    <button className="admin-stories-toggle" onClick={enterStoriesMode}>Stories</button>
+                    <button className="admin-stories-toggle" onClick={enterExplorerMode}>Data Explorer</button>
+                  </div>
                 </>
               )}
             </div>
@@ -2558,7 +2987,9 @@ export default function AdminPage() {
 
       {/* Main area */}
       <div className="admin-main">
-        {storiesMode ? (
+        {explorerMode ? (
+          <DataExplorer />
+        ) : storiesMode ? (
           selectedStory ? (
             <StoryDetail
               key={selectedStory.id}
