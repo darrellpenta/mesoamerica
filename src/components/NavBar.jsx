@@ -13,6 +13,9 @@ export default function NavBar() {
       <NavLink to="/admin" className={({ isActive }) => `app-nav__link${isActive ? ' app-nav__link--active' : ''}`}>
         Admin
       </NavLink>
+      <NavLink to="/guide" className={({ isActive }) => `app-nav__link${isActive ? ' app-nav__link--active' : ''}`}>
+        Guide
+      </NavLink>
     </nav>
   )
 }

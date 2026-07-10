@@ -9,6 +9,7 @@ const App              = lazy(() => import('./App.jsx'))
 const AdminPage        = lazy(() => import('./pages/AdminPage.jsx'))
 const TimelinePage     = lazy(() => import('./pages/TimelinePage.jsx'))
 const StoryViewerPage  = lazy(() => import('./pages/StoryViewerPage.jsx'))
+const GuidePage        = lazy(() => import('./pages/GuidePage.jsx'))
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -101,6 +102,7 @@ createRoot(document.getElementById('root')).render(
               <Route path="/timeline" element={<ErrorBoundary label="Timeline failed to load"><TimelinePage /></ErrorBoundary>} />
               <Route path="/admin" element={<ErrorBoundary label="Admin panel error"><AdminAuthGate /></ErrorBoundary>} />
               <Route path="/stories/:id" element={<ErrorBoundary label="Story failed to load"><StoryViewerPage /></ErrorBoundary>} />
+              <Route path="/guide" element={<ErrorBoundary label="Guide failed to load"><GuidePage /></ErrorBoundary>} />
             </Routes>
           </Suspense>
         </div>

@@ -47,7 +47,11 @@ All routes use `HashRouter` — paths are `/#/path`.
 |-------|-----------|-------------|
 | `/#/` | `src/App.jsx` | Interactive map with 39 layers |
 | `/#/timeline` | `src/pages/TimelinePage.jsx` | Multi-entity historical timeline |
-| `/#/admin` | `src/pages/AdminPage.jsx` | Entity browser + knowledge-graph editor |
+| `/#/admin` | `src/pages/AdminPage.jsx` | Entity browser + knowledge-graph editor (password-gated) |
+| `/#/guide` | `src/pages/GuidePage.jsx` | In-app how-to guide for all features |
+| `/#/stories/:id` | `src/pages/StoryViewerPage.jsx` | Public read-only story viewer |
+
+All page components are **lazy-loaded** with `React.lazy()` + `Suspense`. Each route is wrapped in a class-based `ErrorBoundary` defined in `src/main.jsx`.
 
 ---
 
@@ -68,14 +72,30 @@ The entire app uses a light CSS palette (set in `src/App.css`):
 
 ## Admin Password Protection
 
-`/#/admin` is gated by `AdminAuthGate` in `src/main.jsx`:
+`/#/admin` is gated by `AdminAuthGate` in `src/main.jsx`. The password comes from the `VITE_ADMIN_PASSWORD` environment variable:
 
 ```js
-const ADMIN_PW = 'mesoamerica2026'
+const ADMIN_PW = import.meta.env.VITE_ADMIN_PASSWORD ?? ''
 // Stores 'yes' in localStorage['admin-authed-v1'] on success
 ```
 
-To change the password, edit the `ADMIN_PW` constant in `src/main.jsx`.
+Set `VITE_ADMIN_PASSWORD` in `.env` for local dev and as a GitHub Secret for the deployed site.
+
+---
+
+## GitHub Secrets (Required for CI)
+
+All five secrets must be set in the GitHub repo under **Settings → Secrets and variables → Actions**:
+
+| Secret name | What it is |
+|-------------|-----------|
+| `VITE_MAPBOX_TOKEN` | Mapbox GL JS public token |
+| `VITE_SUPABASE_URL` | Supabase project URL (`https://vqovdkjdawqdpzxomsiw.supabase.co`) |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anon (public) key |
+| `VITE_ADMIN_PASSWORD` | Admin UI password |
+| `SUPABASE_DB_URL` | Full Postgres connection URL (used by migration/GeoJSON scripts in CI) |
+
+> If any `VITE_*` secret is missing, the deployed build silently bakes in an empty string. The Supabase client will initialize to `null`, and all database-dependent UI (Timeline, Admin, Stories) will show empty state with no console error. Diagnose by curling a JS bundle and grepping for the Supabase project ID.
 
 ---
 
@@ -85,7 +105,7 @@ To change the password, edit the `ADMIN_PW` constant in `src/main.jsx`.
 
 ```
 sources            — citation provenance
-entities           — base registry (id, entity_type, name, source_id, layer_id)
+entities           — base registry (id, entity_type, name, source_id, layer_id, search_vector tsvector)
   ├── places       — point geometry, archaeological/historic sites
   ├── geo_features — natural features
   ├── territories  — time-bounded political/cultural polygons
@@ -95,7 +115,10 @@ entities           — base registry (id, entity_type, name, source_id, layer_id
 relationships      — typed, time-bounded edges between entities
 layer_definitions  — map layer config (mirrors src/layers/index.js)
 annotations        — key-value freeform notes on any entity
+entity_sources     — provenance audit trail per entity (source_type, confidence, data_request_id)
 ```
+
+The `entities.search_vector` column is a `tsvector GENERATED ALWAYS AS ... STORED` column powering full-text search via the `entity_search` RPC and a GIN index (`entities_search_vector_idx`).
 
 ### Stories tables (narrative platform)
 
@@ -113,6 +136,9 @@ Migration scripts (run once, in order):
 ```bash
 python3 scripts/create_stories_schema.py   # stories, story_entities, data_requests
 python3 scripts/add_staged_imports.py      # staged_imports
+python3 scripts/add_fulltext_search.py     # search_vector column, GIN index, entity_search RPC
+python3 scripts/add_entity_sources.py      # entity_sources provenance table
+python3 scripts/add_explorer_rpcs.py       # export_entity_type, entity_type_counts, entity_field_counts, export_relationships RPCs
 ```
 
 ### relationships table
@@ -124,6 +150,18 @@ relation_type  -- 'RULED' | 'FOUNDED' | 'TRADED_WITH' | 'ALLIED_WITH'
 valid_from int, valid_to int,   -- year (negative = BCE)
 source_id, notes
 ```
+
+### entity_sources table
+
+```sql
+id, entity_id (FK→entities CASCADE),
+source_type   -- 'manual' | 'csv_import' | 'data_request'
+data_request_id (FK→data_requests SET NULL),
+source_url, source_label, confidence,
+notes, created_at
+```
+
+Written automatically when entities are created: manually via Admin UI (`source_type='manual'`), via CSV import (`source_type='csv_import'`), or via staging approval (`source_type='data_request'`).
 
 ### Current data inventory
 
@@ -192,14 +230,15 @@ const ERAS = [
 
 ## Admin Page (`src/pages/AdminPage.jsx`)
 
-Full knowledge-graph editor behind password gate. Two modes: **Entity browser** and **Stories**.
+Full knowledge-graph editor behind password gate. Three modes: **Entity browser**, **Stories**, and **Data Explorer**.
 
 ### Entity browser features
 - **Dashboard** — entity counts by type, mini sparkline graphs, type-filter pills, browse-by-type without search
+- **Full-text search** — `useEntitySearch` hook tries `entity_search` RPC first (ts_rank scored, union of name + annotation FTS), falls back to `.ilike('name', ...)` if FTS returns nothing; 300ms debounce
 - **Entity record** — master/detail; inline name editing; extension field editing (persons dates, place type, etc.)
 - **Relationship management** — add/delete typed, time-bounded relationships with entity search
 - **Annotations** — freeform key-value notes (text/number/date/url/markdown types)
-- **Create entity** — "New" button with live duplicate detection
+- **Create entity** — "New" button with live duplicate detection; writes `entity_sources` row with `source_type='manual'`
 - **Suggested connections** — surfaces co-rulers and name-similar entities not yet linked
 
 ### Stories mode features
@@ -209,19 +248,21 @@ Accessed via the "Stories" toggle at the bottom of the entity sidebar. Each stor
 - **Story list** — sidebar of all stories; click to open; "New story" button
 - **StoryMeta** — editable title, description, theme, time range
 - **StoryEntityList** — entities linked to this story via `story_entities`; add with role + notes
-- **CSV Import** — upload any CSV, map columns to entity fields (name, type, dates, notes), bulk-create entities and auto-link to story; progress bar + result summary
+- **Story Timeline View** — proportional bar chart of story entities on a shared year axis; triggered by "Show timeline" button in StoryDetail; sorted by start date
+- **CSV Import** — upload any CSV, map columns to entity fields (name, type, dates, notes), bulk-create entities and auto-link to story; validates/normalizes entity_type; tracks coerced count in result; writes `entity_sources` rows with `source_type='csv_import'`
 - **StoryExportPanel** — export story entities as CSV or GeoJSON (properties only, geometry null)
 - **DataRequestPanel** — submit natural-language sourcing prompts to the `data_requests` queue; run `source_data.py` offline to process; status badges: pending / processing / review / done / failed
-- **StagingReviewPanel** — appears when a request reaches `review` status; shows each staged row with confidence badge (high/medium/low/model_knowledge), approve or reject per row; approve creates entity + extension record + annotation + story link in one shot; "Mark request done" closes the loop
+- **StagingReviewPanel** — appears when a request reaches `review` status; shows each staged row with confidence badge (high/medium/low/model_knowledge); **inline edit** (name, entity_type, dates, description) before approving; approve creates entity + extension record + annotation + story link + `entity_sources` row in one shot; "Mark request done" closes the loop
+- **Public story link** — "↗ View public story page" link navigates to `/#/stories/:id`
 
 ### Data Explorer mode
 
 Accessed via "Data Explorer" in the entity browser sidebar. A self-service query builder for exporting data to R / Python / tidyverse / ggplot.
 
-- **Export tab** — pick entity type, check fields, hit Preview (100 rows via RPC), inspect per-field completeness bars (green ≥90%, amber 50–90%, red <50%), download full CSV (up to 5,000 rows, selected fields only). Geometry fields (`lon`/`lat`) are extracted server-side via `ST_X`/`ST_Y` for points or `ST_Centroid` for polygons.
+- **Export tab** — pick entity type (including `relationships`), check fields, hit Preview (100 rows via RPC), inspect per-field completeness bars (green ≥90%, amber 50–90%, red <50%), download full CSV (up to 5,000 rows, selected fields only). Amber cap warning shows if result was truncated. Geometry fields (`lon`/`lat`) are extracted server-side via `ST_X`/`ST_Y` for points or `ST_Centroid` for polygons.
 - **Summarize tab** — database-wide bar chart of entity counts per type; group-by picker for categorical fields (`event_type`, `place_type`, etc.) → grouped count table, exportable as CSV.
 
-Three Supabase RPCs power the explorer (see `scripts/add_explorer_rpcs.py`):
+Five Supabase RPCs power the explorer and search (see `scripts/add_explorer_rpcs.py` and `scripts/add_fulltext_search.py`):
 
 ```js
 // Export full field set for one entity type (lon/lat extracted from geometry)
@@ -235,6 +276,14 @@ supabase.rpc('entity_type_counts')
 // Grouped count for a categorical field (allowlisted fields only — no SQL injection)
 supabase.rpc('entity_field_counts', { p_type: 'event', p_field: 'event_type' })
 // Returns: [{ field_value: 'Battles', entity_count: 4201 }, ...]
+
+// Denormalized relationship graph
+supabase.rpc('export_relationships', { p_story_id: null, p_limit: 5000 })
+// Returns: [{ row_data: { relation_id, from_entity_name, from_entity_type, relation_type, ... } }, ...]
+
+// Full-text entity search (union of name + annotation FTS, ranked by ts_rank)
+supabase.rpc('entity_search', { p_query: 'palenque', p_limit: 30 })
+// Returns: [{ row_data: { id, name, entity_type, rank } }, ...]
 ```
 
 **Geometry extraction rules:**
@@ -242,7 +291,7 @@ supabase.rpc('entity_field_counts', { p_type: 'event', p_field: 'event_type' })
 - `geo_feature`, `territory`, `admin_boundary` → `ST_X(ST_Centroid(geom))` / `ST_Y(ST_Centroid(geom))` (polygon centroid)
 - Null geom rows get null lon/lat (shown in completeness bars)
 
-### Key Admin patterns
+### Key Admin constants
 
 ```js
 // EXT_TABLES mapping (entity_type → extension table name)
@@ -251,10 +300,13 @@ const EXT_TABLES = {
   territory: 'territories', admin_boundary: 'admin_boundaries', event: 'events',
 }
 
-// FIELD_DEFS — static field definitions per entity type (in DataExplorer)
+// FIELD_DEFS — static field definitions per entity type + 'relationships' (in DataExplorer)
 // Keys: entity_id, name, <type-specific fields>, lon, lat
 // Properties: type ('text'|'number'|'id'), geom (bool), groupable (bool)
-// See EXPLORER_DEFAULTS for per-type default field selections
+
+// EXPLORER_DEFAULTS — per-type default field selections
+// 'relationships' defaults: from_entity_name, from_entity_type, relation_type,
+//   to_entity_name, to_entity_type, valid_from, valid_to
 
 // Story entity query (child → parent FK join)
 supabase.from('story_entities')
@@ -348,7 +400,7 @@ This expression is applied to `fill-color`, `line-color` (outlines), and `circle
 | `conflict-events` | `event_subtype` | `colorLegend` | Battles=red, Protests=blue, Riots=purple… |
 | `culturally-significant-species` | `subtype` | `colorLegend` | Jaguar=amber, Quetzal=green |
 
-**Important:** `colorBy` should reference a GeoJSON property that already exists in the original file, OR one that was added by `scripts/add_feature_colors.py` and committed. Properties added only by the script but not in the original GeoJSON will fail silently if the browser caches the old file. Language dialects uses `name` (original), which is safe. Ecoregions uses `biome` and settlements use `site` (both script-added and committed).
+**Important:** `colorBy` should reference a GeoJSON property that already exists in the original file, OR one that was added by `scripts/add_feature_colors.py` and committed. Properties added only by the script but not in the original GeoJSON will fail silently if the browser caches the old file.
 
 **Do not use `['get', 'color']` directly as a fill-color expression** — Mapbox GL JS doesn't reliably coerce a string feature property to its internal color type. Always use a `match` expression instead.
 
@@ -402,7 +454,11 @@ base: './'   // DO NOT change — required for GitHub Pages subdirectory hosting
 
 ### `.env.production` — committed Supabase vars
 
-`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are committed in `.env.production` (the anon key is a public browser credential). `VITE_MAPBOX_TOKEN` is in GitHub Secrets only.
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are committed in `.env.production` (the anon key is a public browser credential). `VITE_MAPBOX_TOKEN` and `VITE_ADMIN_PASSWORD` are in GitHub Secrets only.
+
+### Code splitting
+
+All five page components are lazy-loaded via `React.lazy()`. Each route is wrapped in a class `ErrorBoundary` with a "Try again" button. This keeps the initial bundle small; AdminPage only loads when the user navigates to `/admin`.
 
 ### Map type overlays
 
@@ -417,8 +473,12 @@ File: `.github/workflows/deploy.yml`
 On every push to `main`:
 1. `pip install psycopg2-binary python-dotenv`
 2. `python3 scripts/generate_geojson.py` — regenerates all 39 GeoJSON files from Supabase
-3. `npm run build` — Vite build with `VITE_MAPBOX_TOKEN` from GitHub Secrets
+3. `npm run build` — Vite build with all four `VITE_*` secrets baked in
 4. Deploy `dist/` to GitHub Pages
+
+Action versions (Node.js 24 compatible): `checkout@v7`, `setup-python@v6`, `setup-node@v6`, `configure-pages@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5`.
+
+> **Diagnosis:** If the deployed site shows no Supabase data, curl a JS bundle and grep for the Supabase project ID (`vqovdkjdawqdpzxomsiw`). If absent, a secret is missing. Re-run the workflow via **"Run workflow"** (not "Re-run jobs") after adding secrets so the new env vars are baked into the build.
 
 ---
 
@@ -430,8 +490,10 @@ On every push to `main`:
 | `scripts/add_feature_colors.py` | Add `color`, `family`, `biome`, `site` properties to 9 GeoJSON layers for auto-coloring | Re-run if palette changes; commit output |
 | `scripts/create_stories_schema.py` | One-time migration: create `stories`, `story_entities`, `data_requests` | Already run |
 | `scripts/add_staged_imports.py` | One-time migration: create `staged_imports` | Already run |
+| `scripts/add_fulltext_search.py` | One-time migration: add `search_vector` tsvector column + GIN index + `entity_search` RPC | Already run |
+| `scripts/add_entity_sources.py` | One-time migration: create `entity_sources` provenance table | Already run |
+| `scripts/add_explorer_rpcs.py` | One-time migration: create `export_entity_type`, `entity_type_counts`, `entity_field_counts`, `export_relationships` Postgres functions; grant to anon + authenticated | Already run |
 | `scripts/source_data.py` | Agentic sourcing agent: polls `data_requests` where `status='pending'`, calls LLM to find entities, writes `staged_imports` for review | See below |
-| `scripts/add_explorer_rpcs.py` | One-time migration: create `export_entity_type`, `entity_type_counts`, `entity_field_counts` Postgres functions; grant to anon + authenticated | Already run |
 | `scripts/seed_from_wikidata.py` | Seed rulers from `scripts/wp_rulers_enriched.json` | `python3 scripts/seed_from_wikidata.py [--dry-run]` |
 | `scripts/seed_long_shadow.py` | Seed 20 persons, 16 events, 5 places from *The Long Shadow* | Already run |
 | `scripts/migrate_point_layers.py` | One-time: point GeoJSON → Supabase | Already run |
@@ -449,6 +511,9 @@ python3 scripts/source_data.py              # one pending request
 python3 scripts/source_data.py --all        # all pending
 python3 scripts/source_data.py --id <uuid>  # specific request
 python3 scripts/source_data.py --dry-run    # preview, no DB writes
+python3 scripts/source_data.py --retry-failed  # reset failed requests to pending and reprocess
+python3 scripts/source_data.py --watch      # watch mode: poll every 30s (Ctrl+C to stop)
+python3 scripts/source_data.py --watch --interval 60  # custom poll interval in seconds
 ```
 
 **Fallback chain (tried in order):**
@@ -489,15 +554,20 @@ python3 scripts/generate_geojson.py
 - **Draw tools** — polygon/point/freehand, undo/redo, snap-to-boundary, region-build, image overlay, vertex re-edit
 - **User layers** — persist to localStorage; export/import GeoJSON
 - **Timeline** — multi-entity SVG timeline: persons, events, places, territories, admin boundaries across 6 historical eras with era zoom and reference strip
-- **Admin (password-protected)** — entity browser, full record editing, relationship management, annotations, entity creation, suggested connections
+- **Admin (password-protected, env var)** — entity browser, full record editing, relationship management, annotations, entity creation with duplicate detection, suggested connections
+- **Full-text search** — `entity_search` RPC with ts_rank scoring over name + annotations; fallback to ilike; 300ms debounce
 - **Knowledge graph** — 112 persons seeded with RULED relationships; *The Long Shadow* events and places
-- **Stories (narrative platform)** — named story containers with theme + time bounds; entity curation with roles; CSV bulk import; CSV/GeoJSON export; data request queue
-- **Agentic data sourcing** — `source_data.py` polls the request queue, uses Claude + web search (or Ollama as a free local fallback), stages results; admin reviews rows one-by-one before anything commits
-- **Data Explorer** — self-service query builder in Admin; field picker with completeness bars; geometry extracted as lon/lat; CSV export (up to 5k rows); grouped count summaries; three Supabase RPCs
+- **Stories (narrative platform)** — named story containers with theme + time bounds; entity curation with roles; story timeline bar chart; CSV bulk import with type normalization; CSV/GeoJSON export; data request queue; public share link
+- **Story timeline view** — proportional bar chart of story entities on shared year axis inside Admin
+- **Agentic data sourcing** — `source_data.py` polls the request queue, uses Claude + web search (or Ollama free local fallback), stages results; inline edit before approving; admin reviews rows one-by-one before anything commits; `--retry-failed` and `--watch` modes
+- **Data Explorer** — self-service query builder in Admin; field picker with completeness bars; geometry extracted as lon/lat; CSV export (up to 5k rows) with amber cap warning; grouped count summaries; relationships export; powered by 4 Supabase RPCs
+- **entity_sources provenance** — audit trail written automatically on entity creation (manual, CSV import, staging approval)
+- **Code splitting** — all 5 page components lazy-loaded via `React.lazy()`; each route wrapped in `ErrorBoundary` with "Try again"
+- **Public story viewer** — `/#/stories/:id` — read-only, no login required; shareable URL
+- **In-app Guide** — `/#/guide` — comprehensive how-to covering Map, Timeline, Admin, Stories, Data Requests, Data Explorer, Public Story Viewer
 
 ### Not Yet Implemented
 
-- Public story viewer (`/#/stories/:id`) — read-only map/chart view for a curated story
 - Admin point placement on map (drop new point from admin interface)
 - Wikipedia / external content in the detail sidebar
 - Polity, culture, time_period entity types (schema supports them; no data)
@@ -507,22 +577,47 @@ python3 scripts/generate_geojson.py
 
 ---
 
-## Resuming with Claude Code
+## Claude Handoff — Resuming in a Fresh Session
 
-Paste this file at the start of a new session. Key reminders:
+Paste this README into a new session. Key reminders below.
 
-- **Working dir:** `~/mesoamerica-fresh`; for git, always use `git -C /Users/darrell.penta/mesoamerica-fresh <command>`
+### Environment
+
+- **Working dir:** `~/mesoamerica-fresh`
+- **Git commands:** always use `git -C /Users/darrell.penta/mesoamerica-fresh <command>` — the shell CWD is the home folder, not the repo
 - **Supabase:** `https://vqovdkjdawqdpzxomsiw.supabase.co` — anon key in `.env` and `.env.production`; direct DB URL in `.env` only
-- **GeoJSON files** in `public/data/` are CI build artifacts for entity data — edit data in Supabase. The exception: color/family/biome/site properties added by `add_feature_colors.py` are committed and stable.
-- **Auto-color:** Never use `['get', 'color']` as a fill-color expression — use a `['match', ...]` expression via `buildColorExpr()` in `MapView.jsx`
-- **`colorBy` must reference an existing GeoJSON property** (or a script-added one that's committed) — browser caching will silently break match expressions that depend on freshly-added properties that haven't propagated
+- **Admin password:** set via `VITE_ADMIN_PASSWORD` env var (`.env` locally, GitHub Secret in CI); stored in localStorage key `admin-authed-v1='yes'`
+
+### Architecture reminders
+
 - **`HashRouter`** — all routes are `/#/path`; never use `BrowserRouter`
+- **`base: './'`** in `vite.config.js` — required for GitHub Pages subdirectory hosting; do not change
+- **GeoJSON files** in `public/data/` are CI build artifacts for entity data — edit data in Supabase. Exception: color/family/biome/site properties added by `add_feature_colors.py` are committed and stable
+- **Auto-color:** never use `['get', 'color']` as a fill-color expression — use a `['match', ...]` expression via `buildColorExpr()` in `MapView.jsx`
+- **`colorBy` must reference an existing GeoJSON property** (or a script-added one that's committed) — browser caching silently breaks match expressions that depend on freshly-added properties
 - **`callbacksRef`** — any new prop used inside a Mapbox event handler must be added to `callbacksRef.current` in `MapView.jsx`
-- **Admin password:** `mesoamerica2026` (in `src/main.jsx` as `ADMIN_PW`)
-- **PostgREST FK joins** go from child → parent only (e.g., `from('persons').select('*, entity:entity_id(name)')`, not from `entities`)
-- **`base: './'`** in `vite.config.js` — required for GitHub Pages; do not change
-- **Stories mode** — toggled via the "Stories" button at the bottom of the Admin sidebar; `storiesMode` + `selectedStory` state in `AdminPage`; story operations use `stories`, `story_entities`, `staged_imports`, `data_requests` tables
-- **Agentic sourcing flow:** user submits prompt in DataRequestPanel → run `python3 scripts/source_data.py` → status becomes `review` → admin clicks "Review staged data" → StagingReviewPanel appears → approve/reject rows → "Mark request done"
-- **`staged_imports` confidence values:** `high`, `medium`, `low`, `model_knowledge` — displayed as colored badges in the review panel
-- **Ollama fallback:** `source_data.py` auto-detects Ollama at `http://localhost:11434`; prefers llama3 family. Override with `OLLAMA_BASE_URL` in `.env`.
-- **Data Explorer mode** — toggled via "Data Explorer" button in entity sidebar; `explorerMode` state in `AdminPage`; powered by three RPCs: `export_entity_type` (geometry-aware export), `entity_type_counts` (totals), `entity_field_counts` (group-by). RPC results return `[{ row_data: {...} }]` — unwrap with `data.map(r => r.row_data)`. `FIELD_DEFS` and `EXPLORER_DEFAULTS` constants define available fields and default selections per type.
+- **PostgREST FK joins** go from child → parent only (e.g., `from('persons').select('*, entity:entity_id(name)')`)
+- **RPC results** return `[{ row_data: {...} }]` — unwrap with `data.map(r => r.row_data ?? r)`
+- **Code splitting** — all 5 pages are lazy-loaded; each route has an `ErrorBoundary` wrapper in `src/main.jsx`
+
+### Admin / Stories flow
+
+- **Stories mode** — toggled via "Stories" button at the bottom of Admin sidebar; `storiesMode` + `selectedStory` state in `AdminPage`; uses `stories`, `story_entities`, `staged_imports`, `data_requests`, `entity_sources` tables
+- **Agentic sourcing flow:** submit prompt in DataRequestPanel → run `python3 scripts/source_data.py` → status becomes `review` → click "Review staged data" → edit/approve/reject rows → "Mark request done"
+- **`staged_imports` confidence values:** `high`, `medium`, `low`, `model_knowledge` — displayed as colored badges
+- **Ollama fallback:** `source_data.py` auto-detects Ollama at `http://localhost:11434`; prefers llama3 family; override with `OLLAMA_BASE_URL` in `.env`
+- **Data Explorer routing:** `entityType === 'relationships'` routes to `export_relationships` RPC instead of `export_entity_type`
+
+### Supabase null silent failure
+
+If `VITE_*` secrets are missing from the build, the Supabase client initializes to `null`. All DB-dependent components check `if (!supabase)` and return empty/loading state — no console error. Diagnose by curling a JS bundle and grepping for the Supabase project ID (`vqovdkjdawqdpzxomsiw`). Fix: add secrets to GitHub, then trigger a **new workflow run** (not re-run jobs) so they're baked into the build.
+
+### GitHub Secrets checklist
+
+| Secret | Required for |
+|--------|-------------|
+| `VITE_MAPBOX_TOKEN` | Map rendering |
+| `VITE_SUPABASE_URL` | All database-backed features |
+| `VITE_SUPABASE_ANON_KEY` | All database-backed features |
+| `VITE_ADMIN_PASSWORD` | Admin login |
+| `SUPABASE_DB_URL` | GeoJSON regeneration in CI |
