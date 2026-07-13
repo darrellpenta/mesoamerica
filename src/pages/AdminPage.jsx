@@ -2603,7 +2603,9 @@ function FlowMapEditor({ storyId }) {
   const [pops, setPops]             = useState([])
   const [edges, setEdges]           = useState([])
   const [loading, setLoading]       = useState(true)
+  const [loadError, setLoadError]   = useState(null)
   const [seeding, setSeeding]       = useState(false)
+  const [seedMsg, setSeedMsg]       = useState(null)
   const [newNode, setNewNode]       = useState({ name: '', lon: '', lat: '' })
   const [localYearCols, setLocalYearCols] = useState([])
   const [addYearInput, setAddYearInput]   = useState('')
@@ -2618,17 +2620,22 @@ function FlowMapEditor({ storyId }) {
     let active = true
     const load = async () => {
       setLoading(true)
+      setLoadError(null)
       const [nr, pr, er] = await Promise.all([
         supabase.from('story_flow_nodes').select('*').eq('story_id', storyId).order('sort_order'),
         supabase.from('story_flow_pops').select('*').eq('story_id', storyId),
         supabase.from('story_flow_edges').select('*').eq('story_id', storyId),
       ])
-      if (active) {
-        setNodes(nr.data ?? [])
-        setPops(pr.data ?? [])
-        setEdges(er.data ?? [])
+      if (!active) return
+      if (nr.error) {
+        setLoadError(`Could not load flow nodes: ${nr.error.message}. Have you run scripts/create_flow_map_schema.py?`)
         setLoading(false)
+        return
       }
+      setNodes(nr.data ?? [])
+      setPops(pr.data ?? [])
+      setEdges(er.data ?? [])
+      setLoading(false)
     }
     load()
     return () => { active = false }
@@ -2636,20 +2643,30 @@ function FlowMapEditor({ storyId }) {
 
   const seedFromPlaces = async () => {
     setSeeding(true)
+    setSeedMsg(null)
     try {
-      const { data: raw } = await supabase.rpc('export_entity_type', {
+      const { data: raw, error: rpcErr } = await supabase.rpc('export_entity_type', {
         p_type: 'place', p_story_id: storyId, p_limit: 200,
       })
+      if (rpcErr) { setSeedMsg({ ok: false, text: `RPC error: ${rpcErr.message}` }); return }
+
       const rows = (raw ?? []).map(r => r.row_data ?? r).filter(r => r.lon != null && r.lat != null)
+      if (!rows.length) { setSeedMsg({ ok: false, text: 'No story places with coordinates found. Add places with lat/lon to this story first.' }); return }
+
       const existingIds = new Set(nodes.map(n => n.entity_id).filter(Boolean))
       const toAdd = rows.filter(r => !existingIds.has(r.entity_id))
-      if (!toAdd.length) { alert('All story places are already added as nodes.'); return }
+      if (!toAdd.length) { setSeedMsg({ ok: true, text: `All ${rows.length} story place${rows.length !== 1 ? 's' : ''} are already nodes.` }); return }
+
       const inserts = toAdd.map((r, i) => ({
         story_id: storyId, name: r.name, lon: r.lon, lat: r.lat,
         entity_id: r.entity_id ?? null, sort_order: nodes.length + i,
       }))
-      const { data } = await supabase.from('story_flow_nodes').insert(inserts).select()
-      if (data) setNodes(prev => [...prev, ...data])
+      const { data, error: insertErr } = await supabase.from('story_flow_nodes').insert(inserts).select()
+      if (insertErr) { setSeedMsg({ ok: false, text: `Insert failed: ${insertErr.message}` }); return }
+      if (data) {
+        setNodes(prev => [...prev, ...data])
+        setSeedMsg({ ok: true, text: `Added ${data.length} node${data.length !== 1 ? 's' : ''}.` })
+      }
     } finally {
       setSeeding(false)
     }
@@ -2757,7 +2774,8 @@ function FlowMapEditor({ storyId }) {
 
   const selectStyle = { fontSize: 12, border: '1px solid #e0e4f0', borderRadius: 4, padding: '4px 6px', outline: 'none' }
 
-  if (loading) return <div style={{ padding: 12, color: '#7a82a8', fontSize: 13 }}>Loading flow data…</div>
+  if (loading)   return <div style={{ padding: 12, color: '#7a82a8', fontSize: 13 }}>Loading flow data…</div>
+  if (loadError) return <div style={{ padding: 12, fontSize: 12, color: '#dc2626', background: '#fff8f8', border: '1px solid #fca5a5', borderRadius: 6 }}>{loadError}</div>
 
   return (
     <div>
@@ -2776,7 +2794,7 @@ function FlowMapEditor({ storyId }) {
       {/* ── Nodes ── */}
       {subTab === 'nodes' && (
         <div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
             <button className="admin-section-edit-btn" onClick={seedFromPlaces} disabled={seeding}>
               {seeding ? 'Seeding…' : '⬇ Seed from story places'}
             </button>
@@ -2784,6 +2802,11 @@ function FlowMapEditor({ storyId }) {
               Imports story places with coordinates as nodes. Skips duplicates.
             </span>
           </div>
+          {seedMsg && (
+            <div style={{ fontSize: 12, marginBottom: 10, padding: '6px 10px', borderRadius: 5, background: seedMsg.ok ? '#f0fdf4' : '#fff8f8', color: seedMsg.ok ? '#166534' : '#dc2626', border: `1px solid ${seedMsg.ok ? '#86efac' : '#fca5a5'}` }}>
+              {seedMsg.text}
+            </div>
+          )}
           {nodes.length > 0 && (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 14 }}>
               <thead>
