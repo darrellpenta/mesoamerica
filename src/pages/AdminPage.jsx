@@ -2613,6 +2613,12 @@ function FlowMapEditor({ storyId }) {
     from_node_id: '', to_node_id: '', volume: '',
     valid_from: '', valid_to: '', flow_type: 'displacement', label: '',
   })
+  // CSV import for nodes
+  const [csvParsed, setCsvParsed]   = useState(null)   // { headers, rows }
+  const [csvMap, setCsvMap]         = useState({ name: '', lon: '', lat: '' })
+  const [csvImporting, setCsvImporting] = useState(false)
+  const [csvMsg, setCsvMsg]         = useState(null)
+  const csvInputRef                 = useRef(null)
 
   const yearCols = [...new Set([...pops.map(p => p.year), ...localYearCols])].sort((a, b) => a - b)
 
@@ -2670,6 +2676,54 @@ function FlowMapEditor({ storyId }) {
     } finally {
       setSeeding(false)
     }
+  }
+
+  const onNodesCsvPick = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    setCsvMsg(null)
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const { headers, rows } = parseCSV(ev.target.result)
+      if (!headers.length) { setCsvMsg({ ok: false, text: 'Could not parse CSV.' }); return }
+      const auto = { name: '', lon: '', lat: '' }
+      headers.forEach(h => {
+        const lc = h.toLowerCase().trim()
+        if (/^(name|title|location|place|node)$/.test(lc))    auto.name = auto.name || h
+        else if (/^(lon|lng|longitude|x|long)$/.test(lc))     auto.lon  = auto.lon  || h
+        else if (/^(lat|latitude|y)$/.test(lc))               auto.lat  = auto.lat  || h
+      })
+      setCsvParsed({ headers, rows })
+      setCsvMap(auto)
+    }
+    reader.readAsText(file)
+  }
+
+  const importNodesCsv = async () => {
+    if (!csvParsed || !csvMap.name || !csvMap.lon || !csvMap.lat) return
+    setCsvImporting(true)
+    setCsvMsg(null)
+    const inserts = csvParsed.rows
+      .map((row, i) => {
+        const name = row[csvMap.name]?.trim()
+        const lon  = parseFloat(row[csvMap.lon])
+        const lat  = parseFloat(row[csvMap.lat])
+        if (!name || isNaN(lon) || isNaN(lat)) return null
+        return { story_id: storyId, name, lon, lat, sort_order: nodes.length + i }
+      })
+      .filter(Boolean)
+    if (!inserts.length) {
+      setCsvMsg({ ok: false, text: 'No valid rows found — check that name, lon, lat columns have data.' })
+      setCsvImporting(false)
+      return
+    }
+    const { data, error } = await supabase.from('story_flow_nodes').insert(inserts).select()
+    if (error) { setCsvMsg({ ok: false, text: `Import failed: ${error.message}` }); setCsvImporting(false); return }
+    setNodes(prev => [...prev, ...(data ?? [])])
+    setCsvMsg({ ok: true, text: `Imported ${(data ?? []).length} node${(data ?? []).length !== 1 ? 's' : ''}.` })
+    setCsvParsed(null)
+    setCsvImporting(false)
   }
 
   const addNode = async () => {
@@ -2794,19 +2848,68 @@ function FlowMapEditor({ storyId }) {
       {/* ── Nodes ── */}
       {subTab === 'nodes' && (
         <div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
-            <button className="admin-section-edit-btn" onClick={seedFromPlaces} disabled={seeding}>
-              {seeding ? 'Seeding…' : '⬇ Seed from story places'}
-            </button>
-            <span style={{ fontSize: 11, color: '#7a82a8' }}>
-              Imports story places with coordinates as nodes. Skips duplicates.
-            </span>
-          </div>
-          {seedMsg && (
-            <div style={{ fontSize: 12, marginBottom: 10, padding: '6px 10px', borderRadius: 5, background: seedMsg.ok ? '#f0fdf4' : '#fff8f8', color: seedMsg.ok ? '#166534' : '#dc2626', border: `1px solid ${seedMsg.ok ? '#86efac' : '#fca5a5'}` }}>
-              {seedMsg.text}
+          {/* CSV import */}
+          <div style={{ marginBottom: 14, padding: '10px 12px', background: '#f8f9fd', borderRadius: 6, border: '1px solid #e0e4f0' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Import nodes from CSV
             </div>
-          )}
+            <input ref={csvInputRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={onNodesCsvPick} />
+            {!csvParsed ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button className="admin-section-edit-btn" onClick={() => csvInputRef.current?.click()}>
+                  Choose CSV file
+                </button>
+                <span style={{ fontSize: 11, color: '#7a82a8' }}>
+                  CSV must have columns for name, longitude, and latitude.
+                </span>
+              </div>
+            ) : (
+              <div>
+                <div style={{ fontSize: 12, marginBottom: 8, color: '#374151' }}>
+                  {csvParsed.rows.length} row{csvParsed.rows.length !== 1 ? 's' : ''} found. Map columns:
+                </div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+                  {['name', 'lon', 'lat'].map(field => (
+                    <div key={field}>
+                      <div style={{ fontSize: 10, color: '#7a82a8', marginBottom: 2, textTransform: 'capitalize' }}>
+                        {field === 'lon' ? 'Longitude' : field === 'lat' ? 'Latitude' : 'Name'}
+                      </div>
+                      <select
+                        value={csvMap[field]}
+                        onChange={e => setCsvMap(m => ({ ...m, [field]: e.target.value }))}
+                        style={{ fontSize: 12, border: '1px solid #e0e4f0', borderRadius: 4, padding: '4px 6px', outline: 'none' }}
+                      >
+                        <option value="">— select column —</option>
+                        {csvParsed.headers.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    className="admin-section-edit-btn"
+                    onClick={importNodesCsv}
+                    disabled={csvImporting || !csvMap.name || !csvMap.lon || !csvMap.lat}
+                    style={{ fontWeight: 600 }}
+                  >
+                    {csvImporting ? 'Importing…' : `Import ${csvParsed.rows.length} rows`}
+                  </button>
+                  <button
+                    className="admin-section-edit-btn"
+                    onClick={() => { setCsvParsed(null); setCsvMsg(null) }}
+                    style={{ color: '#7a82a8' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+            {csvMsg && (
+              <div style={{ fontSize: 12, marginTop: 8, padding: '6px 10px', borderRadius: 5, background: csvMsg.ok ? '#f0fdf4' : '#fff8f8', color: csvMsg.ok ? '#166534' : '#dc2626', border: `1px solid ${csvMsg.ok ? '#86efac' : '#fca5a5'}` }}>
+                {csvMsg.text}
+              </div>
+            )}
+          </div>
           {nodes.length > 0 && (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 14 }}>
               <thead>
