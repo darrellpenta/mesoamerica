@@ -2830,60 +2830,69 @@ function FlowMapEditor({ storyId }) {
           {nodes.length === 0
             ? <p style={{ fontSize: 13, color: '#7a82a8' }}>Add nodes first.</p>
             : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ borderCollapse: 'collapse', fontSize: 12 }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #e0e4f0' }}>
-                      <th style={{ padding: '6px 10px', textAlign: 'left', fontWeight: 600, color: '#7a82a8', fontSize: 11, minWidth: 140, position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
-                        Location
-                      </th>
-                      {yearCols.map(y => (
-                        <th key={y} style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 600, color: '#7a82a8', fontSize: 11, minWidth: 96 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
-                            {y}
-                            <button onClick={() => removeYear(y)} title="Remove year" style={{ fontSize: 9, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>✕</button>
-                          </div>
-                        </th>
-                      ))}
-                      <th style={{ padding: '6px 8px', minWidth: 110 }}>
-                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                          <input
-                            type="number"
-                            value={addYearInput}
-                            onChange={e => setAddYearInput(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && addYear()}
-                            placeholder="year"
-                            style={{ width: 52, fontSize: 11, border: '1px solid #e0e4f0', borderRadius: 4, padding: '3px 5px', outline: 'none' }}
-                          />
-                          <button onClick={addYear} className="admin-section-edit-btn" style={{ padding: '2px 8px', fontSize: 11 }}>+</button>
-                        </div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {nodes.map(n => (
-                      <tr key={n.id} style={{ borderBottom: '1px solid #f0f2f8' }}>
-                        <td style={{ padding: '5px 10px', fontWeight: 500, position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
-                          {n.name}
-                        </td>
-                        {yearCols.map(y => {
-                          const pop = pops.find(p => p.node_id === n.id && p.year === y)
-                          return (
-                            <td key={y} style={{ padding: '3px 8px', textAlign: 'right' }}>
-                              <PopCell initial={pop?.count ?? ''} onCommit={v => updatePop(n.id, y, v)} />
+              <>
+                {/* Add year toolbar — always visible above the grid */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, padding: '8px 10px', background: '#f8f9fd', borderRadius: 6, border: '1px solid #e0e4f0' }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Add year column:</span>
+                  <input
+                    type="number"
+                    value={addYearInput}
+                    onChange={e => setAddYearInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && addYear()}
+                    placeholder="e.g. 1980"
+                    style={{ width: 90, fontSize: 12, border: '1px solid #e0e4f0', borderRadius: 4, padding: '4px 8px', outline: 'none' }}
+                  />
+                  <button onClick={addYear} className="admin-section-edit-btn" disabled={!addYearInput}>
+                    Add
+                  </button>
+                  {yearCols.length === 0 && (
+                    <span style={{ fontSize: 11, color: '#7a82a8' }}>Enter a year and click Add to start entering population data.</span>
+                  )}
+                </div>
+
+                {yearCols.length > 0 && (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ borderCollapse: 'collapse', fontSize: 12 }}>
+                      <thead>
+                        <tr style={{ borderBottom: '2px solid #e0e4f0' }}>
+                          <th style={{ padding: '6px 10px', textAlign: 'left', fontWeight: 600, color: '#7a82a8', fontSize: 11, minWidth: 140, position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
+                            Location
+                          </th>
+                          {yearCols.map(y => (
+                            <th key={y} style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 600, color: '#7a82a8', fontSize: 11, minWidth: 96 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                                {y}
+                                <button onClick={() => removeYear(y)} title="Remove year" style={{ fontSize: 9, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>✕</button>
+                              </div>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {nodes.map(n => (
+                          <tr key={n.id} style={{ borderBottom: '1px solid #f0f2f8' }}>
+                            <td style={{ padding: '5px 10px', fontWeight: 500, position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
+                              {n.name}
                             </td>
-                          )
-                        })}
-                        <td />
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                            {yearCols.map(y => {
+                              const pop = pops.find(p => p.node_id === n.id && p.year === y)
+                              return (
+                                <td key={y} style={{ padding: '3px 8px', textAlign: 'right' }}>
+                                  <PopCell initial={pop?.count ?? ''} onCommit={v => updatePop(n.id, y, v)} />
+                                </td>
+                              )
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
             )
           }
           <p style={{ fontSize: 11, color: '#7a82a8', marginTop: 8 }}>
-            Enter counts per location per year. Cells auto-save on Tab / Enter / click-away.
+            Enter population or displacement counts per location per year. Cells auto-save on Tab / Enter / click-away.
             A year column persists only after at least one cell has data.
           </p>
         </div>
