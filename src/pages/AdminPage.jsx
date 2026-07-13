@@ -2243,8 +2243,10 @@ function CSVImporter({ storyId, onDone, onCancel }) {
         const lc = h.toLowerCase()
         if (/^name$/i.test(lc) || lc === 'title')            auto[h] = 'name'
         else if (/type/i.test(lc))                            auto[h] = 'entity_type'
+        else if (/birth|born/i.test(lc))                              auto[h] = 'date_start'
+        else if (/death|died/i.test(lc))                              auto[h] = 'date_end'
         else if (/start|begin|from|year_start|date_start/i.test(lc)) auto[h] = 'date_start'
-        else if (/end|to|year_end|date_end/i.test(lc))        auto[h] = 'date_end'
+        else if (/end|to|year_end|date_end/i.test(lc))               auto[h] = 'date_end'
         else if (/desc|note|summary/i.test(lc))               auto[h] = 'description'
         else                                                   auto[h] = '_skip'
       })
@@ -2294,12 +2296,14 @@ function CSVImporter({ storyId, onDone, onCancel }) {
       // Provenance
       await supabase.from('entity_sources').insert({ entity_id: ent.id, source_type: 'csv_import', confidence: 'medium' })
 
-      // Extension record (dates)
+      // Extension record (dates) — field names differ by entity type
       const extTable = EXT_TABLES[ent.entity_type]
       if (extTable && (ds_col || de_col)) {
         const extRow = { entity_id: ent.id }
-        if (ds_col && row[ds_col]) { const n = parseInt(row[ds_col], 10); if (!isNaN(n)) extRow.date_start = n }
-        if (de_col && row[de_col]) { const n = parseInt(row[de_col], 10); if (!isNaN(n)) extRow.date_end   = n }
+        const dsKey = ent.entity_type === 'event' ? 'date_year_start' : ent.entity_type === 'person' ? 'birth_year'  : 'date_start'
+        const deKey = ent.entity_type === 'event' ? 'date_year_end'   : ent.entity_type === 'person' ? 'death_year'  : 'date_end'
+        if (ds_col && row[ds_col]) { const n = parseInt(row[ds_col], 10); if (!isNaN(n)) extRow[dsKey] = n }
+        if (de_col && row[de_col]) { const n = parseInt(row[de_col], 10); if (!isNaN(n)) extRow[deKey] = n }
         await supabase.from(extTable).insert(extRow)
       }
 
@@ -2559,12 +2563,414 @@ function StoryTimeline({ storyId, timeStart, timeEnd }) {
   )
 }
 
+// ── Flow map editor ───────────────────────────────────────────────────────────
+const FLOW_TYPES = ['displacement', 'refugee', 'economic', 'deportation', 'repatriation', 'caravan', 'other']
+
+function PopCell({ initial, onCommit }) {
+  const [val, setVal]   = useState(String(initial ?? ''))
+  const prevRef         = useRef(String(initial ?? ''))
+  useEffect(() => {
+    const s = String(initial ?? '')
+    setVal(s)
+    prevRef.current = s
+  }, [initial])
+  return (
+    <input
+      type="number"
+      value={val}
+      onChange={e => setVal(e.target.value)}
+      onBlur={e => {
+        if (e.target.value !== prevRef.current) {
+          prevRef.current = e.target.value
+          onCommit(e.target.value)
+        }
+      }}
+      onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
+      placeholder="—"
+      style={{
+        width: 78, textAlign: 'right', fontSize: 12,
+        border: '1px solid #e0e4f0', borderRadius: 4, padding: '3px 6px',
+        background: val ? '#eff6ff' : '#fff',
+        fontVariantNumeric: 'tabular-nums', outline: 'none', lineHeight: 1,
+      }}
+    />
+  )
+}
+
+function FlowMapEditor({ storyId }) {
+  const [subTab, setSubTab]         = useState('nodes')
+  const [nodes, setNodes]           = useState([])
+  const [pops, setPops]             = useState([])
+  const [edges, setEdges]           = useState([])
+  const [loading, setLoading]       = useState(true)
+  const [seeding, setSeeding]       = useState(false)
+  const [newNode, setNewNode]       = useState({ name: '', lon: '', lat: '' })
+  const [localYearCols, setLocalYearCols] = useState([])
+  const [addYearInput, setAddYearInput]   = useState('')
+  const [newEdge, setNewEdge]       = useState({
+    from_node_id: '', to_node_id: '', volume: '',
+    valid_from: '', valid_to: '', flow_type: 'displacement', label: '',
+  })
+
+  const yearCols = [...new Set([...pops.map(p => p.year), ...localYearCols])].sort((a, b) => a - b)
+
+  useEffect(() => {
+    let active = true
+    const load = async () => {
+      setLoading(true)
+      const [nr, pr, er] = await Promise.all([
+        supabase.from('story_flow_nodes').select('*').eq('story_id', storyId).order('sort_order'),
+        supabase.from('story_flow_pops').select('*').eq('story_id', storyId),
+        supabase.from('story_flow_edges').select('*').eq('story_id', storyId),
+      ])
+      if (active) {
+        setNodes(nr.data ?? [])
+        setPops(pr.data ?? [])
+        setEdges(er.data ?? [])
+        setLoading(false)
+      }
+    }
+    load()
+    return () => { active = false }
+  }, [storyId])
+
+  const seedFromPlaces = async () => {
+    setSeeding(true)
+    try {
+      const { data: raw } = await supabase.rpc('export_entity_type', {
+        p_type: 'place', p_story_id: storyId, p_limit: 200,
+      })
+      const rows = (raw ?? []).map(r => r.row_data ?? r).filter(r => r.lon != null && r.lat != null)
+      const existingIds = new Set(nodes.map(n => n.entity_id).filter(Boolean))
+      const toAdd = rows.filter(r => !existingIds.has(r.entity_id))
+      if (!toAdd.length) { alert('All story places are already added as nodes.'); return }
+      const inserts = toAdd.map((r, i) => ({
+        story_id: storyId, name: r.name, lon: r.lon, lat: r.lat,
+        entity_id: r.entity_id ?? null, sort_order: nodes.length + i,
+      }))
+      const { data } = await supabase.from('story_flow_nodes').insert(inserts).select()
+      if (data) setNodes(prev => [...prev, ...data])
+    } finally {
+      setSeeding(false)
+    }
+  }
+
+  const addNode = async () => {
+    const lon = parseFloat(newNode.lon), lat = parseFloat(newNode.lat)
+    if (!newNode.name || isNaN(lon) || isNaN(lat)) return
+    const { data } = await supabase.from('story_flow_nodes')
+      .insert({ story_id: storyId, name: newNode.name, lon, lat, sort_order: nodes.length })
+      .select().single()
+    if (data) { setNodes(prev => [...prev, data]); setNewNode({ name: '', lon: '', lat: '' }) }
+  }
+
+  const deleteNode = async (id) => {
+    if (!window.confirm('Delete this node and all its population data?')) return
+    await supabase.from('story_flow_nodes').delete().eq('id', id)
+    setNodes(prev => prev.filter(n => n.id !== id))
+    setPops(prev => prev.filter(p => p.node_id !== id))
+    setEdges(prev => prev.filter(e => e.from_node_id !== id && e.to_node_id !== id))
+  }
+
+  const updatePop = async (nodeId, year, rawValue) => {
+    const count = rawValue === '' ? null : parseInt(rawValue, 10)
+    if (rawValue !== '' && isNaN(count)) return
+    const existing = pops.find(p => p.node_id === nodeId && p.year === year)
+    if (existing) {
+      if (count === existing.count) return
+      if (count === null) {
+        await supabase.from('story_flow_pops').delete().eq('id', existing.id)
+        setPops(prev => prev.filter(p => p.id !== existing.id))
+      } else {
+        await supabase.from('story_flow_pops').update({ count }).eq('id', existing.id)
+        setPops(prev => prev.map(p => p.id === existing.id ? { ...p, count } : p))
+      }
+    } else if (count !== null) {
+      const { data } = await supabase.from('story_flow_pops')
+        .insert({ story_id: storyId, node_id: nodeId, year, count })
+        .select().single()
+      if (data) setPops(prev => [...prev, data])
+    }
+  }
+
+  const addYear = () => {
+    const y = parseInt(addYearInput, 10)
+    if (!isNaN(y) && !yearCols.includes(y)) {
+      setLocalYearCols(prev => [...new Set([...prev, y])].sort((a, b) => a - b))
+    }
+    setAddYearInput('')
+  }
+
+  const removeYear = async (y) => {
+    if (!window.confirm(`Remove year ${y} column and all its data?`)) return
+    const toDelete = pops.filter(p => p.year === y)
+    if (toDelete.length) {
+      await supabase.from('story_flow_pops').delete().in('id', toDelete.map(p => p.id))
+    }
+    setPops(prev => prev.filter(p => p.year !== y))
+    setLocalYearCols(prev => prev.filter(yy => yy !== y))
+  }
+
+  const addEdge = async () => {
+    if (!newEdge.from_node_id || !newEdge.to_node_id) return
+    const insert = {
+      story_id: storyId,
+      from_node_id: newEdge.from_node_id,
+      to_node_id:   newEdge.to_node_id,
+      volume:     newEdge.volume     ? parseInt(newEdge.volume, 10)     : null,
+      valid_from: newEdge.valid_from ? parseInt(newEdge.valid_from, 10) : null,
+      valid_to:   newEdge.valid_to   ? parseInt(newEdge.valid_to, 10)   : null,
+      flow_type: newEdge.flow_type || 'displacement',
+      label:     newEdge.label || null,
+    }
+    const { data } = await supabase.from('story_flow_edges').insert(insert).select().single()
+    if (data) {
+      setEdges(prev => [...prev, data])
+      setNewEdge({ from_node_id: '', to_node_id: '', volume: '', valid_from: '', valid_to: '', flow_type: 'displacement', label: '' })
+    }
+  }
+
+  const deleteEdge = async (id) => {
+    await supabase.from('story_flow_edges').delete().eq('id', id)
+    setEdges(prev => prev.filter(e => e.id !== id))
+  }
+
+  const pill = (t) => ({
+    padding: '4px 12px', borderRadius: 16, border: 'none', cursor: 'pointer',
+    fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
+    background: subTab === t ? '#2563eb' : 'transparent',
+    color:      subTab === t ? '#fff'    : '#7a82a8',
+    outline:    subTab === t ? 'none'    : '1px solid #e0e4f0',
+  })
+
+  const field = (label, content) => (
+    <div key={label}>
+      <div style={{ fontSize: 10, color: '#7a82a8', marginBottom: 2 }}>{label}</div>
+      {content}
+    </div>
+  )
+
+  const inputStyle = (width) => ({
+    fontSize: 12, border: '1px solid #e0e4f0', borderRadius: 4,
+    padding: '4px 8px', width: width ?? 'auto', outline: 'none',
+  })
+
+  const selectStyle = { fontSize: 12, border: '1px solid #e0e4f0', borderRadius: 4, padding: '4px 6px', outline: 'none' }
+
+  if (loading) return <div style={{ padding: 12, color: '#7a82a8', fontSize: 13 }}>Loading flow data…</div>
+
+  return (
+    <div>
+      {/* Sub-tab bar */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+        {['nodes', 'populations', 'flows'].map(t => (
+          <button key={t} style={pill(t)} onClick={() => setSubTab(t)}>
+            {t.charAt(0).toUpperCase() + t.slice(1)}
+          </button>
+        ))}
+        <span style={{ fontSize: 11, color: '#7a82a8', alignSelf: 'center', marginLeft: 6 }}>
+          {nodes.length} node{nodes.length !== 1 ? 's' : ''} · {yearCols.length} year col{yearCols.length !== 1 ? 's' : ''} · {edges.length} flow{edges.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      {/* ── Nodes ── */}
+      {subTab === 'nodes' && (
+        <div>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
+            <button className="admin-section-edit-btn" onClick={seedFromPlaces} disabled={seeding}>
+              {seeding ? 'Seeding…' : '⬇ Seed from story places'}
+            </button>
+            <span style={{ fontSize: 11, color: '#7a82a8' }}>
+              Imports story places with coordinates as nodes. Skips duplicates.
+            </span>
+          </div>
+          {nodes.length > 0 && (
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 14 }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #e0e4f0' }}>
+                  {['Name', 'Lon', 'Lat', ''].map(h => (
+                    <th key={h} style={{ padding: '4px 8px', textAlign: 'left', fontWeight: 600, color: '#7a82a8', fontSize: 11 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {nodes.map(n => (
+                  <tr key={n.id} style={{ borderBottom: '1px solid #f0f2f8' }}>
+                    <td style={{ padding: '5px 8px', fontWeight: 500 }}>{n.name}</td>
+                    <td style={{ padding: '5px 8px', fontVariantNumeric: 'tabular-nums' }}>{n.lon.toFixed(4)}</td>
+                    <td style={{ padding: '5px 8px', fontVariantNumeric: 'tabular-nums' }}>{n.lat.toFixed(4)}</td>
+                    <td style={{ padding: '5px 8px', textAlign: 'right' }}>
+                      <button
+                        onClick={() => deleteNode(n.id)}
+                        style={{ fontSize: 11, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                        title="Remove node"
+                      >✕</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            {field('Name',      <input value={newNode.name} onChange={e => setNewNode(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Guatemala City" style={{ ...inputStyle(160) }} />)}
+            {field('Longitude', <input type="number" value={newNode.lon}  onChange={e => setNewNode(f => ({ ...f, lon:  e.target.value }))} placeholder="-90.51" style={{ ...inputStyle(90) }} />)}
+            {field('Latitude',  <input type="number" value={newNode.lat}  onChange={e => setNewNode(f => ({ ...f, lat:  e.target.value }))} placeholder="14.63"  style={{ ...inputStyle(90) }} />)}
+            <button
+              className="admin-section-edit-btn"
+              onClick={addNode}
+              disabled={!newNode.name || !newNode.lon || !newNode.lat}
+            >Add node</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Populations ── */}
+      {subTab === 'populations' && (
+        <div>
+          {nodes.length === 0
+            ? <p style={{ fontSize: 13, color: '#7a82a8' }}>Add nodes first.</p>
+            : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ borderCollapse: 'collapse', fontSize: 12 }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #e0e4f0' }}>
+                      <th style={{ padding: '6px 10px', textAlign: 'left', fontWeight: 600, color: '#7a82a8', fontSize: 11, minWidth: 140, position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
+                        Location
+                      </th>
+                      {yearCols.map(y => (
+                        <th key={y} style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 600, color: '#7a82a8', fontSize: 11, minWidth: 96 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                            {y}
+                            <button onClick={() => removeYear(y)} title="Remove year" style={{ fontSize: 9, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>✕</button>
+                          </div>
+                        </th>
+                      ))}
+                      <th style={{ padding: '6px 8px', minWidth: 110 }}>
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <input
+                            type="number"
+                            value={addYearInput}
+                            onChange={e => setAddYearInput(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && addYear()}
+                            placeholder="year"
+                            style={{ width: 52, fontSize: 11, border: '1px solid #e0e4f0', borderRadius: 4, padding: '3px 5px', outline: 'none' }}
+                          />
+                          <button onClick={addYear} className="admin-section-edit-btn" style={{ padding: '2px 8px', fontSize: 11 }}>+</button>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {nodes.map(n => (
+                      <tr key={n.id} style={{ borderBottom: '1px solid #f0f2f8' }}>
+                        <td style={{ padding: '5px 10px', fontWeight: 500, position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
+                          {n.name}
+                        </td>
+                        {yearCols.map(y => {
+                          const pop = pops.find(p => p.node_id === n.id && p.year === y)
+                          return (
+                            <td key={y} style={{ padding: '3px 8px', textAlign: 'right' }}>
+                              <PopCell initial={pop?.count ?? ''} onCommit={v => updatePop(n.id, y, v)} />
+                            </td>
+                          )
+                        })}
+                        <td />
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          }
+          <p style={{ fontSize: 11, color: '#7a82a8', marginTop: 8 }}>
+            Enter counts per location per year. Cells auto-save on Tab / Enter / click-away.
+            A year column persists only after at least one cell has data.
+          </p>
+        </div>
+      )}
+
+      {/* ── Flows ── */}
+      {subTab === 'flows' && (
+        <div>
+          {edges.length > 0 && (
+            <div style={{ overflowX: 'auto', marginBottom: 16 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #e0e4f0' }}>
+                    {['From', 'To', 'Volume', 'From yr', 'To yr', 'Type', 'Label', ''].map(h => (
+                      <th key={h} style={{ padding: '4px 8px', textAlign: 'left', fontWeight: 600, color: '#7a82a8', fontSize: 11 }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {edges.map(e => (
+                    <tr key={e.id} style={{ borderBottom: '1px solid #f0f2f8' }}>
+                      <td style={{ padding: '5px 8px' }}>{nodes.find(n => n.id === e.from_node_id)?.name ?? '—'}</td>
+                      <td style={{ padding: '5px 8px' }}>{nodes.find(n => n.id === e.to_node_id)?.name ?? '—'}</td>
+                      <td style={{ padding: '5px 8px', fontVariantNumeric: 'tabular-nums' }}>{e.volume?.toLocaleString() ?? '—'}</td>
+                      <td style={{ padding: '5px 8px' }}>{e.valid_from ?? '—'}</td>
+                      <td style={{ padding: '5px 8px' }}>{e.valid_to ?? '—'}</td>
+                      <td style={{ padding: '5px 8px', textTransform: 'capitalize' }}>{e.flow_type ?? 'displacement'}</td>
+                      <td style={{ padding: '5px 8px', color: '#7a82a8' }}>{e.label ?? ''}</td>
+                      <td style={{ padding: '5px 8px', textAlign: 'right' }}>
+                        <button onClick={() => deleteEdge(e.id)} style={{ fontSize: 11, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>✕</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {nodes.length < 2
+            ? <p style={{ fontSize: 12, color: '#7a82a8' }}>Add at least two nodes to create flows.</p>
+            : (
+              <div style={{ background: '#f8f9fd', borderRadius: 8, padding: 12, border: '1px solid #e0e4f0' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#7a82a8', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Add flow</div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                  {field('From', (
+                    <select value={newEdge.from_node_id} onChange={e => setNewEdge(p => ({ ...p, from_node_id: e.target.value }))} style={{ ...selectStyle, minWidth: 130 }}>
+                      <option value="">— select —</option>
+                      {nodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
+                    </select>
+                  ))}
+                  {field('To', (
+                    <select value={newEdge.to_node_id} onChange={e => setNewEdge(p => ({ ...p, to_node_id: e.target.value }))} style={{ ...selectStyle, minWidth: 130 }}>
+                      <option value="">— select —</option>
+                      {nodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
+                    </select>
+                  ))}
+                  {field('Volume',    <input type="number" value={newEdge.volume}     onChange={e => setNewEdge(p => ({ ...p, volume:     e.target.value }))} placeholder="50000" style={{ ...inputStyle(86) }} />)}
+                  {field('From yr',  <input type="number" value={newEdge.valid_from} onChange={e => setNewEdge(p => ({ ...p, valid_from: e.target.value }))} placeholder="1980"  style={{ ...inputStyle(72) }} />)}
+                  {field('To yr',    <input type="number" value={newEdge.valid_to}   onChange={e => setNewEdge(p => ({ ...p, valid_to:   e.target.value }))} placeholder="2000"  style={{ ...inputStyle(72) }} />)}
+                  {field('Type', (
+                    <select value={newEdge.flow_type} onChange={e => setNewEdge(p => ({ ...p, flow_type: e.target.value }))} style={selectStyle}>
+                      {FLOW_TYPES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                    </select>
+                  ))}
+                  {field('Label (opt)', <input value={newEdge.label} onChange={e => setNewEdge(p => ({ ...p, label: e.target.value }))} placeholder="short label" style={{ ...inputStyle(120) }} />)}
+                  <button
+                    className="admin-section-edit-btn"
+                    onClick={addEdge}
+                    disabled={!newEdge.from_node_id || !newEdge.to_node_id}
+                    style={{ fontWeight: 600 }}
+                  >Add flow</button>
+                </div>
+              </div>
+            )
+          }
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Story detail ──────────────────────────────────────────────────────────────
 function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
   const [story, setStory]           = useState(initialStory)
   const [showImporter, setShowImporter] = useState(false)
   const [entityListKey, setEntityListKey] = useState(0)
   const [showTimeline, setShowTimeline] = useState(false)
+  const [showFlowEditor, setShowFlowEditor] = useState(false)
 
   const handleDelete = async () => {
     if (!supabase || !window.confirm(`Delete story "${story.title}"? This cannot be undone.`)) return
@@ -2625,6 +3031,22 @@ function StoryDetail({ story: initialStory, onUpdated, onDelete }) {
         {showTimeline && (
           <StoryTimeline storyId={story.id} timeStart={story.time_start} timeEnd={story.time_end} />
         )}
+      </div>
+
+      {/* Flow map */}
+      <div className="admin-record__section">
+        <div className="admin-section-header">
+          <span className="admin-section-title">Flow Map</span>
+          <button className="admin-section-edit-btn" onClick={() => setShowFlowEditor(v => !v)}>
+            {showFlowEditor ? 'Hide' : 'Edit'}
+          </button>
+        </div>
+        {showFlowEditor
+          ? <FlowMapEditor storyId={story.id} />
+          : <p className="admin-story-description" style={{ marginTop: 4 }}>
+              Define geographic nodes, population snapshots, and migration flows. Powers the Flow Map tab in the public story view.
+            </p>
+        }
       </div>
 
       <StoryExportPanel storyId={story.id} storyTitle={story.title} />

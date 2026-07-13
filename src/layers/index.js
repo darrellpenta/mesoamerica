@@ -601,6 +601,26 @@ export const LAYER_REGISTRY = [
 
   // ── Conflict & Security ──────────────────────────────────────────────────
   {
+    id: 'migration-flows',
+    group: 'Conflict & History',
+    label: 'Migration & Displacement Corridors',
+    color: '#7a82a8',
+    mapboxType: 'line',
+    dataUrl: './data/migration-flows.geojson',
+    visible: false,
+    description: 'Major migration and displacement corridors — Guatemala & El Salvador, 1954–present. Colored by era; dashed lines indicate deportation flows.',
+    sourceUrl: null,
+    colorBy: 'era',
+    colorLegend: [
+      { label: 'Cold War Origins (1950–1979)',       value: 1, color: '#6366f1' },
+      { label: 'Peak Civil War (1979–1992)',          value: 2, color: '#dc2626' },
+      { label: 'Post-War & Gang Seeding (1992–2000)', value: 3, color: '#d97706' },
+      { label: 'Gang Violence Era (2000–2014)',       value: 4, color: '#ea580c' },
+      { label: 'Caravan Era (2014–2021)',             value: 5, color: '#7c3aed' },
+      { label: 'Divergence (2022–present)',           value: 6, color: '#0891b2' },
+    ],
+  },
+  {
     id: 'modern-conflict-sites',
     group: 'Conflict & History',
         label: 'Modern Conflict Sites',

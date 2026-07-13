@@ -1,0 +1,290 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Guatemala → USA (Early Diaspora)",
+        "era": 1,
+        "valid_from": 1954,
+        "valid_to": 1979,
+        "flow_type": "displacement",
+        "origin": "Guatemala",
+        "destination": "Los Angeles, USA",
+        "color": "#6366f1",
+        "description": "Post-coup (1954) political exiles and 1976 earthquake victims (23,000 killed; 1.2M homeless) founded the first Guatemalan communities in Los Angeles, Houston, Chicago, and Washington DC — the diaspora networks that would absorb the larger civil-war wave."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-90.51, 14.63],
+          [-93.0, 16.0],
+          [-96.72, 17.07],
+          [-99.13, 19.43],
+          [-104.5, 21.5],
+          [-109.5, 27.5],
+          [-115.5, 32.2],
+          [-118.28, 34.05]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Guatemalan Maya → Chiapas Refugee Camps",
+        "era": 2,
+        "valid_from": 1981,
+        "valid_to": 1984,
+        "flow_type": "refugee",
+        "origin": "Ixil Triangle, El Quiché",
+        "destination": "Chiapas Camp Network, Mexico",
+        "color": "#dc2626",
+        "description": "Operation Sofia (1982–83) razed 70–90% of Ixil villages. ~200,000 Guatemalans crossed into Mexico 1981–1984; 46,000 officially registered with UNHCR in 90+ camps along the Chiapas border. First arrivals crossed at Ejido Arroyo Negro, May 1981."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-91.42, 15.40],
+          [-91.65, 15.58],
+          [-91.80, 15.82],
+          [-91.90, 16.18]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "El Salvador → Mesa Grande (Refugee Camp)",
+        "era": 2,
+        "valid_from": 1980,
+        "valid_to": 1992,
+        "flow_type": "refugee",
+        "origin": "Morazán Department, El Salvador",
+        "destination": "Mesa Grande, Honduras",
+        "color": "#dc2626",
+        "description": "Survivors of El Mozote massacre (Dec 1981) and Morazán Department violence fled north to Mesa Grande refugee camp in Santa Bárbara, Honduras, which held an estimated 30,000–40,000 Salvadorans at peak. Operated by UNHCR."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-88.12, 13.72],
+          [-88.18, 14.15],
+          [-88.22, 14.62],
+          [-88.28, 15.07]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "El Salvador → USA (Civil War Exodus)",
+        "era": 2,
+        "valid_from": 1980,
+        "valid_to": 1992,
+        "flow_type": "displacement",
+        "origin": "El Salvador",
+        "destination": "Pico-Union, Los Angeles",
+        "color": "#dc2626",
+        "description": "~1 million Salvadorans displaced by civil war — one-fifth of the 1980 population. ~500,000 reached the United States by the late 1980s, primarily to Pico-Union, Los Angeles. US asylum approval rate: 2%, as Reagan administration classified Salvadorans as economic migrants to avoid acknowledging the US-backed government's atrocities. ~187,000 registered for TPS by 1992."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-89.18, 13.69],
+          [-90.51, 14.63],
+          [-92.13, 14.69],
+          [-92.26, 14.90],
+          [-93.90, 16.24],
+          [-96.72, 17.07],
+          [-99.13, 19.43],
+          [-103.35, 20.67],
+          [-116.80, 32.50],
+          [-118.28, 34.05]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Chiapas → Guatemala (UNHCR Repatriation)",
+        "era": 3,
+        "valid_from": 1993,
+        "valid_to": 1999,
+        "flow_type": "repatriation",
+        "origin": "Chiapas Camp Network, Mexico",
+        "destination": "Ixil Triangle, Guatemala",
+        "color": "#d97706",
+        "description": "After the 1996 peace accords, UNHCR organized repatriation of ~43,000 Guatemalan refugees from Mexican camps. Many returned to the Ixil Triangle and other highland communities, though land restitution remained contested. Communities in Campeche and Quintana Roo who had achieved self-sufficiency on Mexican government land often stayed."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-91.90, 16.18],
+          [-91.80, 15.82],
+          [-91.65, 15.58],
+          [-91.42, 15.40]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "USA → Central America (Gang Deportations)",
+        "era": 3,
+        "valid_from": 1996,
+        "valid_to": 2005,
+        "flow_type": "deportation",
+        "origin": "Pico-Union, Los Angeles",
+        "destination": "El Salvador / Guatemala",
+        "color": "#d97706",
+        "description": "IIRIRA (1996) enabled mass deportation of ~31,000 convicted criminals to Central America 1996–2002, including ~12,000 to El Salvador alone. MS-13 (formed in LA among Salvadoran refugees) and Barrio 18 members leveraged their organized structure in post-war societies with no capacity to absorb them. MS-13's extortion economy in El Salvador reached an estimated $756M/year by the mid-2010s — creating the next generation of forced emigration."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-118.28, 34.05],
+          [-117.03, 32.54],
+          [-106.48, 31.76],
+          [-99.13, 19.43],
+          [-90.51, 14.63],
+          [-89.18, 13.69]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Northern Triangle → US Border (Economic & Asylum)",
+        "era": 4,
+        "valid_from": 2000,
+        "valid_to": 2014,
+        "flow_type": "economic",
+        "origin": "Guatemala / El Salvador",
+        "destination": "Rio Grande Valley, Texas",
+        "color": "#ea580c",
+        "description": "Gang violence — seeded by deportations — replaced civil war as the primary driver of asylum claims. FY2014: 51,705 unaccompanied children apprehended at the US southwest border (17,057 Guatemalan; 16,404 Salvadoran; 18,244 Honduran). Primary route: Guatemala → Tapachula → La Bestia freight trains through Mexico → Rio Grande Valley. Tapachula became a major bottleneck."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-90.51, 14.63],
+          [-92.13, 14.69],
+          [-92.26, 14.90],
+          [-93.90, 16.24],
+          [-95.50, 17.20],
+          [-99.13, 19.43],
+          [-99.50, 25.50],
+          [-98.24, 26.08]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "2018 Migrant Caravan",
+        "era": 5,
+        "valid_from": 2018,
+        "valid_to": 2018,
+        "flow_type": "caravan",
+        "origin": "San Pedro Sula, Honduras",
+        "destination": "San Ysidro / Tijuana",
+        "color": "#7c3aed",
+        "description": "Started October 12–13, 2018 in San Pedro Sula with ~160 people; grew to 7,000+ (UN estimate, Oct 21). ~20,500 crossed the Guatemala-Mexico border at Tecún Umán/Ciudad Hidalgo October 17–November 3. Caravan reached Tijuana with ~1,500 by mid-November. Nov 25: US Border Patrol used tear gas at San Ysidro. US deployed 5,200 active-duty troops to the border."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-88.03, 15.50],
+          [-89.20, 15.00],
+          [-90.51, 14.63],
+          [-92.13, 14.69],
+          [-92.26, 14.90],
+          [-93.90, 16.24],
+          [-96.72, 17.07],
+          [-99.13, 19.43],
+          [-103.35, 20.67],
+          [-107.39, 24.80],
+          [-116.80, 32.50],
+          [-117.03, 32.54]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "January 2021 Caravan",
+        "era": 5,
+        "valid_from": 2021,
+        "valid_to": 2021,
+        "flow_type": "caravan",
+        "origin": "Honduras / El Salvador",
+        "destination": "Guatemala (dispersed)",
+        "color": "#7c3aed",
+        "description": "January 13–19, 2021: 7,000–8,000 Hondurans and Salvadorans crossed into Guatemala. Driven by Hurricanes Eta/Iota damage (339,000 displaced in Guatemala; 1.5M regionally), COVID economic losses, and gang violence. Guatemalan and Mexican military dispersed the caravan near the Guatemalan-Honduran border January 19."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-88.03, 15.50],
+          [-89.10, 15.20],
+          [-89.55, 15.00],
+          [-90.00, 14.90]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Guatemala → USA (Ongoing Emigration)",
+        "era": 6,
+        "valid_from": 2022,
+        "valid_to": 2026,
+        "flow_type": "economic",
+        "origin": "Guatemala highlands",
+        "destination": "Rio Grande Valley, Texas",
+        "color": "#0891b2",
+        "description": "Guatemala remains a major emigration source despite Bukele's security transformation of El Salvador. ~$20 billion in remittances in 2023 (~20% of Guatemala's GDP) reflects the scale of the diaspora. Guatemalan-born population in the US: ~1.1–1.2 million. Title 42 ended May 11, 2023; record US border encounter numbers followed."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-91.42, 15.40],
+          [-90.51, 14.63],
+          [-92.13, 14.69],
+          [-92.26, 14.90],
+          [-93.90, 16.24],
+          [-95.50, 17.20],
+          [-99.13, 19.43],
+          [-99.50, 25.50],
+          [-98.24, 26.08]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "USA → CECOT (Trump-Bukele Deportation Deal)",
+        "era": 6,
+        "valid_from": 2025,
+        "valid_to": 2026,
+        "flow_type": "deportation",
+        "origin": "United States",
+        "destination": "CECOT, El Salvador",
+        "color": "#0891b2",
+        "description": "2025 Trump-Bukele agreement: US deportees, including those designated as gang members, held at CECOT mega-prison (capacity 40,000) in Tecoluca, El Salvador. El Salvador's homicides fell from 1,147 (2021) to near zero (2023) under the State of Exception; Salvadoran emigration to the US fell sharply post-2022. The bilateral deportation pipeline represents a new model of US migration enforcement through foreign detention."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-118.28, 34.05],
+          [-117.03, 32.54],
+          [-106.48, 31.76],
+          [-99.13, 19.43],
+          [-90.51, 14.63],
+          [-89.18, 13.69],
+          [-88.93, 13.54]
+        ]
+      }
+    }
+  ]
+}
